@@ -67,25 +67,13 @@ func HandleIntegratedAddress(discord *discordgo.Session, message *discordgo.Mess
 	// Print the entire httpResponse map
 	fmt.Println("\nhttpResponse:", httpResponse)
 
-	// Print individual fields if present
-	if result, ok := httpResponse["result"].(map[string]interface{}); ok {
-		fmt.Println("\nResult:", result)
-
-		// If "payload_rpc" field is present
-		if payloadRPC, ok := result["payload_rpc"].([]interface{}); ok {
-			for _, payloadMap := range payloadRPC {
-				if payload, ok := payloadMap.(map[string]interface{}); ok {
-					if value, ok := payload["value"].(string); ok {
-						if strings.HasPrefix(value, "You are trading") {
-							output := strings.TrimPrefix(value, "You are trading")
-							fmt.Println("Output:", output)
-							log.Printf("Echo response: " + output)
-							discord.ChannelMessageSend(message.ChannelID, "Integrated Address: "+output)
-							return
-						}
-					}
-				}
-			}
-		}
+	// Print the entire httpResponse map
+	var outputMessage string
+	for key, value := range httpResponse {
+		formattedValue, _ := json.MarshalIndent(value, "", "  ")
+		outputMessage += fmt.Sprintf("%s: %s\n", key, formattedValue)
 	}
+
+	// Send the entire response to Discord
+	discord.ChannelMessageSend(message.ChannelID, "Integrated Address Response:\n```\n"+outputMessage+"```")
 }
