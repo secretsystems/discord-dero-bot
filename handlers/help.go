@@ -9,6 +9,7 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	helpMessage += "```We share our knowledge, insights and relationships we earned from our research and development using DERO.```\n"
 	helpMessage += "Available Commands:\n\n"
 	helpMessage += "`!commands` List:\n\n"
+	helpMessage += "**For privacy, you can dm the bot.**\n\n"
 	helpMessage += "Server:\n"
 	helpMessage += "```!help```"
 	// helpMessage += "Produces this help message\n"
