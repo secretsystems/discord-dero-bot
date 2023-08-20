@@ -8,15 +8,16 @@ import (
 )
 
 var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate){
-	// "!compliment": handlers.HandleCompliment,
-	// "!insult":     handlers.HandleInsult,
-	"!decode":  handlers.HandleIntegratedAddress,
-	"!lookup":  handlers.HandleWalletName,
-	"!derod":   handlers.HandleGetInfoDerod,
-	"!monerod": handlers.HandleGetInfoMonerod,
-	"!quote":   handlers.HandleQuoteRequest,
-	"!markets": handlers.HandleMarketsRequest,
-	"!help":    handlers.HandleHelp,
+	"!compliment": handlers.HandleCompliment,
+	"!insult":     handlers.HandleInsult,
+	"!decode":     handlers.HandleIntegratedAddress,
+	"!lookup":     handlers.HandleWalletName,
+	"!derod":      handlers.HandleGetInfoDerod,
+	"!monerod":    handlers.HandleGetInfoMonerod,
+	"!quote":      handlers.HandleQuoteRequest,
+	"!markets":    handlers.HandleMarketsRequest,
+	"!help":       handlers.HandleHelp,
+	// "!membership"  handlers.HandleMembership
 }
 
 type Bot struct {
