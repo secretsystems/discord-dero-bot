@@ -7,6 +7,18 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate){
+	// "!compliment": handlers.HandleCompliment,
+	// "!insult":     handlers.HandleInsult,
+	"!decode":  handlers.HandleIntegratedAddress,
+	"!lookup":  handlers.HandleWalletName,
+	"!derod":   handlers.HandleGetInfoDerod,
+	"!monerod": handlers.HandleGetInfoMonerod,
+	"!quote":   handlers.HandleQuoteRequest,
+	"!markets": handlers.HandleMarketsRequest,
+	"!help":    handlers.HandleHelp,
+}
+
 type Bot struct {
 	discord *discordgo.Session
 }
@@ -38,12 +50,10 @@ func (bot *Bot) newMessage(discord *discordgo.Session, message *discordgo.Messag
 		return
 	}
 
-	switch {
-	case strings.Contains(message.Content, "!compliment"):
-		bot.discord.ChannelMessageSend(message.ChannelID, "You are a wonderful human!")
-	case strings.Contains(message.Content, "!insult"):
-		bot.discord.ChannelMessageSend(message.ChannelID, "We don't say that stuff around here!")
-	case strings.Contains(message.Content, "!decode"):
-		handlers.HandleIntegratedAddress(bot.discord, message)
+	for command, handler := range CommandHandlers {
+		if strings.Contains(message.Content, command) {
+			handler(discord, message)
+			return
+		}
 	}
 }

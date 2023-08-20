@@ -1,4 +1,4 @@
-// handlers/echo_handler.go
+// handlers/integrated_address.go
 
 package handlers
 
@@ -41,9 +41,7 @@ func HandleIntegratedAddress(discord *discordgo.Session, message *discordgo.Mess
 
 	// Set Basic Authentication
 	request.SetBasicAuth("user", "pass")
-
 	request.Header.Set("Content-type", "application/json")
-
 	fmt.Println("\nRequest: ", request)
 
 	client := http.DefaultClient
@@ -55,21 +53,21 @@ func HandleIntegratedAddress(discord *discordgo.Session, message *discordgo.Mess
 	defer response.Body.Close()
 
 	responseBody, _ := io.ReadAll(response.Body)
-	fmt.Println("\nResponse Body:", string(responseBody))
+	log.Printf("Response Body: %v", string(responseBody))
 
-	var httpResponse map[string]interface{}
-	err = json.Unmarshal(responseBody, &httpResponse)
+	var mapResponse map[string]interface{}
+	err = json.Unmarshal(responseBody, &mapResponse)
 	if err != nil {
 		log.Printf("Error decoding response JSON: %v", err)
 		return
 	}
 
-	// Print the entire httpResponse map
-	fmt.Println("\nhttpResponse:", httpResponse)
+	// Print the entire mapResponse map
+	fmt.Println("\nmapResponse:", mapResponse)
 
-	// Print the entire httpResponse map
+	// Print the entire mapResponse map
 	var outputMessage string
-	for key, value := range httpResponse {
+	for key, value := range mapResponse {
 		formattedValue, _ := json.MarshalIndent(value, "", "  ")
 		outputMessage += fmt.Sprintf("%s: %s\n", key, formattedValue)
 	}
