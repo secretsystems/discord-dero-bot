@@ -7,7 +7,8 @@ import (
 	"os/signal"
 
 	"fuck_you.com/bot" // Import your bot package
-	// Import your utilities package
+	"fuck_you.com/utils"
+
 	"github.com/joho/godotenv" // Import the godotenv package
 )
 
@@ -44,26 +45,29 @@ func main() {
 	signal.Notify(channel, os.Interrupt)
 
 	// Start the transfers fetching routine
-	// go runTransfersFetching()
+	go FetchAndPrintTransfers()
 
 	// Wait for an interrupt signal to close the program
 	<-channel
 }
 
-// func runTransfersFetching() {
-// 	// Fetch Dero transfers in a loop
-// 	for {
-// 		// Fetch transfers data using the utils package
-// 		transfersData, err := utils.FetchDeroTransfers()
-// 		if err != nil {
-// 			log.Printf("Error fetching Dero transfers: %v", err)
-// 		} else {
-// 			// Format the JSON data for pretty printing
-// 			prettyJSON := utils.FormatJSON(transfersData)
-// 			// fmt.Println(prettyJSON)
-// 		}
+func FetchAndPrintTransfers() {
+	// Call the FetchDeroTransfers function to obtain the JSON response
+	responseBody, err := utils.FetchDeroTransfers()
+	if err != nil {
+		log.Fatalf("Error fetching transfers: %v", err)
+	}
 
-// 		// Sleep for a while before fetching transfers again
-// 		time.Sleep(18 * time.Second) // Adjust the sleep duration as needed
-// 	}
-// }
+	log.Printf("Raw response: %s", responseBody) // Print raw response for debugging
+
+	// Parse the JSON response and extract the "height" values
+	entries, err := utils.ParseTransfersResponse(responseBody)
+	if err != nil {
+		log.Fatalf("Error parsing transfers response: %v", err)
+	}
+
+	// Print the "height" values
+	for _, entry := range entries {
+		fmt.Printf("Height: %d\n", entry.Height)
+	}
+}

@@ -8,8 +8,8 @@ import (
 )
 
 var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate){
-	"!compliment": handlers.HandleCompliment,
-	"!insult":     handlers.HandleInsult,
+	"!compliment": handlers.HandleMessage,
+	"!insult":     handlers.HandleMessage,
 	"!decode":     handlers.HandleIntegratedAddress,
 	"!lookup":     handlers.HandleWalletName,
 	"!derod":      handlers.HandleGetInfoDerod,

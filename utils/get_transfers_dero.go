@@ -1,4 +1,5 @@
-// utils/gettransfers_dero.go
+// utils/get_transfers_dero.go
+
 package utils
 
 import (
@@ -8,6 +9,8 @@ import (
 	"io"
 	"net/http"
 )
+
+// Rest of your FetchDeroTransfers function and other code ...
 
 func FetchDeroTransfers() ([]byte, error) {
 	url := "http://192.168.12.208:10103/json_rpc"
@@ -24,12 +27,12 @@ func FetchDeroTransfers() ([]byte, error) {
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error marshaling JSON: %v", err)
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error creating request: %v", err)
 	}
 
 	req.SetBasicAuth("user", "pass")
@@ -38,24 +41,14 @@ func FetchDeroTransfers() ([]byte, error) {
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error sending request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
 
 	return body, nil
-}
-
-func FormatJSON(jsonData []byte) string {
-	var prettyJSON bytes.Buffer
-	err := json.Indent(&prettyJSON, jsonData, "", "  ")
-	if err != nil {
-		fmt.Println("Error formatting JSON:", err)
-		return ""
-	}
-	return prettyJSON.String()
 }
