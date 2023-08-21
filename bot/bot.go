@@ -19,6 +19,7 @@ var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCrea
 	"!help":       handlers.HandleHelp,
 	"!bot":        handlers.HandleChat,
 	"!tip":        handlers.HandleTip,
+	"!register":   handlers.HandleRegister,
 	// "!membership"  handlers.HandleMembership
 }
 

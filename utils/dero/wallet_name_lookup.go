@@ -62,8 +62,10 @@ func WalletNameToAddress(walletName string) string {
 			return ""
 		}
 
-		if addr, ok := mapResponse["result"].(map[string]interface{})["address"].(string); ok {
-			return addr
+		if result, ok := mapResponse["result"].(map[string]interface{}); ok {
+			if addr, addrOk := result["address"].(string); addrOk {
+				return addr
+			}
 		}
 	}
 

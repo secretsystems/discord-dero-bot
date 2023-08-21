@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"strings"
 
 	"fuck_you.com/utils/dero" // Import the dero package from your project
@@ -13,8 +14,19 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	if strings.HasPrefix(content, "!tip ") {
 		// Extract the address or wallet name from the content
 		input := strings.TrimPrefix(content, "!tip ")
+		fmt.Println(input)
 
-		if len(input) == 66 && strings.HasPrefix(input, "dero") {
+		// Check if the user input is in the userMappings
+		userID := message.Author.ID
+		userMappingsMutex.Lock()
+		mappedAddress, exists := userMappings[userID]
+		userMappingsMutex.Unlock()
+
+		if exists {
+			// Use the mapped address for the tip
+			dero.MakeTransfer(mappedAddress)
+			discord.ChannelMessageSend(message.ChannelID, "Tip sent!")
+		} else if len(input) == 66 && strings.HasPrefix(input, "dero") {
 			// If input is a valid DERO address, use it directly for transfer
 			dero.MakeTransfer(input)
 			discord.ChannelMessageSend(message.ChannelID, "Tip sent!")
