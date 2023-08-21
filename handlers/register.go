@@ -66,9 +66,23 @@ func HandleRegister(discord *discordgo.Session, message *discordgo.MessageCreate
 		userMappingsMutex.Lock()
 		defer userMappingsMutex.Unlock()
 
+		// Check if the user is already registered
+		if existingInput, exists := userMappings[username]; exists {
+			discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> is already registered with wallet input: `%s`", username, existingInput))
+			return
+		}
+
+		// Check if the wallet input is already registered
+		for _, existingInput := range userMappings {
+			if existingInput == input {
+				discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("Wallet input `%s` is already registered.", input))
+				return
+			}
+		}
+
 		userMappings[username] = input
 		saveUserMappings()
 
-		discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("User %s registered with input: %s", username, input))
+		discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> registered wallet with input: `%s`", username, input))
 	}
 }

@@ -10,6 +10,11 @@ import (
 	"os"
 )
 
+type WalletInfo struct {
+	Address      string
+	IsRegistered bool
+}
+
 func WalletNameToAddress(walletName string) string {
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
@@ -62,8 +67,10 @@ func WalletNameToAddress(walletName string) string {
 			return ""
 		}
 
-		if result, ok := mapResponse["result"].(map[string]interface{}); ok {
-			if addr, addrOk := result["address"].(string); addrOk {
+		result, resultExists := mapResponse["result"].(map[string]interface{})
+		if resultExists {
+			addr, addrExists := result["address"].(string)
+			if addrExists {
 				return addr
 			}
 		}
