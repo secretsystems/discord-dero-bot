@@ -9,7 +9,7 @@ import (
 )
 
 func handleDEROFunctionality() {
-	fmt.Printf("Initializing DERO")
+	fmt.Printf("Initializing DERO\n")
 	// Call FetchAndParseTransfers function from the utils package
 	transferEntries, err := dero.FetchAndParseTransfers()
 	if err != nil {

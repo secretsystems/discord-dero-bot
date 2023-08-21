@@ -55,7 +55,7 @@ func (bot *Bot) newMessage(discord *discordgo.Session, message *discordgo.Messag
 		return
 	}
 	for command, handler := range CommandHandlers {
-		if strings.Contains(message.Content, command) {
+		if strings.HasPrefix(message.Content, command) {
 			handler(discord, message)
 			return
 		}
