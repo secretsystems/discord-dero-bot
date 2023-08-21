@@ -33,7 +33,7 @@ func HandleQuoteRequest(discord *discordgo.Session, message *discordgo.MessageCr
 	}
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Printf("Response Body: %v", string(responseBody))
+	// log.Printf("Response Body: %v", string(responseBody))
 
 	var mapResponse map[string]interface{}
 	err = json.Unmarshal(responseBody, &mapResponse)
@@ -43,7 +43,7 @@ func HandleQuoteRequest(discord *discordgo.Session, message *discordgo.MessageCr
 	}
 
 	// Print the entire mapResponse map
-	fmt.Println("\nmapResponse:", mapResponse)
+	// fmt.Println("\nmapResponse:", mapResponse)
 
 	var outputMessage string
 	for key, value := range mapResponse {

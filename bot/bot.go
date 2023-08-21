@@ -17,6 +17,7 @@ var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCrea
 	"!quote":      handlers.HandleQuoteRequest,
 	"!markets":    handlers.HandleMarketsRequest,
 	"!help":       handlers.HandleHelp,
+	"!bot":        handlers.HandleChat,
 	// "!tip":        handlers.HandleTip,
 	// "!membership"  handlers.HandleMembership
 }
@@ -25,8 +26,8 @@ type Bot struct {
 	discord *discordgo.Session
 }
 
-func NewBot(token string) (*Bot, error) {
-	discord, err := discordgo.New("Bot " + token)
+func NewBot(BotToken string) (*Bot, error) {
+	discord, err := discordgo.New("Bot " + BotToken)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +52,6 @@ func (bot *Bot) newMessage(discord *discordgo.Session, message *discordgo.Messag
 	if message.Author.ID == discord.State.User.ID {
 		return
 	}
-
 	for command, handler := range CommandHandlers {
 		if strings.Contains(message.Content, command) {
 			handler(discord, message)

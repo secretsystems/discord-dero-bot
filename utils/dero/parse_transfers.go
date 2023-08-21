@@ -1,5 +1,5 @@
 // utils/dero/parse_transfers.go
-package utils
+package dero
 
 import (
 	"encoding/json"

@@ -12,6 +12,7 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	helpMessage += "**For privacy, you can dm the bot.**\n\n"
 	helpMessage += "Server:\n"
 	helpMessage += "```!help```"
+	helpMessage += "```!bot <insert query for botGPT>```"
 	// helpMessage += "Produces this help message\n"
 	helpMessage += "\n"
 	helpMessage += "DERO Wallet:\n"
