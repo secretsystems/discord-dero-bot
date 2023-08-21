@@ -7,13 +7,12 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func HandleGetInfoDerod(discord *discordgo.Session, message *discordgo.MessageCreate) {
-	// trim userInput for processing
-
 	// Define JSON struct
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
@@ -27,47 +26,67 @@ func HandleGetInfoDerod(discord *discordgo.Session, message *discordgo.MessageCr
 		return
 	}
 
+	// Retrieve IP address, wallet port, and node port from environment variables
+	ip := os.Getenv("DERO_SERVER_IP")
+	derodPort := os.Getenv("DERO_NODE_PORT")
+
+	// Construct the URL using the retrieved IP address and wallet port
+	url := fmt.Sprintf("http://%s:%s/json_rpc", ip, derodPort)
+
 	// Define request for node
-	request, err := http.NewRequest("POST", "http://192.168.12.208:10102/json_rpc", bytes.NewBuffer(jsonData))
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Printf("Error marchaling JSNON: %v", err)
+		log.Printf("Error creating request: %v", err)
 		return
 	}
 
-	// Define request authentication for node
-	request.SetBasicAuth("user", "pass")
-	request.Header.Set("content-type", "application/json")
+	// Retrieve authentication credentials from environment variables
+	username := os.Getenv("USER")
+	password := os.Getenv("PASS")
+
+	// Set basic authentication for the request
+	request.SetBasicAuth(username, password)
+	request.Header.Set("Content-Type", "application/json")
+
 	fmt.Println("\nRequest: ", request)
 	client := http.DefaultClient
+
+	// Read response body
 	response, err := client.Do(request)
 	if err != nil {
 		log.Printf("Error sending HTTP Post request: %v", err)
 		return
 	}
-
-	// close out authenticated response
 	defer response.Body.Close()
+
+	// Check if the response status code indicates authorization required
+	if response.StatusCode == http.StatusUnauthorized {
+		log.Printf("Authorization required for the request")
+		return
+	}
 
 	responseBody, _ := io.ReadAll(response.Body)
 	log.Printf("Response Body: %v", string(responseBody))
 
-	var mapResponse map[string]interface{}
-	err = json.Unmarshal(responseBody, &mapResponse)
-	if err != nil {
-		log.Printf("Error decoding resopnse JSON: %v", err)
-		return
+	// Check if the response body is not empty
+	if len(responseBody) > 0 {
+		var mapResponse map[string]interface{}
+		err = json.Unmarshal(responseBody, &mapResponse)
+		if err != nil {
+			log.Printf("Error decoding response JSON: %v", err)
+			return
+		}
+
+		// Format response for printing
+		var outputMessage string
+		for key, value := range mapResponse {
+			formattedValue, _ := json.MarshalIndent(value, "", " ")
+			outputMessage += fmt.Sprintf("%s: %s\n", key, formattedValue)
+		}
+
+		// Send the entire response to Discord
+		discord.ChannelMessageSend(message.ChannelID, "Node Info:\n```\n"+outputMessage+"```")
+	} else {
+		log.Printf("Empty response body")
 	}
-
-	// Print the entire httpResponse map
-	log.Printf("\nResponse Body: %v", string(responseBody))
-
-	var outputMessage string
-	for key, value := range mapResponse {
-		formattedValue, _ := json.MarshalIndent(value, "", " ")
-		outputMessage += fmt.Sprintf("%s: %s\n", key, formattedValue)
-	}
-
-	// Send the entire response to Discord
-	discord.ChannelMessageSend(message.ChannelID, "Node Info:\n```\n"+outputMessage+"```")
-
 }

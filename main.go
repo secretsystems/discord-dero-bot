@@ -7,24 +7,75 @@ import (
 	"os/signal"
 
 	"fuck_you.com/bot" // Import your bot package
-	"fuck_you.com/utils"
 
 	"github.com/joho/godotenv" // Import the godotenv package
 )
 
 var (
-	BotToken string
+	BotToken         string
+	GuildID          string
+	AppID            string
+	DeroServerIP     string
+	DeroWalletPort   string
+	DeroUser         string
+	DeroPass         string
+	PongAmount       = "1337331"
+	PongDir          string
+	PongDB           string
+	IAddressTextFile string
+	DeroNodePort     string
 )
 
-func main() {
+func init() {
 	// Load environment variables from .env file
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
+	// Read environment variables
+	BotToken = os.Getenv("BOT_TOKEN")
+	GuildID = os.Getenv("GUILD_ID")
+	AppID = os.Getenv("APP_ID")
+	DeroServerIP = os.Getenv("DERO_SERVER_IP")
+	DeroWalletPort = os.Getenv("DERO_WALLET_PORT")
+	DeroUser = os.Getenv("USER")
+	DeroPass = os.Getenv("PASS")
+	homeDir, _ := os.UserHomeDir()
+	PongDir = homeDir + "/dero-utils"
+	PongDB = PongDir + "/" + PongAmount + ".sales.db"
+	IAddressTextFile = PongDir + "/" + PongAmount + ".iaddress.txt"
+	DeroNodePort = os.Getenv("DERO_NODE_PORT")
+
+	// Ensure the directory exists
+	if _, err := os.Stat(PongDir); os.IsNotExist(err) {
+		err := os.Mkdir(PongDir, 0755)
+		if err != nil {
+			log.Fatalf("Error creating directory: %v", err)
+		}
+	}
+}
+
+func printInit() {
+	fmt.Println("Initialized variables:")
+	fmt.Printf("BotToken: %s\n", BotToken)
+	fmt.Printf("GuildID: %s\n", GuildID)
+	fmt.Printf("AppID: %s\n", AppID)
+	fmt.Printf("DeroServerIP: %s\n", DeroServerIP)
+	fmt.Printf("DeroWalletPort: %s\n", DeroWalletPort)
+	fmt.Printf("DeroNodePort: %s\n", DeroNodePort)
+	fmt.Printf("DeroUser: %s\n", DeroUser)
+	fmt.Printf("DeroPass: %s\n", DeroPass)
+	fmt.Printf("PongDir: %s\n", PongDir)
+	fmt.Printf("PongDB: %s\n", PongDB)
+	fmt.Printf("IAddressTextFile: %s\n", IAddressTextFile)
+}
+
+func main() {
+	printInit()
+
 	// Create a new bot instance using the provided token
-	bot, err := bot.NewBot(os.Getenv("BOT_TOKEN"))
+	bot, err := bot.NewBot(BotToken)
 	if err != nil {
 		log.Fatalf("Error creating bot: %v", err)
 	}
@@ -44,30 +95,6 @@ func main() {
 	channel := make(chan os.Signal, 1)
 	signal.Notify(channel, os.Interrupt)
 
-	// Start the transfers fetching routine
-	go FetchAndPrintTransfers()
-
 	// Wait for an interrupt signal to close the program
 	<-channel
-}
-
-func FetchAndPrintTransfers() {
-	// Call the FetchDeroTransfers function to obtain the JSON response
-	responseBody, err := utils.FetchDeroTransfers()
-	if err != nil {
-		log.Fatalf("Error fetching transfers: %v", err)
-	}
-
-	log.Printf("Raw response: %s", responseBody) // Print raw response for debugging
-
-	// Parse the JSON response and extract the "height" values
-	entries, err := utils.ParseTransfersResponse(responseBody)
-	if err != nil {
-		log.Fatalf("Error parsing transfers response: %v", err)
-	}
-
-	// Print the "height" values
-	for _, entry := range entries {
-		fmt.Printf("Height: %d\n", entry.Height)
-	}
 }

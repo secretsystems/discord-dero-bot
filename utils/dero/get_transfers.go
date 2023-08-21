@@ -1,5 +1,3 @@
-// utils/get_transfers_dero.go
-
 package utils
 
 import (
@@ -8,12 +6,16 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 // Rest of your FetchDeroTransfers function and other code ...
 
 func FetchDeroTransfers() ([]byte, error) {
-	url := "http://192.168.12.208:10103/json_rpc"
+	serverIP := os.Getenv("DERO_SERVER_IP")
+	serverPort := os.Getenv("DERO_WALLET_PORT")
+	url := fmt.Sprintf("http://%s:%s/json_rpc", serverIP, serverPort)
+
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "1",
@@ -35,7 +37,7 @@ func FetchDeroTransfers() ([]byte, error) {
 		return nil, fmt.Errorf("error creating request: %v", err)
 	}
 
-	req.SetBasicAuth("user", "pass")
+	req.SetBasicAuth(os.Getenv("USER"), os.Getenv("PASS")) // Use values from .env
 	req.Header.Set("Content-type", "application/json")
 
 	client := http.DefaultClient
