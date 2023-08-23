@@ -1,6 +1,9 @@
 package dero
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 func FetchAndParseTransfers() ([]TransferEntry, error) {
 	// Call the FetchDeroTransfers function to obtain the JSON response
@@ -11,7 +14,7 @@ func FetchAndParseTransfers() ([]TransferEntry, error) {
 	}
 
 	// Parse the JSON response and extract the "height" values
-	fmt.Println("Parsing transfers response...")
+	log.Println("Parsing transfers response...")
 	entries, err := ParseTransfersResponse(responseBody)
 	if err != nil {
 		fmt.Printf("Error parsing transfers response: %v\n", err)

@@ -33,7 +33,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		if len(mentionedUserIDs) == 2 {
 			// A user was mentioned, look up their registered wallet address
 			mentionedUserID := mentionedUserIDs[1]
-			fmt.Println("Mentioned User ID: %s", mentionedUserID)
+			// fmt.Println("Mentioned User ID: %s", mentionedUserID)
 
 			userMappingsMutex.Lock()
 			mappedAddress, exists = userMappings[mentionedUserID]
@@ -43,7 +43,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 				input = mappedAddress
 			} else {
 				userMention := "<@" + mentionedUserIDs[1] + ">"
-				discord.ChannelMessageSend(message.ChannelID, "Mentioned user "+userMention+" not found. Please consider using `!register <wallet addr or wallet name>`")
+				discord.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `!register <wallet addr or wallet name>`")
 				return
 			}
 		}

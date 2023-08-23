@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -34,7 +33,7 @@ func main() {
 	handleDEROFunctionality()
 	initChatGPT()
 
-	fmt.Println("Bot is running. Press Ctrl+C to stop.")
+	log.Println("Bot is running. Press Ctrl+C to stop.")
 
 	// Set up a channel to capture the Ctrl+C signal
 	channel := make(chan os.Signal, 1)

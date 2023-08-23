@@ -1,9 +1,7 @@
 // chatgpt.go
 package main
 
-import (
-	"fmt"
-)
+import "log"
 
 func initChatGPT() {
 	printChatGPTInit()
@@ -13,5 +11,5 @@ func initChatGPT() {
 func printChatGPTInit() {
 	// fmt.Println("Initializing ChatGPT variables:")
 	// fmt.Printf("ChatGptApi: %s\n", ChatGptApi)
-	fmt.Println("ChatGPT variables initialized.")
+	log.Println("ChatGPT variables initialized.")
 }

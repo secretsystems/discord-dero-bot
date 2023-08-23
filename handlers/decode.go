@@ -17,7 +17,7 @@ import (
 
 func HandleIntegratedAddress(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
-	fmt.Println("CONTENT: %s", content)
+	// fmt.Printf("CONTENT: %s", content)
 	if content == "!decode" {
 		discord.ChannelMessageSend(message.ChannelID, "To decode an integrated address: `!decode <integrated_address>`")
 		return

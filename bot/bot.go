@@ -65,12 +65,12 @@ func (bot *Bot) AddHandler(handler interface{}) func() {
 func (bot *Bot) OnGeneric(s *discordgo.Session, event interface{}) {
 	t := reflect.TypeOf(event)
 
-	log.Printf("GENERIC EVENT, %v\n", t)
+	log.Printf("GENERIC EVENT: %v\n", t)
 	switch cast := event.(type) {
 	case *discordgo.TypingStart:
-		log.Printf("User %v is typing on channel %v\n", cast.UserID, cast.ChannelID)
+		log.Printf("TYPING EVENT: User %v is typing on channel %v\n", cast.UserID, cast.ChannelID)
 	case *discordgo.MessageCreate:
-		log.Printf("Someone Just created a Fucking Message!!! %v | %v", cast.Author, cast.Content)
+		log.Printf("MESSAGE EVENT: %v | %v", cast.Author, cast.Content)
 	}
 }
 
