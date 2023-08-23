@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"log"
+	"reflect"
 	"strings"
 
 	"fuck_you.com/handlers"
@@ -38,8 +40,9 @@ func NewBot(BotToken string) (*Bot, error) {
 		DiscordSession: discord, // Store the session in the Bot instance
 	}
 
-	discord.AddHandler(bot.NewMessage)
-	discord.AddHandler(bot.OnReady) // Add this line to register the onReady handler
+	bot.AddHandler(bot.NewMessage)
+	bot.AddHandler(bot.OnReady) // Add this line to register the onReady handler
+	bot.AddHandler(bot.OnGeneric)
 	return bot, nil
 }
 
@@ -53,6 +56,15 @@ func (bot *Bot) Close() {
 
 func (bot *Bot) GetDiscordSession() *discordgo.Session {
 	return bot.DiscordSession
+}
+
+func (bot *Bot) AddHandler(handler interface{}) func() {
+	return bot.DiscordSession.AddHandler(handler)
+}
+
+func (bot *Bot) OnGeneric(s *discordgo.Session, event interface{}) {
+	t := reflect.TypeOf(event)
+	log.Printf("GENERIC EVENT, %v\n", t)
 }
 
 func (bot *Bot) OnReady(discord *discordgo.Session, ready *discordgo.Ready) {
