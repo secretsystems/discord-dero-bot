@@ -37,7 +37,7 @@ func HandleGetInfoMonerod(discord *discordgo.Session, message *discordgo.Message
 	// Define request authentication for node
 	request.SetBasicAuth("user", "pass")
 	request.Header.Set("content-type", "application/json")
-	fmt.Println("\nRequest: ", request)
+	// fmt.Println("\nRequest: ", request)
 	client := http.DefaultClient
 	response, err := client.Do(request)
 	if err != nil {
@@ -49,7 +49,7 @@ func HandleGetInfoMonerod(discord *discordgo.Session, message *discordgo.Message
 	defer response.Body.Close()
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Printf("Response Body: %v", string(responseBody))
+	// log.Printf("Response Body: %v", string(responseBody))
 
 	var mapResponse map[string]interface{}
 	err = json.Unmarshal(responseBody, &mapResponse)
@@ -59,7 +59,7 @@ func HandleGetInfoMonerod(discord *discordgo.Session, message *discordgo.Message
 	}
 
 	// Print the entire httpResponse map
-	log.Printf("\nResponse Body: %v", string(responseBody))
+	// log.Printf("\nResponse Body: %v", string(responseBody))
 
 	var outputMessage string
 	for key, value := range mapResponse {

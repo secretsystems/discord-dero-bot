@@ -5,16 +5,31 @@ import (
 	"log"
 	"os"
 	"os/signal"
+
+	"fuck_you.com/bot"      // Update with the correct import path for your bot package
+	"fuck_you.com/handlers" // Update with the correct import path for your handlers package
 )
 
 func main() {
 	loadConfig()
 
-	bot, err := initDiscordBot(BotToken)
+	// Initialize the bot
+	botInstance, err := bot.NewBot(BotToken) // Replace with the actual initialization function
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
-	defer bot.Close()
+
+	err = botInstance.Open()
+	if err != nil {
+		log.Fatalf("Error opening Discord bot connection: %v", err)
+	}
+	defer botInstance.Close()
+
+	// Get the Discord session from the bot instance
+	discordSession := botInstance.GetDiscordSession()
+
+	// Register interaction handlers
+	handlers.RegisterInteractionHandlersFromHandlers(discordSession, AppID, GuildID)
 
 	handleDEROFunctionality()
 	initChatGPT()

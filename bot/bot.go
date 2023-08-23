@@ -25,7 +25,7 @@ var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCrea
 }
 
 type Bot struct {
-	discord *discordgo.Session
+	DiscordSession *discordgo.Session // Exported field for accessing the Discord session
 }
 
 func NewBot(BotToken string) (*Bot, error) {
@@ -35,28 +35,37 @@ func NewBot(BotToken string) (*Bot, error) {
 	}
 
 	bot := &Bot{
-		discord: discord,
+		DiscordSession: discord, // Store the session in the Bot instance
 	}
 
-	discord.AddHandler(bot.newMessage)
+	discord.AddHandler(bot.NewMessage)
+	discord.AddHandler(bot.OnReady) // Add this line to register the onReady handler
 	return bot, nil
 }
 
 func (bot *Bot) Open() error {
-	return bot.discord.Open()
+	return bot.DiscordSession.Open()
 }
 
 func (bot *Bot) Close() {
-	bot.discord.Close()
+	bot.DiscordSession.Close()
 }
 
-func (bot *Bot) newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
-	if message.Author.ID == discord.State.User.ID {
+func (bot *Bot) GetDiscordSession() *discordgo.Session {
+	return bot.DiscordSession
+}
+
+func (bot *Bot) OnReady(discord *discordgo.Session, ready *discordgo.Ready) {
+
+}
+
+func (bot *Bot) NewMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
+	if message.Author.ID == bot.DiscordSession.State.User.ID {
 		return
 	}
 	for command, handler := range CommandHandlers {
 		if strings.HasPrefix(message.Content, command) {
-			handler(discord, message)
+			handler(bot.DiscordSession, message)
 			return
 		}
 	}

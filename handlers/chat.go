@@ -3,7 +3,6 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -29,7 +28,7 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 	userInput := strings.TrimPrefix(message.Content, "!bot ")
-	fmt.Printf(userInput)
+	// fmt.Printf(userInput)
 	// Prepare the request payload
 	payload := struct {
 		Model    string `json:"model"`
@@ -72,7 +71,7 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		log.Printf("Error creating HTTP request: %v", err)
 		return
 	}
-	fmt.Printf("requst: %v\n", req)
+	// fmt.Printf("requst: %v\n", req)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+apiToken)
 
@@ -91,7 +90,7 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	fmt.Printf("Response Body: %s\n", respBody)
+	// fmt.Printf("Response Body: %s\n", respBody)
 
 	var chatResponse struct {
 		ID      string `json:"id"`

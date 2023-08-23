@@ -59,6 +59,12 @@ func saveUserMappings() {
 func HandleRegister(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
 
+	if content == "!register" {
+		// Send help message about how to use the command
+		discord.ChannelMessageSend(message.ChannelID, "To register, use the format: `!register <wallet_address or wallet_name>`")
+		return
+	}
+
 	if strings.HasPrefix(content, "!register ") {
 		input := strings.TrimPrefix(content, "!register ")
 		username := message.Author.ID

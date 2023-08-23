@@ -48,7 +48,7 @@ func HandleGetInfoDerod(discord *discordgo.Session, message *discordgo.MessageCr
 	request.SetBasicAuth(username, password)
 	request.Header.Set("Content-Type", "application/json")
 
-	fmt.Println("\nRequest: ", request)
+	// fmt.Println("\nRequest: ", request)
 	client := http.DefaultClient
 
 	// Read response body
@@ -66,7 +66,7 @@ func HandleGetInfoDerod(discord *discordgo.Session, message *discordgo.MessageCr
 	}
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Printf("Response Body: %v", string(responseBody))
+	// log.Printf("Response Body: %v", string(responseBody))
 
 	// Check if the response body is not empty
 	if len(responseBody) > 0 {

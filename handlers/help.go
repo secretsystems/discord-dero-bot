@@ -10,7 +10,7 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	helpCommand := strings.TrimPrefix(message.Content, "!help ")
 
 	switch helpCommand {
-	case "!me":
+	case "list":
 		// Send the general help message with a list of available commands
 		helpMsg := "# Welcome to the Secret Discord Server!\n"
 		helpMsg += "```We share our knowledge, insights and relationships we earned from our research and development using DERO.```\n"
@@ -31,32 +31,37 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		discord.ChannelMessageSend(message.ChannelID, helpMsg)
 	case "!bot":
 		// Send a breakdown of the bot command and its usage
-		botHelpMsg := "Usage: !bot <query>\n" +
+		botHelpMsg := "Usage: `!bot <query>`\n" +
 			"Get information from the bot based on your query."
 		discord.ChannelMessageSend(message.ChannelID, botHelpMsg)
 	case "!register":
 		// Send a breakdown of the register command and its usage
-		registerHelpMsg := "Usage: !register <wallet address or wallet-name>\n" +
+		registerHelpMsg := "Usage: `!register <wallet address or wallet-name>`\n" +
 			"Register your wallet address or wallet name for tipping."
 		discord.ChannelMessageSend(message.ChannelID, registerHelpMsg)
+	case "!unregister":
+		// Send a breakdown of the register command and its usage
+		unregisterHelpMsg := "Usage: `!unregister`\n" +
+			"Unregister your wallet address or wallet name for tipping."
+		discord.ChannelMessageSend(message.ChannelID, unregisterHelpMsg)
 	case "!lookup":
 		// Send a breakdown of the lookup command and its usage
-		lookupHelpMsg := "Usage: !lookup <@username or wallet name>\n" +
+		lookupHelpMsg := "Usage: `!lookup <@username or wallet name>`\n" +
 			"Look up the DERO address associated with a username or wallet name."
 		discord.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
 	case "!tip":
 		// Send a breakdown of the tip command and its usage
-		tipHelpMsg := "Usage: !tip <@username, dero1q, or wallet-name>\n" +
+		tipHelpMsg := "Usage: `!tip <@username, dero1q, or wallet-name>`\n" +
 			"Send a tip to the specified user or DERO address."
 		discord.ChannelMessageSend(message.ChannelID, tipHelpMsg)
 	case "!derod":
 		// Send a breakdown of the derod command and its usage
-		derodHelpMsg := "Usage: !derod\n" +
+		derodHelpMsg := "Usage: `!derod`\n" +
 			"Get the current status of the DERO Network."
 		discord.ChannelMessageSend(message.ChannelID, derodHelpMsg)
 	case "!monerod":
 		// Send a breakdown of the monerod command and its usage
-		monerodHelpMsg := "Usage: !monerod\n" +
+		monerodHelpMsg := "Usage: `!monerod`\n" +
 			"Get the current status of the Monero Network."
 		discord.ChannelMessageSend(message.ChannelID, monerodHelpMsg)
 	case "!markets":
@@ -66,11 +71,11 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		discord.ChannelMessageSend(message.ChannelID, marketsHelpMsg)
 	case "!quote":
 		// Send a breakdown of the quote command and its usage
-		quoteHelpMsg := "Usage: !quote <insert base-pair>\n" +
+		quoteHelpMsg := "Usage: `!quote <insert base-pair>`\n" +
 			"Get the current quote of a pair provided by Trade Ogre."
 		discord.ChannelMessageSend(message.ChannelID, quoteHelpMsg)
 	default:
 		// Send a message indicating the help command is not recognized
-		discord.ChannelMessageSend(message.ChannelID, "You have activated the !help menu. Use `!help !me` to see available commands.")
+		discord.ChannelMessageSend(message.ChannelID, "You have activated the !help menu. Use `!help list` to see available commands.")
 	}
 }

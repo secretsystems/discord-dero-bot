@@ -31,7 +31,7 @@ func HandleMarketsRequest(discord *discordgo.Session, message *discordgo.Message
 	defer response.Body.Close()
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Printf("Response Body: %v", string(responseBody))
+	// log.Printf("Response Body: %v", string(responseBody))
 
 	var marketData []map[string]map[string]string
 	err = json.Unmarshal(responseBody, &marketData)

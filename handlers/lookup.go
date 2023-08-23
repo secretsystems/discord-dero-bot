@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"strings"
 
 	"fuck_you.com/utils/dero"
@@ -9,8 +8,16 @@ import (
 )
 
 func HandleWalletName(discord *discordgo.Session, message *discordgo.MessageCreate) {
+	content := message.Content
+	// fmt.Println("CONTENT: %s", content)
+
+	if !strings.HasPrefix(content, "!lookup ") {
+		discord.ChannelMessageSend(message.ChannelID, "To lookup a DERO address, use the format: `!lookup <@user_mention or wallet_name>`")
+		return
+	}
+
 	userInput := strings.TrimPrefix(message.Content, "!lookup ")
-	log.Printf("User Input: " + userInput)
+	// log.Printf("User Input: " + userInput)
 
 	// Check if the input matches the format of a user mention
 	if strings.HasPrefix(userInput, "<@") && strings.HasSuffix(userInput, ">") {
@@ -22,7 +29,7 @@ func HandleWalletName(discord *discordgo.Session, message *discordgo.MessageCrea
 		userMappingsMutex.Unlock()
 
 		if exists {
-			discord.ChannelMessageSend(message.ChannelID, "DERO Address (from registered user): "+mappedAddress)
+			discord.ChannelMessageSend(message.ChannelID, "DERO Address (from registered user): ```"+mappedAddress+"```")
 		} else {
 			// Ping the user with the mention
 			userMention := "<@" + userID + ">"
@@ -33,7 +40,7 @@ func HandleWalletName(discord *discordgo.Session, message *discordgo.MessageCrea
 		deroAddress := dero.WalletNameToAddress(userInput)
 
 		if deroAddress != "" {
-			discord.ChannelMessageSend(message.ChannelID, "DERO Address: "+deroAddress)
+			discord.ChannelMessageSend(message.ChannelID, "DERO Address: ```"+deroAddress+"```")
 		} else {
 			discord.ChannelMessageSend(message.ChannelID, "Wallet name not found or invalid.")
 		}
