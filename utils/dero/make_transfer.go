@@ -10,24 +10,29 @@ import (
 	"os"
 )
 
-func MakeTransfer(address string) {
+func MakeTransfer(address string, amnt int, comment string) {
 	// Define payload data
 	addr := address
-	amnt := 2
+
 	scid := "0000000000000000000000000000000000000000000000000000000000000000"
 	payloadData := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "1",
 		"method":  "transfer",
 		"params": map[string]interface{}{
+			"ringsize": 16,
 			"transfers": []map[string]interface{}{
 				{
 					"scid":        scid,
 					"destination": addr,
 					"amount":      amnt,
+					"payload": map[string]interface{}{
+						"name":     "C",
+						"datatype": "S",
+						"value":    comment,
+					},
 				},
 			},
-			"ringsize": 16,
 		},
 	}
 

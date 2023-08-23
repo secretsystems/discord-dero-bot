@@ -7,6 +7,7 @@ import (
 
 func FetchAndParseTransfers() ([]TransferEntry, error) {
 	// Call the FetchDeroTransfers function to obtain the JSON response
+	log.Println("Festching transfers response...")
 	responseBody, err := FetchDeroTransfers()
 	if err != nil {
 		fmt.Printf("Error fetching transfers: %v\n", err)

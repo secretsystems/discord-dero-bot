@@ -1,2 +1,6 @@
 .env
 userMappings.json
+env
+_work
+_home
+env_script.sh
