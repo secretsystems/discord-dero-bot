@@ -6,6 +6,18 @@ import (
 )
 
 var (
+	Commands = []discordgo.ApplicationCommand{
+		{
+			Name:        "encode",
+			Description: "Encode Address",
+		},
+		{
+			Name:        "trade-dero-xmr",
+			Description: "Trade DERO-XMR",
+		},
+	}
+)
+var (
 	componentsHandlers = map[string]func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string){
 		"fd_yes": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
 			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
@@ -70,6 +82,55 @@ var (
 									Style:    discordgo.LinkButton,
 									Disabled: false,
 									URL:      "https://youtu.be/x_EZ3BdpyyY",
+								},
+							},
+						},
+					},
+				},
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
+		"encode": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseModal,
+				Data: &discordgo.InteractionResponseData{
+					CustomID: "encode_" + interaction.Interaction.Member.User.ID,
+					Title:    "Encode",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "address",
+								Label:       "Address",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "dero1q wallet address",
+								Required:    true,
+								MaxLength:   66,
+								MinLength:   66,
+							},
+						},
+						},
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "amount",
+								Label:       "Amount; minimum 2 DERI",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "How much in atomic units? 1 DERO = 100000",
+								Required:    true,
+								MaxLength:   64,
+								MinLength:   1,
+							},
+						},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:  "comment",
+									Label:     "What would you include in your encoding?",
+									Style:     discordgo.TextInputParagraph,
+									Required:  false,
+									MaxLength: 128,
 								},
 							},
 						},

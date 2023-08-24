@@ -13,25 +13,24 @@ func main() {
 	loadConfig()
 
 	// Initialize the bot
-	botInstance, err := bot.NewBot(BotToken) // Replace with the actual initialization function
+	bot, err := bot.NewBot(BotToken) // Replace with the actual initialization function
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
 
-	err = botInstance.Open()
+	err = bot.Open()
 	if err != nil {
 		log.Fatalf("Error opening Discord bot connection: %v", err)
 	}
-	defer botInstance.Close()
+	defer bot.Close()
 
 	// Get the Discord session from the bot instance
-	discordSession := botInstance.GetDiscordSession()
+	discord := bot.GetDiscordSession()
 
 	// Register interaction handlers
-	handlers.RegisterInteractionHandlersFromHandlers(discordSession, AppID, GuildID)
+	handlers.AddHandlers(discord, AppID, GuildID)
 
 	handleDEROFunctionality()
-	initChatGPT()
 
 	log.Println("Bot is running. Press Ctrl+C to stop.")
 
