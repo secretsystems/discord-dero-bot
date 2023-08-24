@@ -1,7 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
+	"strconv"
+
+	"fuck_you.com/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -31,24 +35,37 @@ func AddHandlers(discord *discordgo.Session, AppID, GuildID string) {
 				h(discord, interaction, AppID, GuildID) // Pass appID and guildID
 			}
 		case discordgo.InteractionModalSubmit:
+			data := interaction.ModalSubmitData()
+			address := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+			amountString := data.Components[1].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+			amount, error := strconv.Atoi(amountString)
+			if error != nil {
+				log.Printf("Error converting amount to int: %v", error)
+			}
+			comment := data.Components[2].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+			integratedAddress := dero.MakeIntegratedAddress(address, amount, comment)
+
+			// Now you can use the integratedAddress
+			fmt.Printf("Integrated Address: %s\n", integratedAddress)
+
 			// Send an immediate response to the user
 			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "PLACE HOLDER FOR INTEGRATED ADDRESS",
+					Content: integratedAddress,
 					Flags:   discordgo.MessageFlagsEphemeral,
 				},
 			})
 			if err != nil {
 				panic(err)
 			}
-			// not really sure why this doesn't work very well. there is some kind panic: HTTP 405 Method Not Allowed, {"message": "405: Method Not Allowed", "code": 0}
+			// not really sure why this doesn't work very well. there is some kind of panic:
+			// HTTP 405 Method Not Allowed, {"message": "405: Method Not Allowed", "code": 0}
 			// goroutine 40 [running]:
 			// fuck_you.com/handlers.AddHandlers.func2(0xc00009f500?, 0xc000554020)
 			//         /home/secret/phone_mount/code/fuck_you/handlers/add_handlers.go:67 +0x9ba
 			// // Now you are going to be receiving this information some where
 			// and so you are submiting it to something
-			// data := interaction.ModalSubmitData()
 
 			// if !strings.HasPrefix(data.CustomID, "encode") {
 			// 	return
@@ -60,9 +77,7 @@ func AddHandlers(discord *discordgo.Session, AppID, GuildID string) {
 			// // the results channel is defined in the config.go
 			// _, err = discord.ChannelMessageSend(ResultsChannel, fmt.Sprintf("Request Received %v %v %v",
 			// 	userid,
-			// 	data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value,
-			// 	data.Components[1].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value,
-			// 	data.Components[2].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value,
+
 			// ),
 			// )
 			// if err != nil {
