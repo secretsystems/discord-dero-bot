@@ -13,7 +13,6 @@ import (
 var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate){
 	"!compliment": handlers.HandleMessage,
 	"!insult":     handlers.HandleMessage,
-	"!decode":     handlers.HandleIntegratedAddress,
 	"!lookup":     handlers.HandleWalletName,
 	"!derod":      handlers.HandleGetInfoDerod,
 	"!monerod":    handlers.HandleGetInfoMonerod,

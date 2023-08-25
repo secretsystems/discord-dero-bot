@@ -53,7 +53,7 @@ func handleEncodeInteraction(discord *discordgo.Session, interaction *discordgo.
 	err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: integratedAddress,
+			Content: "```" + integratedAddress + "```",
 			Flags:   discordgo.MessageFlagsEphemeral,
 		},
 	})
@@ -75,7 +75,7 @@ func handleDecodeInteraction(discord *discordgo.Session, interaction *discordgo.
 	err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: splitintegratedAddress,
+			Content: "```" + splitintegratedAddress + "```",
 			Flags:   discordgo.MessageFlagsEphemeral,
 		},
 	})

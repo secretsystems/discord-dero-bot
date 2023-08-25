@@ -168,7 +168,7 @@ var (
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
 					CustomID: "decode_" + interaction.Interaction.Member.User.ID,
-					Title:    "Decode a DERO Integrated Address",
+					Title:    "Decode DERO Integrated Addr",
 					Components: []discordgo.MessageComponent{
 						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
 							discordgo.TextInput{
