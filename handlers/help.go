@@ -15,21 +15,14 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		helpMsg := "# Welcome to the Secret Discord Server!\n"
 		helpMsg += "```We share our knowledge, insights and relationships we earned from our research and development using DERO.```\n"
 		helpMsg += "## Available Commands:\n\n"
-		helpMsg += "### `!commands` List:\n\n"
 		helpMsg += "**Server:**\n"
-		helpMsg += "```!help <!command>``````!bot <query>``````!register <wallet address or wallet-name>``````!unregister```\n"
+		helpMsg += "```!help <!command>``````!bot <query>``````!register <wallet address or wallet-name>``````!unregister``````/trade-dero-xmr```\n"
 		helpMsg += "**DERO Wallet:**\n"
-		helpMsg += "```/decode``````/encode``````!lookup <@username or wallet name>``````!tip <@username, dero1q or wallet-name>```\n"
+		helpMsg += "```!lookup <@username or wallet name>``````!tip <@username, dero1q or wallet-name>``````/decode``````/encode```\n"
 		helpMsg += "**Node**\n"
 		helpMsg += "```!derod``````!monerod```\n"
 		helpMsg += "**Markets**\n"
 		helpMsg += "```!markets``````!quote <insert base-pair>```\n"
-		helpMsg += "### `/commands` List:\n"
-		helpMsg += "\n"
-		helpMsg += "**Trades**\n"
-		helpMsg += "```/trade-dero-xmr```\n"
-		helpMsg += "**Encode**\n"
-		helpMsg += "```/encode```\n"
 		discord.ChannelMessageSend(message.ChannelID, helpMsg)
 	case "!bot":
 		// Send a breakdown of the bot command and its usage
