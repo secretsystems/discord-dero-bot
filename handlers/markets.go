@@ -68,5 +68,5 @@ func HandleMarketsRequest(discord *discordgo.Session, message *discordgo.Message
 	}
 
 	// Send the sorted pairs to Discord
-	discord.ChannelMessageSend(message.ChannelID, "Sorted Market Pairs:\n```\n"+formattedPairs.String()+"```")
+	discord.ChannelMessageSend(message.ChannelID, "Sorted Market Pairs TradeOgre.com:\n```\n"+formattedPairs.String()+"```")
 }

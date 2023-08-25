@@ -110,6 +110,6 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		amnt := 2
 		comment := "secret_pong_bot sends secret'a love"
 		dero.MakeTransfer(recipientAddress, amnt, comment)
-		discord.ChannelMessageSend(message.ChannelID, "Tip sent! \nFeed the bot by sending DERO to `secret-wallet`")
+		discord.ChannelMessageSend(message.ChannelID, "Tip sent!\n\nFeed the bot by sending DERO to `secret-wallet`")
 	}
 }

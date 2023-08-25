@@ -19,7 +19,7 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		helpMsg += "**Server:**\n"
 		helpMsg += "```!help <!command>``````!bot <query>``````!register <wallet address or wallet-name>``````!unregister```\n"
 		helpMsg += "**DERO Wallet:**\n"
-		helpMsg += "```!decode <integrated address>``````!lookup <@username or wallet name>``````!tip <@username, dero1q or wallet-name>```\n"
+		helpMsg += "```/decode``````/encode``````!lookup <@username or wallet name>``````!tip <@username, dero1q or wallet-name>```\n"
 		helpMsg += "**Node**\n"
 		helpMsg += "```!derod``````!monerod```\n"
 		helpMsg += "**Markets**\n"
@@ -50,6 +50,11 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		// Send a breakdown of the lookup command and its usage
 		lookupHelpMsg := "Usage: `!lookup <@username or wallet name>`\n" +
 			"Look up the DERO address associated with a username or wallet name."
+		discord.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
+	case "/decode":
+		// Send a breakdown of the lookup command and its usage
+		lookupHelpMsg := "Usage: `/decode`\n" +
+			"Decode an integrated address and receive a DM of the output."
 		discord.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
 	case "!tip":
 		// Send a breakdown of the tip command and its usage
@@ -84,7 +89,7 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	case "/encode":
 		// Send a breakdown of the quote command and its usage
 		tradeHelpMsg := "Usage: `/encode`\n" +
-			"Encode ad DERO integrated Address using wallet address, amount and comment."
+			"Encode a DERO integrated Address using wallet address, amount and comment."
 		discord.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
 	default:
 		// Send a message indicating the help command is not recognized

@@ -10,41 +10,20 @@ import (
 	"os"
 )
 
-func MakeIntegratedAddress(address string, amount int, comment string, destination int) string {
+func SplitIntegratedAddress(userInput string) string {
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "1",
-		"method":  "MakeIntegratedAddress",
-		"params": map[string]interface{}{
-			"address": address,
-			"payload_rpc": []map[string]interface{}{
-				{
-					"name":     "C",
-					"datatype": "S",
-					"value":    comment,
-				},
-				{
-					"name":     "V",
-					"datatype": "U",
-					"value":    amount,
-				},
-				{
-					"name":     "N",
-					"datatype": "U",
-					"value":    1,
-				}, {
-					"name":     "D",
-					"datatype": "U",
-					"value":    destination,
-				},
-			},
+		"method":  "SplitIntegratedAddress",
+		"params": map[string]string{
+			"integrated_address": userInput,
 		},
 	}
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		log.Printf("Error marshaling JSON data: %v", err)
-		return ""
+		return "Error marshaling JSON"
 	}
 
 	// Retrieve IP address, wallet port, and node port from environment variables
@@ -58,7 +37,7 @@ func MakeIntegratedAddress(address string, amount int, comment string, destinati
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating request: %v", err)
-		return ""
+		return "Error creating request"
 	}
 
 	// Retrieve authentication credentials from environment variables
@@ -68,34 +47,34 @@ func MakeIntegratedAddress(address string, amount int, comment string, destinati
 	// Set basic authentication for the request
 	request.SetBasicAuth(username, password)
 	request.Header.Set("Content-type", "application/json")
-	fmt.Println("\nRequest: ", request)
+	// fmt.Println("\nRequest: ", request)
 
 	client := http.DefaultClient
 	response, err := client.Do(request)
 	if err != nil {
 		log.Printf("Error sending HTTP Post request: %v", err)
-		return ""
+		return "Error sending HTTP Post"
 	}
 	defer response.Body.Close()
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Printf("Response Body: %v", string(responseBody))
+	// log.Printf("Response Body: %v", string(responseBody))
 
 	var mapResponse map[string]interface{}
 	err = json.Unmarshal(responseBody, &mapResponse)
 	if err != nil {
 		log.Printf("Error decoding response JSON: %v", err)
-		return ""
+		return "Error decoding response JSON"
 	}
 
 	// Print the entire mapResponse map
-	fmt.Println("\nmapResponse:", mapResponse)
+	// fmt.Println("\nmapResponse:", mapResponse)
 
 	// Print the entire mapResponse map
 	var outputMessage string
 	for key, value := range mapResponse {
 		formattedValue, _ := json.MarshalIndent(value, "", "  ")
-		outputMessage += fmt.Sprintf("```%s: %s\n```", key, formattedValue)
+		outputMessage += fmt.Sprintf("%s: %s\n", key, formattedValue)
 	}
 	return outputMessage
 }
