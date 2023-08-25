@@ -31,6 +31,7 @@ git clone https://github.com/secretnamebasis/discord-dero-bot
 Afterwords you are going to want to set up your `.env` file for loading enviroment dependent variables.
 
 ```sh
+cd discord-dero-bot
 touch .env
 ```
 
