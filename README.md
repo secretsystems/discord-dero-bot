@@ -1,15 +1,18 @@
-
-
 # discord-dero-bot
 
-This example demonstrates how to utilize the secret-discord-server's secret_pong_bot with DERO functions built in.
+This example demonstrates how to utilize the secret-discord-server's secret_pong_bot with DERO functions built in. 
 
 Such as message components, buttons, modals and pongs to user !pings; while also demonstrating ChatGPT's helpful bot, and DERO's wallet API functionality for its permissionless, private by default, cryptocurrency.
+
+This project is under active development, so have fun with that.
+I am a terrible coder, so have fun with that.
+And I really enjoyed making this project for my friends on discord...
+so... have... fun.
 
 **Join [Secret Discord Server](https://discord.gg/GM5mY2t7Wg)
 Discord chat channel for support.**
 
-This project is under active development, so have fun with that.
+And with that...
 
 ## Build
 
