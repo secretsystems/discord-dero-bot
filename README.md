@@ -33,6 +33,7 @@ Afterwords you are going to want to set up your `.env` file for loading envirome
 ```sh
 cd discord-dero-bot
 touch .env
+vim .env
 ```
 
 Then copy the following template to your new `.env`
