@@ -86,6 +86,16 @@ var (
 								},
 							},
 						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.Button{
+									Label:    "DERO-XMR-SWAP Repo",
+									Style:    discordgo.LinkButton,
+									Disabled: false,
+									URL:      "https://github.com/secretnamebasis/dero-xmr-swap",
+								},
+							},
+						},
 					},
 				},
 			})
