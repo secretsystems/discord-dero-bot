@@ -84,10 +84,6 @@ var (
 									Disabled: false,
 									URL:      "https://youtu.be/x_EZ3BdpyyY",
 								},
-							},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
 								discordgo.Button{
 									Label:    "DERO-XMR-SWAP Repo",
 									Style:    discordgo.LinkButton,
