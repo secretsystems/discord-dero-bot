@@ -12,18 +12,17 @@ import (
 
 var (
 	ResultsChannel string
+	session        string
 )
 
 func AddHandlers(discord *discordgo.Session, AppID, GuildID string) {
 	// This handler will be triggered when the bot is ready
 	log.Println("Registering Interaction Handlers")
-	discord.AddHandler(func(discord *discordgo.Session, r *discordgo.Ready) {
-		log.Println("Bot is up!")
-	})
 
 	// Components are part of interactions, so we register InteractionCreate handler
 	discord.AddHandler(func(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
 		switch interaction.Type {
+
 		case discordgo.InteractionApplicationCommand:
 			log.Println("received: discordgo.InteractionApplicationCommand")
 			if h, ok := commandsHandlers[interaction.ApplicationCommandData().Name]; ok {
