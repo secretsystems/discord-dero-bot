@@ -22,6 +22,7 @@ var (
 	IAddressTextFile string
 	DeroNodePort     string
 	ChatGptApi       string
+	ResultsChannel   string
 )
 
 func loadConfig() {
@@ -45,6 +46,7 @@ func loadConfig() {
 	IAddressTextFile = PongDir + "/" + PongAmount + ".iaddress.txt"
 	DeroNodePort = os.Getenv("DERO_NODE_PORT")
 	ChatGptApi = os.Getenv("OPEN_AI_TOKEN")
+	ResultsChannel = os.Getenv("RESULTS_CHANNEL")
 
 	// Ensure the directory exists
 	if _, err := os.Stat(PongDir); os.IsNotExist(err) {

@@ -3,7 +3,8 @@ package handlers
 import (
 	"strings"
 
-	"fuck_you.com/utils/dero"
+	"discord-dero-bot/utils/dero"
+
 	"github.com/bwmarrin/discordgo"
 )
 

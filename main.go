@@ -1,37 +1,36 @@
 package main
 
 import (
+	"discord-dero-bot/bot"      // Update with the correct import path for your bot package
+	"discord-dero-bot/handlers" // Update with the correct import path for your handlers package
+	"discord-dero-bot/utils/dero"
 	"log"
 	"os"
 	"os/signal"
-
-	"fuck_you.com/bot"      // Update with the correct import path for your bot package
-	"fuck_you.com/handlers" // Update with the correct import path for your handlers package
 )
 
 func main() {
 	loadConfig()
 
 	// Initialize the bot
-	botInstance, err := bot.NewBot(BotToken) // Replace with the actual initialization function
+	bot, err := bot.NewBot(BotToken) // Replace with the actual initialization function
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
 
-	err = botInstance.Open()
+	err = bot.Open()
 	if err != nil {
 		log.Fatalf("Error opening Discord bot connection: %v", err)
 	}
-	defer botInstance.Close()
+	defer bot.Close()
 
 	// Get the Discord session from the bot instance
-	discordSession := botInstance.GetDiscordSession()
+	discord := bot.GetDiscordSession()
 
 	// Register interaction handlers
-	handlers.RegisterInteractionHandlersFromHandlers(discordSession, AppID, GuildID)
+	handlers.AddHandlers(discord, AppID, GuildID)
 
-	handleDEROFunctionality()
-	initChatGPT()
+	dero.HandleDEROFunctionality()
 
 	log.Println("Bot is running. Press Ctrl+C to stop.")
 
