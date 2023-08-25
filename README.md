@@ -25,7 +25,7 @@ This example assumes the following about your set up:
 So first you will need to
 
 ```sh
-git clone https:github.com/secretnamebasis/discord-dero-bot
+git clone https://github.com/secretnamebasis/discord-dero-bot
 ```
 
 Afterwords you are going to want to set up your `.env` file for loading enviroment dependent variables.
