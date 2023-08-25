@@ -73,4 +73,5 @@ source .env
 And then you will need to
 
 ```sh
-go run .```
+go run .
+```
