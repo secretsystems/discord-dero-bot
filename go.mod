@@ -1,4 +1,4 @@
-module fuck_you.com
+module discord-dero-bot
 
 go 1.20
 

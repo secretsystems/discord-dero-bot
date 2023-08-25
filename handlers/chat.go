@@ -27,7 +27,10 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		discord.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.")
 		return
 	}
+
 	userInput := strings.TrimPrefix(message.Content, "!bot ")
+	discord.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
+
 	// fmt.Printf(userInput)
 	// Prepare the request payload
 	payload := struct {

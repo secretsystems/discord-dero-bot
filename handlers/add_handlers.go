@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 
-	"fuck_you.com/utils/dero"
+	"discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )

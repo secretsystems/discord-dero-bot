@@ -5,7 +5,8 @@ import (
 	"regexp"
 	"strings"
 
-	"fuck_you.com/utils/dero" // Import the dero package from your project
+	"discord-dero-bot/utils/dero" // Import the dero package from your project
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -105,10 +106,10 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
 		// Send the tip
 		fmt.Println(recipientAddress)
-		discord.ChannelMessageSend(message.ChannelID, "Tip of 0.00002 DERO, or 2 DERI, is being sent from the `secret-wallet`")
+		discord.ChannelMessageSend(message.ChannelID, "Tip is being sent from the `secret-wallet`: 0.00002 DERO, or 2 DERI")
 		amnt := 2
 		comment := "secret_pong_bot sends secret'a love"
 		dero.MakeTransfer(recipientAddress, amnt, comment)
-		discord.ChannelMessageSend(message.ChannelID, "Tip 2 DERI sent! Please consider feeding the tip bot by sending DERO to `secret-wallet`")
+		discord.ChannelMessageSend(message.ChannelID, "Tip sent! \nFeed the bot by sending DERO to `secret-wallet`")
 	}
 }

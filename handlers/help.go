@@ -28,6 +28,8 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		helpMsg += "\n"
 		helpMsg += "**Trades**\n"
 		helpMsg += "```/trade-dero-xmr```\n"
+		helpMsg += "**Encoding**\n"
+		helpMsg += "```/encode```\n"
 		discord.ChannelMessageSend(message.ChannelID, helpMsg)
 	case "!bot":
 		// Send a breakdown of the bot command and its usage
@@ -74,6 +76,16 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		quoteHelpMsg := "Usage: `!quote <insert base-pair>`\n" +
 			"Get the current quote of a pair provided by Trade Ogre."
 		discord.ChannelMessageSend(message.ChannelID, quoteHelpMsg)
+	case "/trade-dero-xmr":
+		// Send a breakdown of the quote command and its usage
+		tradeHelpMsg := "Usage: `/trade-dero-xmr`\n" +
+			"Trade DERO-XMR by way of integrated addresses and tx_messages."
+		discord.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
+	case "/encode":
+		// Send a breakdown of the quote command and its usage
+		encodeHelpMsg := "Usage: `/encode`\n" +
+			"Build a DERO integrated address via form."
+		discord.ChannelMessageSend(message.ChannelID, encodeHelpMsg)
 	default:
 		// Send a message indicating the help command is not recognized
 		discord.ChannelMessageSend(message.ChannelID, "You have activated the !help menu. Use `!help list` to see available commands.")

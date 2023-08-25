@@ -1,16 +1,14 @@
 // dero_handler.go
-package main
+package dero
 
 import (
 	"log"
-
-	"fuck_you.com/utils/dero"
 )
 
-func handleDEROFunctionality() {
+func HandleDEROFunctionality() {
 	log.Printf("Initializing DERO\n")
 	// Call FetchAndParseTransfers function from the utils package
-	transferEntries, err := dero.FetchAndParseTransfers()
+	transferEntries, err := FetchAndParseTransfers()
 	if err != nil {
 		log.Printf("Error fetching and parsing transfers: %v", err)
 	} else {

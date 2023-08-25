@@ -1,40 +1,74 @@
-<img align="right" alt="DiscordGo logo" src="/docs/img/discordgo.svg" width="200">
 
-## DiscordGo Components Example
 
-This example demonstrates how to utilize DiscordGo to create and use message
-components, such as buttons and select menus. For usage of the text input
-component and modals, please refer to the `modals` example.
+# discord-dero-bot
 
-**Join [Discord Gophers](https://discord.gg/0f1SbxBZjYoCtNPP)
+This example demonstrates how to utilize the secret-discord-server's secret_pong_bot with DERO functions built in.
+
+Such as message components, buttons, modals and pongs to user !pings; while also demonstrating ChatGPT's helpful bot, and DERO's wallet API functionality for its permissionless, private by default, cryptocurrency.
+
+**Join [Secret Discord Server](https://discord.gg/GM5mY2t7Wg)
 Discord chat channel for support.**
 
-### Build
+This project is under active development, so have fun with that.
 
-This assumes you already have a working Go environment setup and that
-DiscordGo is correctly installed on your system.
+## Build
 
-From within the components example folder, run the below command to compile the
-example.
+This example assumes the following about your set up:
 
-```sh
-go build
-```
+1. working Go environment setup
+2. registered DERO wallet running in `--rpc-server` mode
+3. DERO node running
+4. Monero node running
+5. ChatGPT API key
+6. Discord API key
 
-### Usage
-
-```
-Usage of components:
-  -app string
-    	Application ID
-  -guild string
-    	Test guild ID
-  -token string
-    	Bot access token
-```
-
-The below example shows how to start the bot from the components example folder.
+So first you will need to
 
 ```sh
-./components -app YOUR_APPLICATION_ID -guild YOUR_TESTING_GUILD -token YOUR_BOT_TOKEN
+git clone https:github.com/secretnamebasis/discord-dero-bot
 ```
+
+Afterwords you are going to want to set up your `.env` file for loading enviroment dependent variables.
+
+```sh
+touch .env
+```
+
+Then copy the following template to your new `.env`
+
+```
+# DISCORD
+# Bare in mind that you will want
+# to make sure that your application
+# has proper permissions
+BOT_TOKEN=yourAppToken
+GUILD_ID=yourServerID
+APP_ID=yourDiscordAppID
+
+# DERO
+# The example has your node and wallet
+# on the same device. Obviously, you could
+# simple set up the DERO_NODE_IP & DERO_WALLET_IP
+# as seperate; but I is lazy
+DERO_SERVER_IP=ipaddress of you dero node and wallet
+DERO_WALLET_PORT=10103
+DERO_NODE_PORT=10102
+USER=username
+PASS=passwor
+
+# ChatGPT
+# This is a paid feature, so that kind of sucks;
+# But users love it.
+OPEN_AI_TOKEN=yourChatGPTToken
+```
+
+You will need to `source` your new `.env` file
+
+```sh
+source .env
+```
+
+And then you will need to
+
+```sh
+go run .```
