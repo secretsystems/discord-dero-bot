@@ -72,24 +72,24 @@ var (
 									Disabled: false,
 									CustomID: "fd_no",
 								},
+							},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
 								discordgo.Button{
 									Label:    "DERO-XMR chart",
 									Style:    discordgo.LinkButton,
 									Disabled: false,
 									URL:      "https://www.tradingview.com/chart/XAuuVNP7/",
 								},
-							},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
 								discordgo.Button{
-									Label:    "Swap Walkthru",
+									Label:    "Walkthru",
 									Style:    discordgo.LinkButton,
 									Disabled: false,
 									URL:      "https://youtu.be/x_EZ3BdpyyY",
 								},
 								discordgo.Button{
-									Label:    "DERO-XMR-SWAP Repo",
+									Label:    "Github Repo",
 									Style:    discordgo.LinkButton,
 									Disabled: false,
 									URL:      "https://github.com/secretnamebasis/dero-xmr-swap",
