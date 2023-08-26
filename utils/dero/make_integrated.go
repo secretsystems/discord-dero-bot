@@ -88,14 +88,17 @@ func MakeIntegratedAddress(address string, amount int, comment string, destinati
 		return ""
 	}
 
-	// Print the entire mapResponse map
-	fmt.Println("\nmapResponse:", mapResponse)
+	var integratedAddress string
 
-	// Print the entire mapResponse map
-	var outputMessage string
-	for key, value := range mapResponse {
-		formattedValue, _ := json.MarshalIndent(value, "", "  ")
-		outputMessage += fmt.Sprintf("```%s: %s\n```", key, formattedValue)
+	// Assuming `mapResponse` is a map or struct that holds the JSON response
+	if result, ok := mapResponse["result"]; ok {
+		if resultMap, ok := result.(map[string]interface{}); ok {
+			if addr, ok := resultMap["integrated_address"].(string); ok {
+				integratedAddress = addr
+			}
+		}
 	}
+
+	outputMessage := fmt.Sprintf("%s", integratedAddress)
 	return outputMessage
 }

@@ -78,7 +78,7 @@ func HandleShop(discord *discordgo.Session, interaction *discordgo.MessageCreate
 			"- 4 dero collection stickers\n" +
 			"	-  8 stickers with each collection\n" +
 			"Delivered in 14-21 days\n" +
-			"To order please, use ```/order-gift-box```"
+			"To order please, use ```/giftbox```"
 		// Create a slice with the image file and assign it to the MessageSend struct
 		messageSend := &discordgo.MessageSend{
 			Files:   []*discordgo.File{image},

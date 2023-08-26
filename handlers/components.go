@@ -20,6 +20,10 @@ var (
 			Name:        "decode",
 			Description: "Decode Integrated Address",
 		},
+		{
+			Name:        "giftbox",
+			Description: "Get a DERO gift box!",
+		},
 	}
 )
 var (
@@ -150,6 +154,62 @@ var (
 								discordgo.TextInput{
 									CustomID:  "destionation",
 									Label:     "What port you want to send this too?, ex 1337",
+									Style:     discordgo.TextInputShort,
+									Required:  false,
+									MaxLength: 128,
+								},
+							},
+						},
+					},
+				},
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
+		"giftbox": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseModal,
+				Data: &discordgo.InteractionResponseData{
+					CustomID: "giftbox_" + interaction.Interaction.Member.User.ID,
+					Title:    "Purchase a DERO Gift Box",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "color",
+								Label:       "Shirt Color",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "black or white?",
+								Required:    true,
+							},
+						},
+						},
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "size",
+								Label:       "Shirt Size",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "What size fits you: S,M,L,XL,XXL,XXXL",
+								Required:    true,
+							},
+						},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:  "address",
+									Label:     "Shipping Address?",
+									Style:     discordgo.TextInputParagraph,
+									Required:  false,
+									MaxLength: 80,
+								},
+							},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:  "Contact Info",
+									Label:     "If we need to reach you?",
 									Style:     discordgo.TextInputShort,
 									Required:  false,
 									MaxLength: 128,

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"discord-dero-bot/utils/dero"
+	"encoding/json"
 	"log"
+	"net/http"
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
@@ -21,6 +23,8 @@ func AddModals(discord *discordgo.Session, AppID, GuildID string) {
 				handleEncodeInteraction(discord, interaction)
 			case "decode_" + interaction.Member.User.ID:
 				handleDecodeInteraction(discord, interaction)
+			case "giftbox_" + interaction.Member.User.ID:
+				handleGiftboxInteraction(discord, interaction)
 			}
 		}
 	})
@@ -81,5 +85,63 @@ func handleDecodeInteraction(discord *discordgo.Session, interaction *discordgo.
 	})
 	if err != nil {
 		log.Println("Error responding to decode interaction:", err)
+	}
+}
+
+func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	// Step 1: Make a GET request to the API endpoint
+	response, err := http.Get("https://tradeogre.com/api/v1/ticker/dero-usdt")
+	if err != nil {
+		log.Println("Error fetching API data:", err)
+		return
+	}
+	defer response.Body.Close()
+
+	// Step 2: Parse the JSON response
+	var apiResponse struct {
+		Success bool   `json:"success"`
+		Price   string `json:"price"`
+	}
+	err = json.NewDecoder(response.Body).Decode(&apiResponse)
+	if err != nil {
+		log.Println("Error decoding API response:", err)
+		return
+	}
+
+	// Convert the price from string to float64
+	price, err := strconv.ParseFloat(apiResponse.Price, 64)
+	if err != nil {
+		log.Println("Error parsing price:", err)
+		return
+	}
+
+	// Step 3: Calculate the amount
+	amount := int(55 / price)
+
+	data := interaction.ModalSubmitData()
+
+	color := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+	size := data.Components[1].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+	shipping := data.Components[2].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+	contact := data.Components[3].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+	comment := ""
+	comment += color
+	comment += size
+	comment += shipping
+	comment += contact
+	address := "dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4"
+	destination := 1337
+	integratedAddress := dero.MakeIntegratedAddress(address, amount, comment, destination)
+	messageContent := integratedAddress
+
+	err = discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "To purchase your giftbox, please use the following address :\n```" + messageContent + "```And we will get back to you as soon as your order is marked receieved.\nWe will contact you on your shipping status.",
+			Flags:   discordgo.MessageFlagsEphemeral,
+		},
+	})
+	if err != nil {
+		log.Println("Error responding to encode interaction:", err)
 	}
 }
