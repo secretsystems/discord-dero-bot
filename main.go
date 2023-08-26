@@ -41,4 +41,6 @@ func main() {
 
 	// Wait for an interrupt signal to close the program
 	<-channel
+	log.Println("Bot is cleaning up.")
+
 }

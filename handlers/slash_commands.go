@@ -13,16 +13,19 @@ var (
 
 // Register slash commands
 func RegisterSlashCommands(discord *discordgo.Session, AppID, GuildID string) {
+	log.Println("Adding Registering Slash Commands")
 	for _, command := range Commands {
 		registeredCommands, err := discord.ApplicationCommandCreate(AppID, GuildID, &command)
 		if err != nil {
 			log.Fatalf("Cannot create %v slash command: %v", &command, err)
 		}
+		log.Printf("Registered Slash Commands: %v", &command)
 		commandIDs[registeredCommands.ID] = registeredCommands.Name
 	}
 }
 
 func Cleanup(discord *discordgo.Session, AppID, GuildID string) {
+	log.Println("Adding Cleaning up")
 	for id, name := range commandIDs {
 		err := discord.ApplicationCommandDelete(AppID, GuildID, id)
 		if err != nil {

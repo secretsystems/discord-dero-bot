@@ -24,7 +24,7 @@ func AddModals(discord *discordgo.Session, AppID, GuildID string) {
 			}
 		}
 	})
-
+	log.Println("Adding Modals to Discord")
 	// Register slash commands
 	RegisterSlashCommands(discord, AppID, GuildID)
 }

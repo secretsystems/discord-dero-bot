@@ -31,6 +31,7 @@ func AddHandlers(discord *discordgo.Session, AppID, GuildID string) {
 			}
 		}
 	})
+	log.Println("Adding Handlers to Discord")
 	// Register slash commands
 	RegisterSlashCommands(discord, AppID, GuildID)
 }
