@@ -10,7 +10,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var CommandHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate){
+var PingHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate){
 	"!compliment": handlers.HandleMessage,
 	"!insult":     handlers.HandleMessage,
 	"!lookup":     handlers.HandleWalletName,
@@ -82,7 +82,7 @@ func (bot *Bot) NewMessage(discord *discordgo.Session, message *discordgo.Messag
 	if message.Author.ID == bot.DiscordSession.State.User.ID {
 		return
 	}
-	for command, handler := range CommandHandlers {
+	for command, handler := range PingHandlers {
 		if strings.HasPrefix(message.Content, command) {
 			handler(bot.DiscordSession, message)
 			return
