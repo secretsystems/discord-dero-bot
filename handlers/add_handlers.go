@@ -29,6 +29,7 @@ func AddHandlers(discord *discordgo.Session, AppID, GuildID string) {
 			if h, ok := componentsHandlers[interaction.MessageComponentData().CustomID]; ok {
 				h(discord, interaction, AppID, GuildID) // Pass appID and guildID
 			}
+
 		}
 	})
 	log.Println("Adding Handlers to Discord")

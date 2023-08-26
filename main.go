@@ -29,7 +29,7 @@ func main() {
 
 	// Register interaction handlers
 	handlers.AddHandlers(discord, AppID, GuildID)
-	handlers.AddModals(discord, AppID, GuildID)
+	handlers.AddModals(discord, AppID, GuildID, ResultsChannel)
 
 	dero.HandleDEROFunctionality()
 

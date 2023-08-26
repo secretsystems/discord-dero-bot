@@ -3,14 +3,16 @@ package handlers
 import (
 	"discord-dero-bot/utils/dero"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func AddModals(discord *discordgo.Session, AppID, GuildID string) {
+func AddModals(discord *discordgo.Session, AppID, GuildID string, ResultsChannel string) {
 	discord.AddHandler(func(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
 		// Check if the interaction type is ModalSubmitData
 		if interaction.Type == discordgo.InteractionModalSubmit {
@@ -24,7 +26,7 @@ func AddModals(discord *discordgo.Session, AppID, GuildID string) {
 			case "decode_" + interaction.Member.User.ID:
 				handleDecodeInteraction(discord, interaction)
 			case "giftbox_" + interaction.Member.User.ID:
-				handleGiftboxInteraction(discord, interaction)
+				handleGiftboxInteraction(discord, interaction, ResultsChannel)
 			}
 		}
 	})
@@ -88,7 +90,7 @@ func handleDecodeInteraction(discord *discordgo.Session, interaction *discordgo.
 	}
 }
 
-func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
+func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo.InteractionCreate, ResultsChannel string) {
 	// Step 1: Make a GET request to the API endpoint
 	response, err := http.Get("https://tradeogre.com/api/v1/ticker/dero-usdt")
 	if err != nil {
@@ -142,6 +144,17 @@ func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo
 		},
 	})
 	if err != nil {
-		log.Println("Error responding to encode interaction:", err)
+		panic(err)
+	}
+	if !strings.HasPrefix(data.CustomID, "giftbox_") {
+		return
+	}
+
+	userid := strings.Split(data.CustomID, "_")[1]
+	resultsMsg := fmt.Sprintf(
+		"User <@%s> has made an integrated address for a Giftbox", userid)
+	_, err = discord.ChannelMessageSend(ResultsChannel, resultsMsg)
+	if err != nil {
+		panic(err)
 	}
 }
