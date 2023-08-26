@@ -23,6 +23,7 @@ var PingHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate)
 	"!tip":        handlers.HandleTip,
 	"!register":   handlers.HandleRegister,
 	"!unregister": handlers.HandleUnregister,
+	"!shop":       handlers.HandleShop,
 	// "!membership"  handlers.HandleMembership
 }
 
