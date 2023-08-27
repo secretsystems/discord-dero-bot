@@ -42,6 +42,7 @@ func main() {
 
 	// Wait for an interrupt signal to close the program
 	<-channel
+	handlers.Cleanup(discord, AppID, GuildID)
 	log.Println("Bot is cleaning up.")
 
 }
