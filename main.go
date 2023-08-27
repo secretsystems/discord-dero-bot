@@ -30,6 +30,7 @@ func main() {
 	// Register interaction handlers
 	handlers.AddHandlers(discord, AppID, GuildID)
 	handlers.AddModals(discord, AppID, GuildID, ResultsChannel)
+	handlers.RegisterSlashCommands(discord, AppID, GuildID)
 
 	dero.HandleDEROFunctionality()
 

@@ -30,9 +30,6 @@ func AddModals(discord *discordgo.Session, AppID, GuildID string, ResultsChannel
 			}
 		}
 	})
-	log.Println("Adding Modals to Discord")
-	// Register slash commands
-	RegisterSlashCommands(discord, AppID, GuildID)
 }
 
 func handleEncodeInteraction(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
@@ -117,8 +114,8 @@ func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo
 		return
 	}
 
-	// Step 3: Calculate the amount
-	amount := int(55 / price)
+	// Step 3: Calculate the amount in atomic units
+	amount := int((55 / price) * 100000)
 
 	data := interaction.ModalSubmitData()
 
@@ -127,10 +124,10 @@ func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo
 	shipping := data.Components[2].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	contact := data.Components[3].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	comment := ""
-	comment += color
-	comment += size
-	comment += shipping
-	comment += contact
+	comment += "C: " + color + " "
+	comment += "S: " + size + " "
+	comment += "A: " + shipping + " "
+	comment += "P: " + contact + " "
 	address := "dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4"
 	destination := 1337
 	integratedAddress := dero.MakeIntegratedAddress(address, amount, comment, destination)
