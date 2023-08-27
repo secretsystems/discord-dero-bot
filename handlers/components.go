@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"discord-dero-bot/utils"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -23,6 +24,10 @@ var (
 		{
 			Name:        "giftbox",
 			Description: "Get a DERO gift box!",
+		},
+		{
+			Name:        "register",
+			Description: "Register you DERO wallet address/name with the server!",
 		},
 	}
 )
@@ -246,6 +251,33 @@ var (
 				},
 			})
 			if err != nil {
+				panic(err)
+			}
+		},
+		"register": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseModal,
+				Data: &discordgo.InteractionResponseData{
+					CustomID: "register_" + interaction.Interaction.Member.User.ID,
+					Title:    "Secret Discord Server Registration",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "register",
+								Label:       "Register DERO addr/name with the server",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "dero1q wallet address or wallet-name",
+								Required:    true,
+								// MaxLength:   500,
+								// MinLength:   66,
+							},
+						},
+						},
+					},
+				},
+			})
+			if err != nil {
+				log.Printf("Component Panic: %v", err)
 				panic(err)
 			}
 		},
