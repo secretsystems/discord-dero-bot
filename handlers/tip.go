@@ -11,6 +11,14 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+var (
+	// Initialize variables to store user information
+	userID           string
+	mappedAddress    string
+	exists           bool
+	recipientAddress string
+)
+
 func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
 	// fmt.Println("CONTENT: %s", content)
@@ -27,16 +35,12 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 		mentionRegex := regexp.MustCompile("<@!?([0-9]+)>")
 		mentionedUserIDs := mentionRegex.FindStringSubmatch(input)
 
-		// Initialize variables to store user information
-		var userID string
-		var mappedAddress string
-		var exists bool
 		log.Println("Checking for mention id")
 
 		if len(mentionedUserIDs) == 2 {
 			// A user was mentioned, look up their registered wallet address
 			mentionedUserID := mentionedUserIDs[1]
-			// fmt.Println("Mentioned User ID: %s", mentionedUserID)
+			log.Printf("Mentioned User ID: %v", mentionedUserID)
 
 			userMappingsMutex.Lock()
 			mappedAddress, exists = userMappings[mentionedUserID]
@@ -74,9 +78,6 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 			}
 		}
 
-		// Determine the recipient's address for the tip
-		var recipientAddress string
-
 		// Check if the input is a valid DERO wallet address
 		if len(input) == 66 && strings.HasPrefix(input, "dero") {
 			recipientAddress = input
@@ -86,6 +87,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 				recipientAddress = addr
 			} else {
 				// Perform a wallet name lookup
+				log.Printf(input)
 				lookupResult := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
 
 				if lookupResult != "" {
@@ -111,7 +113,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 
 		// Send the tip
 		fmt.Println(recipientAddress)
-		session.ChannelMessageSend(message.ChannelID, "Tip is being sent from the `secret-wallet`: 0.00002 DERO, or 2 DERI\nThis process takes roughly 18 seconds; or 1 block interval.")
+		session.ChannelMessageSend(message.ChannelID, "`secret-wallet` is sending 0.00002 DERO, or 2 DERI\nThis process takes roughly 18 seconds; or 1 block interval.")
 		amnt := 2
 		comment := "secret_pong_bot sends secret'a love"
 		dero.MakeTransfer(recipientAddress, amnt, comment)
