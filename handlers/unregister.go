@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleUnregister(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func HandleUnregister(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
 	if content == "!unregister" {
 		// Extract the user ID
@@ -20,12 +20,12 @@ func HandleUnregister(discord *discordgo.Session, message *discordgo.MessageCrea
 			delete(userMappings, userID)
 			saveUserMappings()
 
-			_, err := discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> has been unregistered.", userID))
+			_, err := session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> has been unregistered.", userID))
 			if err != nil {
 				fmt.Printf("Error sending message: %v\n", err)
 			}
 		} else {
-			_, err := discord.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> was not registered.", userID))
+			_, err := session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> was not registered.", userID))
 			if err != nil {
 				fmt.Printf("Error sending message: %v\n", err)
 			}

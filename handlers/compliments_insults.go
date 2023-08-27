@@ -43,7 +43,7 @@ var insults = []string{
 	"You are definitely not the sharpest knife in the drawer.",
 }
 
-func HandleMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func HandleMessage(session *discordgo.Session, message *discordgo.MessageCreate) {
 	// Ignore messages from bots
 	if message.Author.Bot {
 		return
@@ -54,9 +54,9 @@ func HandleMessage(discord *discordgo.Session, message *discordgo.MessageCreate)
 
 	// Check for the !compliment command
 	if strings.HasPrefix(content, "!compliment") {
-		handleCompliment(discord, message)
+		handleCompliment(session, message)
 	} else if strings.HasPrefix(content, "!insult") {
-		handleInsult(discord, message)
+		handleInsult(session, message)
 	}
 }
 
@@ -67,7 +67,7 @@ func getRandomPhrase(phrases []string) string {
 	return phrases[randomIndex]
 }
 
-func handleCompliment(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func handleCompliment(session *discordgo.Session, message *discordgo.MessageCreate) {
 	// Get a random compliment
 	compliment := getRandomPhrase(compliments)
 
@@ -78,7 +78,7 @@ func handleCompliment(discord *discordgo.Session, message *discordgo.MessageCrea
 	if len(mentionedUsers) == 0 && len(mentionedRoles) == 0 {
 		// If no users or roles are mentioned, compliment the message author
 		response := message.Author.Mention() + ", " + compliment
-		discord.ChannelMessageSend(message.ChannelID, response)
+		session.ChannelMessageSend(message.ChannelID, response)
 		return
 	}
 
@@ -98,10 +98,10 @@ func handleCompliment(discord *discordgo.Session, message *discordgo.MessageCrea
 
 	// Send the compliment to all mentioned members and roles
 	response := strings.Join(mentions, " ") + ", " + compliment
-	discord.ChannelMessageSend(message.ChannelID, response)
+	session.ChannelMessageSend(message.ChannelID, response)
 }
 
-func handleInsult(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func handleInsult(session *discordgo.Session, message *discordgo.MessageCreate) {
 
 	// Get a random insult
 	insult := getRandomPhrase(insults)
@@ -109,11 +109,11 @@ func handleInsult(discord *discordgo.Session, message *discordgo.MessageCreate) 
 	// Get mentioned user (if any)
 	mentionedUsers := message.Mentions
 	if len(mentionedUsers) == 0 {
-		discord.ChannelMessageSend(message.ChannelID, "Are you trying to insult yourself?")
+		session.ChannelMessageSend(message.ChannelID, "Are you trying to insult yourself?")
 		return
 	}
 
 	// Send the insult
 	response := mentionedUsers[0].Mention() + ", " + insult
-	discord.ChannelMessageSend(message.ChannelID, response)
+	session.ChannelMessageSend(message.ChannelID, response)
 }

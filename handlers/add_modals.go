@@ -12,8 +12,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func AddModals(discord *discordgo.Session, AppID, GuildID string, ResultsChannel string) {
-	discord.AddHandler(func(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
+func AddModals(session *discordgo.Session, appID, duildID string, resultsChannel string) {
+	session.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 		// Check if the interaction type is ModalSubmitData
 		if interaction.Type == discordgo.InteractionModalSubmit {
 			// Get the CustomID from the interaction data
@@ -22,17 +22,17 @@ func AddModals(discord *discordgo.Session, AppID, GuildID string, ResultsChannel
 			// Distinguish between different custom IDs
 			switch customID {
 			case "encode_" + interaction.Member.User.ID:
-				handleEncodeInteraction(discord, interaction)
+				handleEncodeInteraction(session, interaction)
 			case "decode_" + interaction.Member.User.ID:
-				handleDecodeInteraction(discord, interaction)
+				handleDecodeInteraction(session, interaction)
 			case "giftbox_" + interaction.Member.User.ID:
-				handleGiftboxInteraction(discord, interaction, ResultsChannel)
+				handleGiftboxInteraction(session, interaction, resultsChannel)
 			}
 		}
 	})
 }
 
-func handleEncodeInteraction(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
+func handleEncodeInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 	data := interaction.ModalSubmitData()
 	address := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	amountString := data.Components[1].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
@@ -53,7 +53,7 @@ func handleEncodeInteraction(discord *discordgo.Session, interaction *discordgo.
 
 	// Send an immediate response to the user
 
-	err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: "```" + integratedAddress + "```",
@@ -65,7 +65,7 @@ func handleEncodeInteraction(discord *discordgo.Session, interaction *discordgo.
 	}
 }
 
-func handleDecodeInteraction(discord *discordgo.Session, interaction *discordgo.InteractionCreate) {
+func handleDecodeInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 	data := interaction.ModalSubmitData()
 	address := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 
@@ -75,7 +75,7 @@ func handleDecodeInteraction(discord *discordgo.Session, interaction *discordgo.
 	// fmt.Printf("Integrated Address: %s\n", splitintegratedAddress)
 
 	// Send an immediate response to the user
-	err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: "```" + splitintegratedAddress + "```",
@@ -87,7 +87,7 @@ func handleDecodeInteraction(discord *discordgo.Session, interaction *discordgo.
 	}
 }
 
-func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo.InteractionCreate, ResultsChannel string) {
+func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate, resultsChannel string) {
 	// Step 1: Make a GET request to the API endpoint
 	response, err := http.Get("https://tradeogre.com/api/v1/ticker/dero-usdt")
 	if err != nil {
@@ -133,7 +133,7 @@ func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo
 	integratedAddress := dero.MakeIntegratedAddress(address, amount, comment, destination)
 	messageContent := integratedAddress
 
-	err = discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+	err = session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: "To purchase your giftbox, please use the following address :\n```" + messageContent + "```And we will get back to you as soon as your order is marked receieved.\nWe will contact you on your shipping status.",
@@ -150,7 +150,7 @@ func handleGiftboxInteraction(discord *discordgo.Session, interaction *discordgo
 	userid := strings.Split(data.CustomID, "_")[1]
 	resultsMsg := fmt.Sprintf(
 		"User <@%s> has made an integrated address for a Giftbox", userid)
-	_, err = discord.ChannelMessageSend(ResultsChannel, resultsMsg)
+	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		panic(err)
 	}

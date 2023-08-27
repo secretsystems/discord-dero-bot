@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 )
 
 // Rest of your FetchDeroTransfers function and other code ...
 
 func FetchDeroTransfers() ([]byte, error) {
-	serverIP := os.Getenv("DERO_SERVER_IP")
-	serverPort := os.Getenv("DERO_WALLET_PORT")
-	url := fmt.Sprintf("http://%s:%s/json_rpc", serverIP, serverPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroWalletPort)
 
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
@@ -37,7 +34,7 @@ func FetchDeroTransfers() ([]byte, error) {
 		return nil, fmt.Errorf("error creating request: %v", err)
 	}
 
-	req.SetBasicAuth(os.Getenv("USER"), os.Getenv("PASS")) // Use values from .env
+	req.SetBasicAuth(deroUser, deroPass) // Use values from .env
 	req.Header.Set("Content-type", "application/json")
 
 	client := http.DefaultClient

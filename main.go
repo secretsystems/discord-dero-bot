@@ -7,16 +7,53 @@ import (
 	"log"
 	"os"
 	"os/signal"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 )
+
+var (
+	// discord
+	botToken       string
+	guildID        string
+	appID          string
+	resultsChannel string
+)
+
+func init() {
+
+	// 	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	//discord
+	botToken = os.Getenv("BOT_TOKEN")
+	guildID = os.Getenv("GUILD_ID")
+	appID = os.Getenv("APP_ID")
+	resultsChannel = os.Getenv("RESULTS_CHANNEL")
+}
 
 func main() {
 	loadConfig()
-
 	// Initialize the bot
-	bot, err := bot.NewBot(BotToken) // Replace with the actual initialization function
+
+	bot, err := bot.NewBot(botToken) // Replace with the actual initialization function
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
+	log.Printf("Initializing DERO\n")
+	// Call FetchAndParseTransfers function from the utils package
+	transferEntries, err := dero.FetchAndParseTransfers()
+	if err != nil {
+		log.Printf("Error fetching and parsing transfers: %v", err)
+	} else {
+		// Process the fetched and parsed transfer entries
+		log.Printf("Fetched and parsed %d transfer entries.\n", len(transferEntries))
+	}
+	bot.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
+		log.Println("Bot is up!")
+	})
 
 	err = bot.Open()
 	if err != nil {
@@ -25,14 +62,13 @@ func main() {
 	defer bot.Close()
 
 	// Get the Discord session from the bot instance
-	discord := bot.GetDiscordSession()
+	session := bot.GetDiscordSession()
 
 	// Register interaction handlers
-	handlers.AddHandlers(discord, AppID, GuildID)
-	handlers.AddModals(discord, AppID, GuildID, ResultsChannel)
-	handlers.RegisterSlashCommands(discord, AppID, GuildID)
 
-	dero.HandleDEROFunctionality()
+	handlers.AddHandlers(session, appID, guildID)
+	handlers.AddModals(session, appID, guildID, resultsChannel)
+	handlers.RegisterSlashCommands(session, appID, guildID)
 
 	log.Println("Bot is running. Press Ctrl+C to stop.")
 
@@ -42,7 +78,7 @@ func main() {
 
 	// Wait for an interrupt signal to close the program
 	<-channel
-	handlers.Cleanup(discord, AppID, GuildID)
+	handlers.Cleanup(session, appID, guildID)
 	log.Println("Bot is cleaning up.")
 
 }

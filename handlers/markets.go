@@ -12,7 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleMarketsRequest(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func HandleMarketsRequest(session *discordgo.Session, message *discordgo.MessageCreate) {
 	url := "https://tradeogre.com/api/v1/markets"
 
 	// Create a GET request
@@ -68,5 +68,5 @@ func HandleMarketsRequest(discord *discordgo.Session, message *discordgo.Message
 	}
 
 	// Send the sorted pairs to Discord
-	discord.ChannelMessageSend(message.ChannelID, "Sorted Market Pairs TradeOgre.com:\n```\n"+formattedPairs.String()+"```")
+	session.ChannelMessageSend(message.ChannelID, "Sorted Market Pairs TradeOgre.com:\n```\n"+formattedPairs.String()+"```")
 }

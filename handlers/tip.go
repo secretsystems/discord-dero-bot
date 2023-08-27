@@ -11,11 +11,19 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
+var (
+	// Initialize variables to store user information
+	userID           string
+	mappedAddress    string
+	exists           bool
+	recipientAddress string
+)
+
+func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
 	// fmt.Println("CONTENT: %s", content)
 	if content == "!tip" {
-		discord.ChannelMessageSend(message.ChannelID, "To send a tip, use the format: `!tip <@user_mention or <wallet_address> or <wallet_name>`")
+		session.ChannelMessageSend(message.ChannelID, "To send a tip, use the format: `!tip <@user_mention or <wallet_address> or <wallet_name>`")
 		return
 
 	} else if strings.HasPrefix(content, "!tip ") {
@@ -27,16 +35,12 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		mentionRegex := regexp.MustCompile("<@!?([0-9]+)>")
 		mentionedUserIDs := mentionRegex.FindStringSubmatch(input)
 
-		// Initialize variables to store user information
-		var userID string
-		var mappedAddress string
-		var exists bool
 		log.Println("Checking for mention id")
 
 		if len(mentionedUserIDs) == 2 {
 			// A user was mentioned, look up their registered wallet address
 			mentionedUserID := mentionedUserIDs[1]
-			// fmt.Println("Mentioned User ID: %s", mentionedUserID)
+			log.Printf("Mentioned User ID: %v", mentionedUserID)
 
 			userMappingsMutex.Lock()
 			mappedAddress, exists = userMappings[mentionedUserID]
@@ -47,7 +51,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 				input = mappedAddress
 			} else {
 				userMention := "<@" + mentionedUserIDs[1] + ">"
-				discord.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `!register <wallet addr or wallet name>`")
+				session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `!register <wallet addr or wallet name>`")
 				return
 			}
 		}
@@ -69,13 +73,10 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		// Check if the input address matches any special addresses
 		for _, addr := range specialAddresses {
 			if addr == input || (exists && addr == mappedAddress) {
-				discord.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
+				session.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
 				return
 			}
 		}
-
-		// Determine the recipient's address for the tip
-		var recipientAddress string
 
 		// Check if the input is a valid DERO wallet address
 		if len(input) == 66 && strings.HasPrefix(input, "dero") {
@@ -86,6 +87,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 				recipientAddress = addr
 			} else {
 				// Perform a wallet name lookup
+				log.Printf(input)
 				lookupResult := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
 
 				if lookupResult != "" {
@@ -93,16 +95,16 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 					if lookupResult != mappedAddress {
 						recipientAddress = lookupResult
 					} else {
-						discord.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
+						session.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
 						return
 					}
 				} else {
 					// Mention the mentioned user and provide the message
 					if len(mentionedUserIDs) == 2 {
 						userMention := "<@" + mentionedUserIDs[1] + ">"
-						discord.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\n"+userMention+" Please consider using `!register <wallet addr or wallet name>`")
+						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\n"+userMention+" Please consider using `!register <wallet addr or wallet name>`")
 					} else {
-						discord.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\nPlease consider using `!register <wallet addr or wallet name>`")
+						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\nPlease consider using `!register <wallet addr or wallet name>`")
 					}
 					return
 				}
@@ -111,10 +113,10 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
 		// Send the tip
 		fmt.Println(recipientAddress)
-		discord.ChannelMessageSend(message.ChannelID, "Tip is being sent from the `secret-wallet`: 0.00002 DERO, or 2 DERI")
+		session.ChannelMessageSend(message.ChannelID, "`secret-wallet` is sending 0.00002 DERO, or 2 DERI\nThis process takes roughly 18 seconds; or 1 block interval.")
 		amnt := 2
 		comment := "secret_pong_bot sends secret'a love"
 		dero.MakeTransfer(recipientAddress, amnt, comment)
-		discord.ChannelMessageSend(message.ChannelID, "Tip sent!\n\nFeed the bot by sending DERO to `secret-wallet`")
+		session.ChannelMessageSend(message.ChannelID, "Tip sent!\n\nFeed the bot by sending DERO to `secret-wallet`")
 	}
 }

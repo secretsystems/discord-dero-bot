@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 type WalletInfo struct {
@@ -15,13 +14,13 @@ type WalletInfo struct {
 	IsRegistered bool
 }
 
-func WalletNameToAddress(walletName string) string {
+func WalletNameToAddress(input string) string {
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "1",
 		"method":  "DERO.NameToAddress",
 		"params": map[string]string{
-			"name": walletName,
+			"name": input,
 		},
 	}
 
@@ -31,9 +30,7 @@ func WalletNameToAddress(walletName string) string {
 		return ""
 	}
 
-	ip := os.Getenv("DERO_SERVER_IP")
-	derodPort := os.Getenv("DERO_NODE_PORT")
-	url := fmt.Sprintf("http://%s:%s/json_rpc", ip, derodPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroServerPort)
 
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
@@ -41,10 +38,7 @@ func WalletNameToAddress(walletName string) string {
 		return ""
 	}
 
-	username := os.Getenv("USER")
-	password := os.Getenv("PASS")
-
-	request.SetBasicAuth(username, password)
+	request.SetBasicAuth(deroUser, deroPass)
 	request.Header.Set("Content-Type", "application/json")
 
 	client := http.DefaultClient

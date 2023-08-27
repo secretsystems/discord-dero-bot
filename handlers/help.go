@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
 	helpCommand := strings.TrimPrefix(message.Content, "!help ")
 
 	switch helpCommand {
@@ -23,69 +23,69 @@ func HandleHelp(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		helpMsg += "```!derod``````!monerod```\n"
 		helpMsg += "**Markets**\n"
 		helpMsg += "```!markets``````!quote <insert base-pair>```\n"
-		discord.ChannelMessageSend(message.ChannelID, helpMsg)
+		session.ChannelMessageSend(message.ChannelID, helpMsg)
 	case "!bot":
 		// Send a breakdown of the bot command and its usage
 		botHelpMsg := "Usage: `!bot <query>`\n" +
 			"Get information from the bot based on your query."
-		discord.ChannelMessageSend(message.ChannelID, botHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, botHelpMsg)
 	case "!register":
 		// Send a breakdown of the register command and its usage
 		registerHelpMsg := "Usage: `!register <wallet address or wallet-name>`\n" +
 			"Register your wallet address or wallet name for tipping."
-		discord.ChannelMessageSend(message.ChannelID, registerHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, registerHelpMsg)
 	case "!unregister":
 		// Send a breakdown of the register command and its usage
 		unregisterHelpMsg := "Usage: `!unregister`\n" +
 			"Unregister your wallet address or wallet name for tipping."
-		discord.ChannelMessageSend(message.ChannelID, unregisterHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, unregisterHelpMsg)
 	case "!lookup":
 		// Send a breakdown of the lookup command and its usage
 		lookupHelpMsg := "Usage: `!lookup <@username or wallet name>`\n" +
 			"Look up the DERO address associated with a username or wallet name."
-		discord.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
 	case "/decode":
 		// Send a breakdown of the lookup command and its usage
 		lookupHelpMsg := "Usage: `/decode`\n" +
 			"Decode an integrated address and receive a DM of the output."
-		discord.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
 	case "!tip":
 		// Send a breakdown of the tip command and its usage
 		tipHelpMsg := "Usage: `!tip <@username, dero1q, or wallet-name>`\n" +
 			"Send a tip to the specified user or DERO address."
-		discord.ChannelMessageSend(message.ChannelID, tipHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, tipHelpMsg)
 	case "!derod":
 		// Send a breakdown of the derod command and its usage
 		derodHelpMsg := "Usage: `!derod`\n" +
 			"Get the current status of the DERO Network."
-		discord.ChannelMessageSend(message.ChannelID, derodHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, derodHelpMsg)
 	case "!monerod":
 		// Send a breakdown of the monerod command and its usage
 		monerodHelpMsg := "Usage: `!monerod`\n" +
 			"Get the current status of the Monero Network."
-		discord.ChannelMessageSend(message.ChannelID, monerodHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, monerodHelpMsg)
 	case "!markets":
 		// Send a breakdown of the markets command and its usage
 		marketsHelpMsg := "Usage: !markets\n" +
 			"Get the current list of markets provided by Trade Ogre."
-		discord.ChannelMessageSend(message.ChannelID, marketsHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, marketsHelpMsg)
 	case "!quote":
 		// Send a breakdown of the quote command and its usage
 		quoteHelpMsg := "Usage: `!quote <insert base-pair>`\n" +
 			"Get the current quote of a pair provided by Trade Ogre."
-		discord.ChannelMessageSend(message.ChannelID, quoteHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, quoteHelpMsg)
 	case "/trade-dero-xmr":
 		// Send a breakdown of the quote command and its usage
 		tradeHelpMsg := "Usage: `/trade-dero-xmr`\n" +
 			"Trade DERO-XMR by way of the DERO-XMR swap integrated addresses."
-		discord.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
 	case "/encode":
 		// Send a breakdown of the quote command and its usage
 		tradeHelpMsg := "Usage: `/encode`\n" +
 			"Encode a DERO integrated Address using wallet address, amount and comment."
-		discord.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
+		session.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
 	default:
 		// Send a message indicating the help command is not recognized
-		discord.ChannelMessageSend(message.ChannelID, "You have activated the !help menu. Use `!help list` to see available commands.")
+		session.ChannelMessageSend(message.ChannelID, "You have activated the !help menu. Use `!help list` to see available commands.")
 	}
 }

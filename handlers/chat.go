@@ -6,13 +6,13 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
+
 	// Check if the user has the required role
 	hasSecretMembersRole := false
 	for _, roleID := range message.Member.Roles {
@@ -24,12 +24,12 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
 	if !hasSecretMembersRole {
 		// The user doesn't have the required role, return or send an error message
-		discord.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member`")
+		session.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member`")
 		return
 	}
 
 	userInput := strings.TrimPrefix(message.Content, "!bot ")
-	discord.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
+	session.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
 
 	// fmt.Printf(userInput)
 	// Prepare the request payload
@@ -59,10 +59,8 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	// Retrieve the OpenAI API token from the environment
-	apiToken := os.Getenv("OPEN_AI_TOKEN")
 	// fmt.Printf(apiToken)
-	if apiToken == "" {
+	if chatGptApi == "" {
 		log.Println("OpenAI API token not found in environment")
 		return
 	}
@@ -76,7 +74,7 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 	// fmt.Printf("requst: %v\n", req)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiToken)
+	req.Header.Set("Authorization", "Bearer "+chatGptApi)
 
 	client := http.Client{}
 	resp, err := client.Do(req)
@@ -113,9 +111,9 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	// Send the response to Discord
+	// Send the response to session
 	if len(chatResponse.Choices) > 0 {
 		responseContent := chatResponse.Choices[0].Message.Content
-		discord.ChannelMessageSend(message.ChannelID, responseContent)
+		session.ChannelMessageSend(message.ChannelID, responseContent)
 	}
 }
