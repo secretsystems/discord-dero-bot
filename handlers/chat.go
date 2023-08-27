@@ -6,13 +6,13 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
+
 	// Check if the user has the required role
 	hasSecretMembersRole := false
 	for _, roleID := range message.Member.Roles {
@@ -59,10 +59,8 @@ func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	// Retrieve the OpenAI API token from the environment
-	apiToken := os.Getenv("OPEN_AI_TOKEN")
 	// fmt.Printf(apiToken)
-	if apiToken == "" {
+	if chatGptApi == "" {
 		log.Println("OpenAI API token not found in environment")
 		return
 	}
@@ -76,7 +74,7 @@ func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 	// fmt.Printf("requst: %v\n", req)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiToken)
+	req.Header.Set("Authorization", "Bearer "+chatGptApi)
 
 	client := http.Client{}
 	resp, err := client.Do(req)

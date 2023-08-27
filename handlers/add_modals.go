@@ -12,7 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func AddModals(session *discordgo.Session, AppID, GuildID string, ResultsChannel string) {
+func AddModals(session *discordgo.Session, appID, duildID string, resultsChannel string) {
 	session.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 		// Check if the interaction type is ModalSubmitData
 		if interaction.Type == discordgo.InteractionModalSubmit {
@@ -26,7 +26,7 @@ func AddModals(session *discordgo.Session, AppID, GuildID string, ResultsChannel
 			case "decode_" + interaction.Member.User.ID:
 				handleDecodeInteraction(session, interaction)
 			case "giftbox_" + interaction.Member.User.ID:
-				handleGiftboxInteraction(session, interaction, ResultsChannel)
+				handleGiftboxInteraction(session, interaction, resultsChannel)
 			}
 		}
 	})
@@ -87,7 +87,7 @@ func handleDecodeInteraction(session *discordgo.Session, interaction *discordgo.
 	}
 }
 
-func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate, ResultsChannel string) {
+func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate, resultsChannel string) {
 	// Step 1: Make a GET request to the API endpoint
 	response, err := http.Get("https://tradeogre.com/api/v1/ticker/dero-usdt")
 	if err != nil {
@@ -150,7 +150,7 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	userid := strings.Split(data.CustomID, "_")[1]
 	resultsMsg := fmt.Sprintf(
 		"User <@%s> has made an integrated address for a Giftbox", userid)
-	_, err = session.ChannelMessageSend(ResultsChannel, resultsMsg)
+	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		panic(err)
 	}

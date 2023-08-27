@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 func MakeIntegratedAddress(address string, amount int, comment string, destination int) string {
@@ -47,12 +46,8 @@ func MakeIntegratedAddress(address string, amount int, comment string, destinati
 		return ""
 	}
 
-	// Retrieve IP address, wallet port, and node port from environment variables
-	ip := os.Getenv("DERO_SERVER_IP")
-	derodPort := os.Getenv("DERO_WALLET_PORT")
-
 	// Construct the URL using the retrieved IP address and wallet port
-	url := fmt.Sprintf("http://%s:%s/json_rpc", ip, derodPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroWalletPort)
 
 	// Define request for node
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
@@ -61,12 +56,8 @@ func MakeIntegratedAddress(address string, amount int, comment string, destinati
 		return ""
 	}
 
-	// Retrieve authentication credentials from environment variables
-	username := os.Getenv("USER")
-	password := os.Getenv("PASS")
-
 	// Set basic authentication for the request
-	request.SetBasicAuth(username, password)
+	request.SetBasicAuth(deroUser, deroPass)
 	request.Header.Set("Content-type", "application/json")
 	fmt.Println("\nRequest: ", request)
 

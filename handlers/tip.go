@@ -111,7 +111,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 
 		// Send the tip
 		fmt.Println(recipientAddress)
-		session.ChannelMessageSend(message.ChannelID, "Tip is being sent from the `secret-wallet`: 0.00002 DERO, or 2 DERI")
+		session.ChannelMessageSend(message.ChannelID, "Tip is being sent from the `secret-wallet`: 0.00002 DERO, or 2 DERI\nThis process takes roughly 18 seconds; or 1 block interval.")
 		amnt := 2
 		comment := "secret_pong_bot sends secret'a love"
 		dero.MakeTransfer(recipientAddress, amnt, comment)

@@ -9,13 +9,6 @@ import (
 	"net/http"
 )
 
-var (
-	MoneroServerIP   string
-	MoneroServerPort string
-	MoneroUser       string
-	MoneroPass       string
-)
-
 func GetInfoMonerod() string { // Define JSON struct
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
@@ -29,7 +22,7 @@ func GetInfoMonerod() string { // Define JSON struct
 		return "Error marshaling JSON"
 	}
 
-	url := fmt.Sprintf("http://%s:%s/json_rpc", MoneroServerIP, MoneroServerPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", moneroServerIP, moneroServerPort)
 
 	// Define request for node
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
@@ -39,7 +32,7 @@ func GetInfoMonerod() string { // Define JSON struct
 	}
 
 	// Define request authentication for node
-	request.SetBasicAuth(MoneroUser, MoneroPass)
+	request.SetBasicAuth(moneroUser, moneroPass)
 	request.Header.Set("content-type", "application/json")
 	// fmt.Println("\nRequest: ", request)
 	client := http.DefaultClient

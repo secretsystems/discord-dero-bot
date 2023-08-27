@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 func MakeTransfer(address string, amnt int, comment string) {
@@ -44,15 +43,13 @@ func MakeTransfer(address string, amnt int, comment string) {
 
 	// Define HTTP client and request
 	client := &http.Client{}
-	url := fmt.Sprintf("http://%s:%s/json_rpc", os.Getenv("DERO_SERVER_IP"), os.Getenv("DERO_WALLET_PORT"))
-	username := os.Getenv("USER")
-	password := os.Getenv("PASS")
+	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroWalletPort)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadJSON))
 	if err != nil {
 		log.Fatalf("Error creating request: %v", err)
 	}
-	req.SetBasicAuth(username, password)
+	req.SetBasicAuth(deroUser, deroPass)
 	req.Header.Set("Content-Type", "application/json")
 
 	// Send HTTP request

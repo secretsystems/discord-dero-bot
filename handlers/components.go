@@ -27,8 +27,8 @@ var (
 	}
 )
 var (
-	componentsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string){
-		"fd_yes": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+	componentsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string){
+		"fd_yes": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -40,7 +40,7 @@ var (
 				panic(err)
 			}
 		},
-		"fd_no": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+		"fd_no": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -54,8 +54,8 @@ var (
 		},
 	}
 
-	commandsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string){
-		"trade-dero-xmr": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+	commandsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string){
+		"trade-dero-xmr": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -107,7 +107,7 @@ var (
 				panic(err)
 			}
 		},
-		"encode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+		"encode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
@@ -167,7 +167,7 @@ var (
 				panic(err)
 			}
 		},
-		"giftbox": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+		"giftbox": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
@@ -223,7 +223,7 @@ var (
 				panic(err)
 			}
 		},
-		"decode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+		"decode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{

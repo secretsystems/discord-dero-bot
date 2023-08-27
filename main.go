@@ -9,16 +9,36 @@ import (
 	"os/signal"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
+)
+
+var (
+	// discord
+	botToken       string
+	guildID        string
+	appID          string
+	resultsChannel string
 )
 
 func init() {
 
+	// 	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+	//discord
+	botToken = os.Getenv("BOT_TOKEN")
+	guildID = os.Getenv("GUILD_ID")
+	appID = os.Getenv("APP_ID")
+	resultsChannel = os.Getenv("RESULTS_CHANNEL")
 }
 
 func main() {
 	loadConfig()
 	// Initialize the bot
-	bot, err := bot.NewBot(BotToken) // Replace with the actual initialization function
+
+	bot, err := bot.NewBot(botToken) // Replace with the actual initialization function
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
@@ -46,9 +66,9 @@ func main() {
 
 	// Register interaction handlers
 
-	handlers.AddHandlers(session, AppID, GuildID)
-	handlers.AddModals(session, AppID, GuildID, ResultsChannel)
-	handlers.RegisterSlashCommands(session, AppID, GuildID)
+	handlers.AddHandlers(session, appID, guildID)
+	handlers.AddModals(session, appID, guildID, resultsChannel)
+	handlers.RegisterSlashCommands(session, appID, guildID)
 
 	log.Println("Bot is running. Press Ctrl+C to stop.")
 
@@ -58,7 +78,7 @@ func main() {
 
 	// Wait for an interrupt signal to close the program
 	<-channel
-	handlers.Cleanup(session, AppID, GuildID)
+	handlers.Cleanup(session, appID, guildID)
 	log.Println("Bot is cleaning up.")
 
 }

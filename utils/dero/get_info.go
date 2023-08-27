@@ -9,13 +9,6 @@ import (
 	"net/http"
 )
 
-var (
-	DeroServerIP   string
-	DeroServerPort string
-	DeroUser       string
-	DeroPass       string
-)
-
 func GetInfoDerod() string {
 	// Define JSON struct
 	data := map[string]interface{}{
@@ -31,7 +24,7 @@ func GetInfoDerod() string {
 	}
 
 	// Construct the URL using the retrieved IP address and wallet port
-	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, DeroServerPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroServerPort)
 
 	// Define request for node
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
@@ -41,7 +34,7 @@ func GetInfoDerod() string {
 	}
 
 	// Set basic authentication for the request
-	request.SetBasicAuth(DeroUser, DeroPass)
+	request.SetBasicAuth(deroUser, deroPass)
 	request.Header.Set("Content-Type", "application/json")
 
 	// fmt.Println("\nRequest: ", request)
