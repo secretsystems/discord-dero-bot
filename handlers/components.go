@@ -10,11 +10,19 @@ var (
 	Commands = []discordgo.ApplicationCommand{
 		{
 			Name:        "encode",
-			Description: "Encode Address",
+			Description: "Encode Integrated Address",
 		},
 		{
 			Name:        "trade-dero-xmr",
 			Description: "Trade DERO-XMR",
+		},
+		{
+			Name:        "decode",
+			Description: "Decode Integrated Address",
+		},
+		{
+			Name:        "giftbox",
+			Description: "Get a DERO gift box!",
 		},
 	}
 )
@@ -104,7 +112,7 @@ var (
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
 					CustomID: "encode_" + interaction.Interaction.Member.User.ID,
-					Title:    "Encode",
+					Title:    "Encode a DERO Integrated Address",
 					Components: []discordgo.MessageComponent{
 						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
 							discordgo.TextInput{
@@ -140,6 +148,99 @@ var (
 									MaxLength: 128,
 								},
 							},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:  "destionation",
+									Label:     "What port you want to send this too?, ex 1337",
+									Style:     discordgo.TextInputShort,
+									Required:  false,
+									MaxLength: 128,
+								},
+							},
+						},
+					},
+				},
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
+		"giftbox": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseModal,
+				Data: &discordgo.InteractionResponseData{
+					CustomID: "giftbox_" + interaction.Interaction.Member.User.ID,
+					Title:    "Purchase a DERO Gift Box",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "color",
+								Label:       "Shirt Color",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "black or white?",
+								Required:    true,
+							},
+						},
+						},
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "size",
+								Label:       "Shirt Size",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "What size fits you: S,M,L,XL,XXL,XXXL",
+								Required:    true,
+							},
+						},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:  "address",
+									Label:     "Shipping Address?",
+									Style:     discordgo.TextInputParagraph,
+									Required:  false,
+									MaxLength: 80,
+								},
+							},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:  "Contact Info",
+									Label:     "If we need to reach you?",
+									Style:     discordgo.TextInputShort,
+									Required:  false,
+									MaxLength: 128,
+								},
+							},
+						},
+					},
+				},
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
+		"decode": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseModal,
+				Data: &discordgo.InteractionResponseData{
+					CustomID: "decode_" + interaction.Interaction.Member.User.ID,
+					Title:    "Decode DERO Integrated Addr",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "integrated_address",
+								Label:       "Integrated Address",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "integrated wallet address",
+								Required:    true,
+								// MaxLength:   500,
+								// MinLength:   66,
+							},
+						},
 						},
 					},
 				},

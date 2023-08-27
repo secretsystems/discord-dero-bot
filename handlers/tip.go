@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -30,6 +31,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		var userID string
 		var mappedAddress string
 		var exists bool
+		log.Println("Checking for mention id")
 
 		if len(mentionedUserIDs) == 2 {
 			// A user was mentioned, look up their registered wallet address
@@ -39,6 +41,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 			userMappingsMutex.Lock()
 			mappedAddress, exists = userMappings[mentionedUserID]
 			userMappingsMutex.Unlock()
+			log.Println("Checking for map of addresses")
 
 			if exists {
 				input = mappedAddress
@@ -48,6 +51,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 				return
 			}
 		}
+		log.Println("Checking user map")
 
 		// Check if the user input is in the userMappings
 		userID = message.Author.ID
@@ -60,6 +64,7 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 			"secret-wallet",
 			"dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4",
 		}
+		log.Println("checking against special address")
 
 		// Check if the input address matches any special addresses
 		for _, addr := range specialAddresses {
@@ -110,6 +115,6 @@ func HandleTip(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		amnt := 2
 		comment := "secret_pong_bot sends secret'a love"
 		dero.MakeTransfer(recipientAddress, amnt, comment)
-		discord.ChannelMessageSend(message.ChannelID, "Tip sent! \nFeed the bot by sending DERO to `secret-wallet`")
+		discord.ChannelMessageSend(message.ChannelID, "Tip sent!\n\nFeed the bot by sending DERO to `secret-wallet`")
 	}
 }

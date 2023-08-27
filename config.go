@@ -31,7 +31,7 @@ func loadConfig() {
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
-
+	log.Println("Adding setting up configs")
 	// Read environment variables
 	BotToken = os.Getenv("BOT_TOKEN")
 	GuildID = os.Getenv("GUILD_ID")

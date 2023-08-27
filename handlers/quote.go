@@ -59,6 +59,6 @@ func HandleQuoteRequest(discord *discordgo.Session, message *discordgo.MessageCr
 		}
 
 		// Send the entire response to Discord
-		discord.ChannelMessageSend(message.ChannelID, "Quote Response:\n```\n"+outputMessage+"```")
+		discord.ChannelMessageSend(message.ChannelID, "Quote Response from TradeOgre.com:\n```\n"+outputMessage+"```")
 	}
 }

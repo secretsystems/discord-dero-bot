@@ -24,7 +24,7 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
 	if !hasSecretMembersRole {
 		// The user doesn't have the required role, return or send an error message
-		discord.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.")
+		discord.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member`")
 		return
 	}
 
