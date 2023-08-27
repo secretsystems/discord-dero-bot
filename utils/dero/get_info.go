@@ -7,10 +7,16 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
-func GetInfo() string {
+var (
+	DeroServerIP   string
+	DeroServerPort string
+	DeroUser       string
+	DeroPass       string
+)
+
+func GetInfoDerod() string {
 	// Define JSON struct
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
@@ -24,12 +30,8 @@ func GetInfo() string {
 		return "Error marshaling JSON"
 	}
 
-	// Retrieve IP address, wallet port, and node port from environment variables
-	ip := os.Getenv("DERO_SERVER_IP")
-	derodPort := os.Getenv("DERO_NODE_PORT")
-
 	// Construct the URL using the retrieved IP address and wallet port
-	url := fmt.Sprintf("http://%s:%s/json_rpc", ip, derodPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, DeroServerPort)
 
 	// Define request for node
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
@@ -38,12 +40,8 @@ func GetInfo() string {
 		return "Error creating Request"
 	}
 
-	// Retrieve authentication credentials from environment variables
-	username := os.Getenv("USER")
-	password := os.Getenv("PASS")
-
 	// Set basic authentication for the request
-	request.SetBasicAuth(username, password)
+	request.SetBasicAuth(DeroUser, DeroPass)
 	request.Header.Set("Content-Type", "application/json")
 
 	// fmt.Println("\nRequest: ", request)
@@ -82,6 +80,5 @@ func GetInfo() string {
 		outputMessage += fmt.Sprintf("%s: %s\n", key, formattedValue)
 	}
 	return outputMessage
-	// }
 
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleShop(discord *discordgo.Session, interaction *discordgo.MessageCreate) {
+func HandleShop(session *discordgo.Session, interaction *discordgo.MessageCreate) {
 	helpCommand := strings.TrimPrefix(interaction.Content, "!shop ")
 
 	switch helpCommand {
@@ -18,7 +18,7 @@ func HandleShop(discord *discordgo.Session, interaction *discordgo.MessageCreate
 		helpMsg += "## Available Product and Services(?):\n\n"
 		helpMsg += "- !shop giftbox:\n\n"
 
-		discord.ChannelMessageSend(interaction.ChannelID, helpMsg)
+		session.ChannelMessageSend(interaction.ChannelID, helpMsg)
 	case "giftbox":
 
 		imagePath := "assets/giftbox.png"
@@ -50,7 +50,7 @@ func HandleShop(discord *discordgo.Session, interaction *discordgo.MessageCreate
 			Content: content,
 		}
 
-		_, err = discord.ChannelMessageSendComplex(interaction.ChannelID, messageSend)
+		_, err = session.ChannelMessageSendComplex(interaction.ChannelID, messageSend)
 		if err != nil {
 			log.Println("Error sending ephemeral message:", err)
 		}
@@ -85,14 +85,14 @@ func HandleShop(discord *discordgo.Session, interaction *discordgo.MessageCreate
 	// 		Content: content,
 	// 	}
 
-	// 	_, err = discord.ChannelMessageSendComplex(interaction.ChannelID, messageSend)
+	// 	_, err = session.ChannelMessageSendComplex(interaction.ChannelID, messageSend)
 	// 	if err != nil {
 	// 		log.Println("Error sending ephemeral message:", err)
 	// 	}
 	default:
 		// Send an ephemeral message indicating the help command is not recognized
 		helpMsg := "You have activated the !shop menu. Use `!shop list` to see available products."
-		_, err := discord.ChannelMessageSend(interaction.ChannelID, helpMsg)
+		_, err := session.ChannelMessageSend(interaction.ChannelID, helpMsg)
 		if err != nil {
 			log.Println("Error sending ephemeral message:", err)
 		}

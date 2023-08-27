@@ -28,17 +28,17 @@ var PingHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate)
 }
 
 type Bot struct {
-	DiscordSession *discordgo.Session // Exported field for accessing the Discord session
+	DiscordSession *discordgo.Session // Exported field for accessing the session session
 }
 
 func NewBot(BotToken string) (*Bot, error) {
-	discord, err := discordgo.New("Bot " + BotToken)
+	session, err := discordgo.New("Bot " + BotToken)
 	if err != nil {
 		return nil, err
 	}
 
 	bot := &Bot{
-		DiscordSession: discord, // Store the session in the Bot instance
+		DiscordSession: session, // Store the session in the Bot instance
 	}
 
 	bot.AddHandler(bot.NewMessage)
@@ -75,11 +75,11 @@ func (bot *Bot) OnGeneric(s *discordgo.Session, event interface{}) {
 	}
 }
 
-func (bot *Bot) OnReady(discord *discordgo.Session, ready *discordgo.Ready) {
+func (bot *Bot) OnReady(session *discordgo.Session, ready *discordgo.Ready) {
 
 }
 
-func (bot *Bot) NewMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func (bot *Bot) NewMessage(session *discordgo.Session, message *discordgo.MessageCreate) {
 	if message.Author.ID == bot.DiscordSession.State.User.ID {
 		return
 	}

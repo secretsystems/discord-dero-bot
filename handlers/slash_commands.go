@@ -12,10 +12,10 @@ var (
 )
 
 // Register slash commands
-func RegisterSlashCommands(discord *discordgo.Session, AppID, GuildID string) {
+func RegisterSlashCommands(session *discordgo.Session, AppID, GuildID string) {
 	log.Println("Adding Registering Slash Commands")
 	for _, command := range Commands {
-		registeredCommands, err := discord.ApplicationCommandCreate(AppID, GuildID, &command)
+		registeredCommands, err := session.ApplicationCommandCreate(AppID, GuildID, &command)
 		if err != nil {
 			log.Fatalf("Cannot create %v slash command: %v", command.Name, err)
 		}
@@ -24,11 +24,11 @@ func RegisterSlashCommands(discord *discordgo.Session, AppID, GuildID string) {
 	}
 }
 
-func Cleanup(discord *discordgo.Session, AppID, GuildID string) {
+func Cleanup(session *discordgo.Session, AppID, GuildID string) {
 	log.Println("Adding Cleaning up")
 
 	for id, name := range commandIDs {
-		err := discord.ApplicationCommandDelete(AppID, GuildID, id)
+		err := session.ApplicationCommandDelete(AppID, GuildID, id)
 		if err != nil {
 			log.Fatalf("Cannot delete slash command %q: %v", name, err)
 		}

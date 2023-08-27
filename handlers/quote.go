@@ -11,11 +11,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleQuoteRequest(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func HandleQuoteRequest(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
 	// fmt.Println("CONTENT: %s", content)
 	if content == "!quote" {
-		discord.ChannelMessageSend(message.ChannelID, "To get a quote from TradeOgre: `!quote <base-pair>`\n\n For a list of pairs, use `!markets`")
+		session.ChannelMessageSend(message.ChannelID, "To get a quote from TradeOgre: `!quote <base-pair>`\n\n For a list of pairs, use `!markets`")
 		return
 
 	} else if strings.HasPrefix(content, "!quote ") {
@@ -35,7 +35,7 @@ func HandleQuoteRequest(discord *discordgo.Session, message *discordgo.MessageCr
 		// Check if the response status code indicates an error
 		if response.StatusCode != http.StatusOK {
 			log.Printf("API request failed with status code: %d", response.StatusCode)
-			discord.ChannelMessageSend(message.ChannelID, "API request failed. Please try again later.")
+			session.ChannelMessageSend(message.ChannelID, "API request failed. Please try again later.")
 			return
 		}
 
@@ -58,7 +58,7 @@ func HandleQuoteRequest(discord *discordgo.Session, message *discordgo.MessageCr
 			outputMessage += fmt.Sprintf("%s: %s\n", key, formattedValue)
 		}
 
-		// Send the entire response to Discord
-		discord.ChannelMessageSend(message.ChannelID, "Quote Response from TradeOgre.com:\n```\n"+outputMessage+"```")
+		// Send the entire response to session
+		session.ChannelMessageSend(message.ChannelID, "Quote Response from TradeOgre.com:\n```\n"+outputMessage+"```")
 	}
 }

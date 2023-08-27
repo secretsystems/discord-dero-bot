@@ -12,7 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
+func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 	// Check if the user has the required role
 	hasSecretMembersRole := false
 	for _, roleID := range message.Member.Roles {
@@ -24,12 +24,12 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
 	if !hasSecretMembersRole {
 		// The user doesn't have the required role, return or send an error message
-		discord.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member`")
+		session.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member`")
 		return
 	}
 
 	userInput := strings.TrimPrefix(message.Content, "!bot ")
-	discord.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
+	session.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
 
 	// fmt.Printf(userInput)
 	// Prepare the request payload
@@ -113,9 +113,9 @@ func HandleChat(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	// Send the response to Discord
+	// Send the response to session
 	if len(chatResponse.Choices) > 0 {
 		responseContent := chatResponse.Choices[0].Message.Content
-		discord.ChannelMessageSend(message.ChannelID, responseContent)
+		session.ChannelMessageSend(message.ChannelID, responseContent)
 	}
 }

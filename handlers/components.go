@@ -27,9 +27,9 @@ var (
 	}
 )
 var (
-	componentsHandlers = map[string]func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string){
-		"fd_yes": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
-			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+	componentsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string){
+		"fd_yes": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "Use the following addr in your DERO wallet to obtain instructions on how to sell your DERO for XMR ```deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zat9hh2grpwfjjqcn4095kueeqg3z4yneqwa5hg6pqtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgs8gunpv3jjqctyv3ezqar0yp3x2gryv4kxjan9wfjkggr5dus8jmm4wgs8wctvd3jhgcjy25vs2wtzfe2sqcjk25pqrm2pm2```",
@@ -40,8 +40,8 @@ var (
 				panic(err)
 			}
 		},
-		"fd_no": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
-			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		"fd_no": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "Use the following addr in your DERO wallet to obtain instructions on how to buy DERO with XMR ```deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7z7t9hh2grpwfjjqarjv9jxjmn8ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezqarjv9jx2grfdeehgun4vd68xgr5dusxyefqv3jkc6tkv4ex2epqw3hjq7t0w4ezqampd3kx2arzg323j89rvf892qrz2e2sygeaw9a```",
@@ -54,9 +54,9 @@ var (
 		},
 	}
 
-	commandsHandlers = map[string]func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string){
-		"trade-dero-xmr": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
-			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+	commandsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string){
+		"trade-dero-xmr": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "DERO-XMR is trading at: " + utils.ExchangeRateString() + "\nWould you like to trade? \nTrades have a fee of 1%",
@@ -107,8 +107,8 @@ var (
 				panic(err)
 			}
 		},
-		"encode": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
-			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		"encode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
 					CustomID: "encode_" + interaction.Interaction.Member.User.ID,
@@ -167,8 +167,8 @@ var (
 				panic(err)
 			}
 		},
-		"giftbox": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
-			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		"giftbox": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
 					CustomID: "giftbox_" + interaction.Interaction.Member.User.ID,
@@ -223,8 +223,8 @@ var (
 				panic(err)
 			}
 		},
-		"decode": func(discord *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
-			err := discord.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		"decode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, AppID, GuildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
 					CustomID: "decode_" + interaction.Interaction.Member.User.ID,

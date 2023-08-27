@@ -9,10 +9,15 @@ import (
 )
 
 var (
-	BotToken         string
-	GuildID          string
-	AppID            string
+	// discord
+	BotToken       string
+	GuildID        string
+	AppID          string
+	ResultsChannel string
+
+	// dero
 	DeroServerIP     string
+	DeroNodePort     string
 	DeroWalletPort   string
 	DeroUser         string
 	DeroPass         string
@@ -20,9 +25,16 @@ var (
 	PongDir          string
 	PongDB           string
 	IAddressTextFile string
-	DeroNodePort     string
-	ChatGptApi       string
-	ResultsChannel   string
+
+	// monero
+	MoneroServerIP   string
+	MoneroServerPort string
+	MoneroWalletPort string
+	MoneroUser       string
+	MoneroPass       string
+
+	// chatGPT
+	ChatGptApi string
 )
 
 func loadConfig() {
@@ -33,9 +45,14 @@ func loadConfig() {
 	}
 	log.Println("Adding setting up configs")
 	// Read environment variables
+
+	// discord
 	BotToken = os.Getenv("BOT_TOKEN")
 	GuildID = os.Getenv("GUILD_ID")
 	AppID = os.Getenv("APP_ID")
+	ResultsChannel = os.Getenv("RESULTS_CHANNEL")
+
+	//dero
 	DeroServerIP = os.Getenv("DERO_SERVER_IP")
 	DeroWalletPort = os.Getenv("DERO_WALLET_PORT")
 	DeroUser = os.Getenv("USER")
@@ -45,8 +62,16 @@ func loadConfig() {
 	PongDB = PongDir + "/" + PongAmount + ".sales.db"
 	IAddressTextFile = PongDir + "/" + PongAmount + ".iaddress.txt"
 	DeroNodePort = os.Getenv("DERO_NODE_PORT")
+
+	// monero
+	MoneroServerIP = os.Getenv("MONERO_SERVER_IP")
+	MoneroServerPort = os.Getenv("MONERO_SERVER_PORT")
+	MoneroWalletPort = os.Getenv("MONERO_WALLET_PORT")
+	MoneroUser = os.Getenv("MONERO_WALLET_USER")
+	MoneroPass = os.Getenv("MONERO_WALLET_PASS")
+
+	// chatGPT
 	ChatGptApi = os.Getenv("OPEN_AI_TOKEN")
-	ResultsChannel = os.Getenv("RESULTS_CHANNEL")
 
 	// Ensure the directory exists
 	if _, err := os.Stat(PongDir); os.IsNotExist(err) {
