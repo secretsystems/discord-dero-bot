@@ -16,7 +16,7 @@ func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
 		helpMsg += "```We share our knowledge, insights and relationships we earned from our research and development using DERO.```\n"
 		helpMsg += "## Available Commands:\n\n"
 		helpMsg += "**Server:**\n"
-		helpMsg += "```!help <!command>``````!bot <query>``````!register <wallet address or wallet-name>``````!unregister``````/trade-dero-xmr```\n"
+		helpMsg += "```!help <!command>``````!bot <query>``````/register``````!unregister``````/trade-dero-xmr```\n"
 		helpMsg += "**DERO Wallet:**\n"
 		helpMsg += "```!lookup <@username or wallet name>``````!tip <@username, dero1q or wallet-name>``````/decode``````/encode```\n"
 		helpMsg += "**Node**\n"

@@ -252,9 +252,23 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	userMappings[username] = address
 	saveUserMappings()
 
+	registeredRole := "1144842099653623839"
+	// Add the registered role to the member
+	err := session.GuildMemberRoleAdd(interaction.GuildID, username, registeredRole)
+	if err != nil {
+		log.Println("Error adding role to member:", err)
+	}
+
+	unregisteredRole := "1144846590687838309"
+	// Remove the unregistered role from the member
+	err = session.GuildMemberRoleRemove(interaction.GuildID, username, unregisteredRole)
+	if err != nil {
+		log.Println("Error removing role from member:", err) // Updated log message
+	}
+
 	// Respond to the interaction
 	responseText := fmt.Sprintf("Successfully registered wallet input `%s` for <@%s>.", address, username)
-	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+	err = session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: responseText,
@@ -263,5 +277,13 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	})
 	if err != nil {
 		log.Println("Error responding to interaction:", err)
+	}
+
+	userID := strings.Split(data.CustomID, "_")[1]
+	resultsChannel := "1060312629505167362"
+	resultsMsg := fmt.Sprintf("<@%s> has registered with the server!", userID)
+	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
+	if err != nil {
+		log.Println("Error sending message:", err) // Added log message
 	}
 }
