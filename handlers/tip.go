@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -36,6 +35,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 		mentionedUserIDs := mentionRegex.FindStringSubmatch(input)
 
 		log.Println("Checking for mention id")
+		loadUserMappings()
 
 		if len(mentionedUserIDs) == 2 {
 			// A user was mentioned, look up their registered wallet address
@@ -112,7 +112,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 		}
 
 		// Send the tip
-		fmt.Println(recipientAddress)
+		// fmt.Println(recipientAddress)
 		session.ChannelMessageSend(message.ChannelID, "`secret-wallet` is sending 0.00002 DERO, or 2 DERI\nThis process takes roughly 18 seconds; or 1 block interval.")
 		amnt := 2
 		comment := "secret_pong_bot sends secret'a love"

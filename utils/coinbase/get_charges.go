@@ -8,8 +8,9 @@ import (
 )
 
 func GetCharges() {
+	userInput := 200
 	coinbaseAPIToken := os.Getenv("COINBASE_API_TOKEN")
-	test := "8aeeffba-05e9-4152-86d2-7fe5315d5d23"
+	test := PostCharges(userInput)
 	url := "https://api.commerce.coinbase.com/checkouts/" + test
 	method := "GET"
 

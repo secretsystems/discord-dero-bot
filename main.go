@@ -36,22 +36,24 @@ func init() {
 }
 
 func main() {
-	loadConfig()
 	// Initialize the bot
 
 	bot, err := bot.NewBot(botToken) // Replace with the actual initialization function
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
+
 	log.Printf("Initializing DERO\n")
 	// Call FetchAndParseTransfers function from the utils package
 	transferEntries, err := dero.FetchAndParseTransfers()
+
 	if err != nil {
 		log.Printf("Error fetching and parsing transfers: %v", err)
 	} else {
 		// Process the fetched and parsed transfer entries
 		log.Printf("Fetched and parsed %d transfer entries.\n", len(transferEntries))
 	}
+
 	bot.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
 		log.Println("Bot is up!")
 	})
@@ -70,7 +72,11 @@ func main() {
 	handlers.AddHandlers(session, appID, guildID)
 	handlers.AddModals(session, appID, guildID, resultsChannel)
 	handlers.RegisterSlashCommands(session, appID, guildID)
+	userInput := 123
+	coinbase.PostCharges(userInput)
+
 	coinbase.GetCharges()
+
 	log.Println("Bot is running. Press Ctrl+C to stop.")
 
 	// Set up a channel to capture the Ctrl+C signal
