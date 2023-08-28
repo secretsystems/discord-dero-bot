@@ -51,7 +51,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 				input = mappedAddress
 			} else {
 				userMention := "<@" + mentionedUserIDs[1] + ">"
-				session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `!register <wallet addr or wallet name>`")
+				session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `/register`")
 				return
 			}
 		}
@@ -102,9 +102,9 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 					// Mention the mentioned user and provide the message
 					if len(mentionedUserIDs) == 2 {
 						userMention := "<@" + mentionedUserIDs[1] + ">"
-						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\n"+userMention+" Please consider using `!register <wallet addr or wallet name>`")
+						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\n"+userMention+" Please consider using `/register`")
 					} else {
-						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\nPlease consider using `!register <wallet addr or wallet name>`")
+						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\nPlease consider using `/register`")
 					}
 					return
 				}

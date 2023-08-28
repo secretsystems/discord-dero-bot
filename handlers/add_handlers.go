@@ -11,7 +11,7 @@ var (
 	session        string
 )
 
-func AddHandlers(session *discordgo.Session, AppID, GuildID string) {
+func AddHandlers(session *discordgo.Session, appID, guildID string) {
 	// This handler will be triggered when the bot is ready
 	log.Println("Registering Interaction Handlers")
 
@@ -22,12 +22,12 @@ func AddHandlers(session *discordgo.Session, AppID, GuildID string) {
 		case discordgo.InteractionApplicationCommand:
 			log.Println("received: discordgo.InteractionApplicationCommand")
 			if h, ok := commandsHandlers[interaction.ApplicationCommandData().Name]; ok {
-				h(session, interaction, AppID, GuildID) // Pass appID and guildID
+				h(session, interaction, appID, guildID) // Pass appID and guildID
 			}
 		case discordgo.InteractionMessageComponent:
 			log.Println("received: discordgo.InteractionMessageComponent")
 			if h, ok := componentsHandlers[interaction.MessageComponentData().CustomID]; ok {
-				h(session, interaction, AppID, GuildID) // Pass appID and guildID
+				h(session, interaction, appID, guildID) // Pass appID and guildID
 			}
 
 		}

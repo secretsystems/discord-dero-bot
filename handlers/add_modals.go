@@ -6,13 +6,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func AddModals(session *discordgo.Session, appID, duildID string, resultsChannel string) {
+var userMappings map[string]string
+var userMappingsMutex sync.Mutex
+
+func AddModals(session *discordgo.Session, appID, guildID string, resultsChannel string) {
 	session.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 		// Check if the interaction type is ModalSubmitData
 		if interaction.Type == discordgo.InteractionModalSubmit {
@@ -27,6 +32,8 @@ func AddModals(session *discordgo.Session, appID, duildID string, resultsChannel
 				handleDecodeInteraction(session, interaction)
 			case "giftbox_" + interaction.Member.User.ID:
 				handleGiftboxInteraction(session, interaction, resultsChannel)
+			case "register_" + interaction.Member.User.ID:
+				handleRegister(session, interaction)
 			}
 		}
 	})
@@ -141,6 +148,8 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 		},
 	})
 	if err != nil {
+		log.Printf("Interaction Panic: %v", err)
+
 		panic(err)
 	}
 	if !strings.HasPrefix(data.CustomID, "giftbox_") {
@@ -153,5 +162,128 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func loadUserMappings() {
+	file, err := os.OpenFile("userMappings.json", os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Printf("Error opening user mappings file: %v", err)
+		return
+	}
+	defer file.Close()
+
+	// Check if the file is empty before decoding
+	fileInfo, err := file.Stat()
+	if err != nil {
+		log.Printf("Error getting file info: %v", err)
+		return
+	}
+	if fileInfo.Size() == 0 {
+		userMappings = make(map[string]string)
+		return
+	}
+
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&userMappings)
+	if err != nil {
+		log.Printf("Error decoding user mappings: %v", err)
+	}
+}
+
+func saveUserMappings() {
+	file, err := os.Create("userMappings.json")
+	if err != nil {
+		log.Printf("Error creating user mappings file: %v", err)
+		return
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(userMappings)
+	if err != nil {
+		log.Printf("Error encoding user mappings: %v", err)
+	}
+}
+
+func handleRegister(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	loadUserMappings()
+	data := interaction.ModalSubmitData()
+	address := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+
+	username := interaction.Member.User.ID
+
+	userMappingsMutex.Lock()
+	defer userMappingsMutex.Unlock()
+
+	// Check if the user is already registered
+	if existingAddress, exists := userMappings[username]; exists {
+		err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: fmt.Sprintf("<@%s> is already registered with wallet input: `%s`", username, existingAddress),
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
+		if err != nil {
+			log.Println("Error responding to decode interaction:", err)
+		}
+		return
+	}
+
+	// Check if the wallet input is already registered
+	for _, existingInput := range userMappings {
+		if existingInput == address {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: fmt.Sprintf("Wallet input `%s` is already registered.", address),
+					Flags:   discordgo.MessageFlagsEphemeral,
+				},
+			})
+			if err != nil {
+				log.Println("Error responding to decode interaction:", err)
+			}
+			return
+		}
+	}
+
+	userMappings[username] = address
+	saveUserMappings()
+
+	registeredRole := "1144842099653623839"
+	// Add the registered role to the member
+	err := session.GuildMemberRoleAdd(interaction.GuildID, username, registeredRole)
+	if err != nil {
+		log.Println("Error adding role to member:", err)
+	}
+
+	unregisteredRole := "1144846590687838309"
+	// Remove the unregistered role from the member
+	err = session.GuildMemberRoleRemove(interaction.GuildID, username, unregisteredRole)
+	if err != nil {
+		log.Println("Error removing role from member:", err) // Updated log message
+	}
+
+	// Respond to the interaction
+	responseText := fmt.Sprintf("Successfully registered wallet input `%s` for <@%s>.", address, username)
+	err = session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: responseText,
+			Flags:   discordgo.MessageFlagsEphemeral,
+		},
+	})
+	if err != nil {
+		log.Println("Error responding to interaction:", err)
+	}
+
+	userID := strings.Split(data.CustomID, "_")[1]
+	resultsChannel := "1060312629505167362"
+	resultsMsg := fmt.Sprintf("<@%s> has registered with the server!", userID)
+	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
+	if err != nil {
+		log.Println("Error sending message:", err) // Added log message
 	}
 }
