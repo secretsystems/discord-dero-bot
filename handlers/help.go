@@ -29,9 +29,9 @@ func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
 		botHelpMsg := "Usage: `!bot <query>`\n" +
 			"Get information from the bot based on your query."
 		session.ChannelMessageSend(message.ChannelID, botHelpMsg)
-	case "!register":
+	case "/register":
 		// Send a breakdown of the register command and its usage
-		registerHelpMsg := "Usage: `!register <wallet address or wallet-name>`\n" +
+		registerHelpMsg := "Usage: `/register`\n" +
 			"Register your wallet address or wallet name for tipping."
 		session.ChannelMessageSend(message.ChannelID, registerHelpMsg)
 	case "!unregister":
