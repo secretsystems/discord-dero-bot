@@ -3,8 +3,6 @@ package dero
 import (
 	"log"
 	"os"
-
-	"github.com/joho/godotenv" // Import the godotenv package
 )
 
 var (
@@ -21,11 +19,6 @@ var (
 )
 
 func init() {
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
 
 	//dero
 	deroServerIP = "192.168.12.208"
