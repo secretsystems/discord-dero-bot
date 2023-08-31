@@ -29,6 +29,10 @@ var (
 			Name:        "register",
 			Description: "Register you DERO wallet address/name with the server!",
 		},
+		{
+			Name:        "buy-dero-with-crypto",
+			Description: "Purchase DERO from the secret-wallet with crypto",
+		},
 	}
 )
 var (
@@ -278,6 +282,43 @@ var (
 			})
 			if err != nil {
 				log.Printf("Component Panic: %v", err)
+				panic(err)
+			}
+		},
+		"buy-dero-with-crypto": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseModal,
+				Data: &discordgo.InteractionResponseData{
+					CustomID: "purchase_dero_" + interaction.Interaction.Member.User.ID,
+					Title:    "Purchase a DERO with Crypto",
+					Components: []discordgo.MessageComponent{
+						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
+							discordgo.TextInput{
+								CustomID:    "amount",
+								Label:       "How much DERO would you like",
+								Style:       discordgo.TextInputShort,
+								Placeholder: "Please keep in amounts under 100 DERO",
+								Required:    true,
+							},
+						},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.TextInput{
+									CustomID:    "address",
+									Label:       "Wallet Address?",
+									Style:       discordgo.TextInputShort,
+									Placeholder: "Please provide full dero1q address",
+									Required:    false,
+									MaxLength:   66,
+									MinLength:   66,
+								},
+							},
+						},
+					},
+				},
+			})
+			if err != nil {
 				panic(err)
 			}
 		},

@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	ResultsChannel string
-	session        string
+	session string
 )
 
 func AddHandlers(session *discordgo.Session, appID, guildID string) {

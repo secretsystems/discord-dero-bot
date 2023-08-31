@@ -15,19 +15,16 @@ type CheckoutResponse struct {
 	} `json:"data"`
 }
 
-func PostCharges(userInput int) string {
+func PostCharges(price float64) string {
 
-	amount := userInput
-	if amount == 0 {
-		amount = 100
-	}
+	amount := price
 	url := "https://api.commerce.coinbase.com/checkouts"
 	method := "POST"
 	name := "BUY DERO WITH CRYPTO"
-	description := "Purchase DERO using Coinbase's Commerce Platform. \n Once we have delivered, you will have DERO \n You are being asked for your DERO wallet address/name"
-	requestedInfo := []string{"address"}
+	description := "Purchase DERO using Coinbase's Commerce Platform. \n Once we have delivered, you will have DERO"
+	requestedInfo := []string{"name"}
 	pricingType := "fixed_price"
-	localPrice := map[string]string{"amount": fmt.Sprintf("%d", amount), "currency": "USD"}
+	localPrice := map[string]string{"amount": fmt.Sprintf("%v", amount), "currency": "USD"}
 	coinbaseAPIToken := os.Getenv("COINBASE_API_TOKEN")
 
 	payloadData := map[string]interface{}{
@@ -75,7 +72,7 @@ func PostCharges(userInput int) string {
 		fmt.Println(err)
 		return "ERROR"
 	}
-	Checkout := checkoutResponse.Data.ID
-	fmt.Println("Checkout ID:", Checkout)
+	Checkout := "https://commerce.coinbase.com/checkout/" + checkoutResponse.Data.ID
+	fmt.Println("Checkout URL:", Checkout)
 	return Checkout
 }

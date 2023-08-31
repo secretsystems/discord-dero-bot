@@ -2,7 +2,9 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -29,8 +31,10 @@ func Cleanup(session *discordgo.Session, appID, guildID string) {
 
 	for id, name := range commandIDs {
 		err := session.ApplicationCommandDelete(appID, guildID, id)
+		fmt.Println("Say something")
 		if err != nil {
 			log.Fatalf("Cannot delete slash command %q: %v", name, err)
 		}
+		time.Sleep(2)
 	}
 }

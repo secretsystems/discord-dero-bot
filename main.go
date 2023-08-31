@@ -3,7 +3,6 @@ package main
 import (
 	"discord-dero-bot/bot"      // Update with the correct import path for your bot package
 	"discord-dero-bot/handlers" // Update with the correct import path for your handlers package
-	"discord-dero-bot/utils/coinbase"
 	"discord-dero-bot/utils/dero"
 	"log"
 	"os"
@@ -72,10 +71,6 @@ func main() {
 	handlers.AddHandlers(session, appID, guildID)
 	handlers.AddModals(session, appID, guildID, resultsChannel)
 	handlers.RegisterSlashCommands(session, appID, guildID)
-	userInput := 123
-	coinbase.PostCharges(userInput)
-
-	coinbase.GetCharges()
 
 	log.Println("Bot is running. Press Ctrl+C to stop.")
 
