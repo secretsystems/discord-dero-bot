@@ -4,40 +4,30 @@ import (
 	"discord-dero-bot/bot"      // Update with the correct import path for your bot package
 	"discord-dero-bot/handlers" // Update with the correct import path for your handlers package
 	"discord-dero-bot/utils/dero"
+	"flag"
 	"log"
 	"os"
 	"os/signal"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
 )
 
 var (
 	// discord
-	botToken       string
-	guildID        string
-	appID          string
-	resultsChannel string
+	botToken       = flag.String("token", "", "Bot access token")
+	guildID        = flag.String("guild", "", "Test guild ID")
+	appID          = flag.String("app", "", "Application ID")
+	resultsChannel = flag.String("results", "", "Channel where send survey results to")
 )
 
 func init() {
-
-	// 	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-	//discord
-	botToken = os.Getenv("BOT_TOKEN")
-	guildID = os.Getenv("GUILD_ID")
-	appID = os.Getenv("APP_ID")
-	resultsChannel = os.Getenv("RESULTS_CHANNEL")
+	flag.Parse()
 }
 
 func main() {
 	// Initialize the bot
 
-	bot, err := bot.NewBot(botToken) // Replace with the actual initialization function
+	bot, err := bot.NewBot(*botToken) // Replace with the actual initialization function
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
@@ -68,9 +58,9 @@ func main() {
 
 	// Register interaction handlers
 
-	handlers.AddHandlers(session, appID, guildID)
-	handlers.AddModals(session, appID, guildID, resultsChannel)
-	handlers.RegisterSlashCommands(session, appID, guildID)
+	handlers.AddHandlers(session, *appID, *guildID)
+	handlers.AddModals(session, *appID, *guildID, *resultsChannel)
+	handlers.RegisterSlashCommands(session, *appID, *guildID)
 
 	log.Println("Bot is running. Press Ctrl+C to stop.")
 
@@ -80,7 +70,7 @@ func main() {
 
 	// Wait for an interrupt signal to close the program
 	<-channel
-	handlers.Cleanup(session, appID, guildID)
+	handlers.Cleanup(session, *appID, *guildID)
 	log.Println("Bot is cleaning up.")
 
 }

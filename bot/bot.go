@@ -15,16 +15,13 @@ var PingHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate)
 	"!insult":     handlers.HandleMessage,
 	"!lookup":     handlers.HandleWalletName,
 	"!derod":      handlers.HandleGetInfoDerod,
-	"!monerod":    handlers.HandleGetInfoMonerod,
 	"!quote":      handlers.HandleQuoteRequest,
 	"!markets":    handlers.HandleMarketsRequest,
 	"!help":       handlers.HandleHelp,
 	"!bot":        handlers.HandleChat,
 	"!tip":        handlers.HandleTip,
-	// "!register":   handlers.HandleRegister,
 	"!unregister": handlers.HandleUnregister,
 	"!shop":       handlers.HandleShop,
-	// "!membership"  handlers.HandleMembership
 }
 
 type Bot struct {

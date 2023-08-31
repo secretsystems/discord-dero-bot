@@ -3,19 +3,21 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-var chatGPTAPI string
+var chatGPTAPI = flag.String("chat", "", "Channel where send survey results to")
 
+func init() {
+	flag.Parse()
+}
 func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
-	chatGPTAPI = os.Getenv("OPEN_AI_TOKEN")
 
 	// Check if the user has the required role
 	hasSecretMembersRole := false
@@ -64,7 +66,7 @@ func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 
 	// fmt.Printf(apiToken)
-	if chatGPTAPI == "" {
+	if *chatGPTAPI == "" {
 		log.Println("OpenAI API token not found in environment")
 		return
 	}
@@ -78,7 +80,7 @@ func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 	// fmt.Printf("requst: %v\n", req)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+chatGPTAPI)
+	req.Header.Set("Authorization", "Bearer "+*chatGPTAPI)
 
 	client := http.Client{}
 	resp, err := client.Do(req)

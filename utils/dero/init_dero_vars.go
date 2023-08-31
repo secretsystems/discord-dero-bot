@@ -28,11 +28,11 @@ func init() {
 	}
 
 	//dero
-	deroServerIP = os.Getenv("DERO_SERVER_IP")
-	deroWalletPort = os.Getenv("DERO_WALLET_PORT")
-	deroServerPort = os.Getenv("DERO_NODE_PORT")
-	deroUser = os.Getenv("USER")
-	deroPass = os.Getenv("PASS")
+	deroServerIP = "192.168.12.208"
+	deroWalletPort = "10103"
+	deroServerPort = "10102"
+	deroUser = "user"
+	deroPass = "pass"
 	homeDir, _ := os.UserHomeDir()
 	pongDir = homeDir + "/dero-utils"
 	pongDB = pongDir + "/" + pongAmount + ".sales.db"

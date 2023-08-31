@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils"
 	"log"
 
 	"github.com/bwmarrin/discordgo"
@@ -14,10 +13,6 @@ var (
 			Description: "Encode Integrated Address",
 		},
 		{
-			Name:        "trade-dero-xmr",
-			Description: "Trade DERO-XMR",
-		},
-		{
 			Name:        "decode",
 			Description: "Decode Integrated Address",
 		},
@@ -28,10 +23,6 @@ var (
 		{
 			Name:        "register",
 			Description: "Register you DERO wallet address/name with the server!",
-		},
-		{
-			Name:        "buy-dero-with-crypto",
-			Description: "Purchase DERO from the secret-wallet with crypto",
 		},
 	}
 )
@@ -64,58 +55,6 @@ var (
 	}
 
 	commandsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string){
-		"trade-dero-xmr": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "DERO-XMR is trading at: " + utils.ExchangeRateString() + "\nWould you like to trade? \nTrades have a fee of 1%",
-					Flags:   discordgo.MessageFlagsEphemeral,
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.Button{
-									Label:    "BUY DERO with XMR",
-									Style:    discordgo.SuccessButton,
-									Disabled: false,
-									CustomID: "fd_yes",
-								},
-								discordgo.Button{
-									Label:    "SELL DERO for XMR",
-									Style:    discordgo.DangerButton,
-									Disabled: false,
-									CustomID: "fd_no",
-								},
-							},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.Button{
-									Label:    "DERO-XMR chart",
-									Style:    discordgo.LinkButton,
-									Disabled: false,
-									URL:      "https://www.tradingview.com/chart/XAuuVNP7/",
-								},
-								discordgo.Button{
-									Label:    "Walkthru",
-									Style:    discordgo.LinkButton,
-									Disabled: false,
-									URL:      "https://youtu.be/x_EZ3BdpyyY",
-								},
-								discordgo.Button{
-									Label:    "Github Repo",
-									Style:    discordgo.LinkButton,
-									Disabled: false,
-									URL:      "https://github.com/secretnamebasis/dero-xmr-swap",
-								},
-							},
-						},
-					},
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
 		"encode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,

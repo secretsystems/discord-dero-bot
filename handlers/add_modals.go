@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils/coinbase"
 	"discord-dero-bot/utils/dero"
 	"encoding/json"
 	"fmt"
@@ -30,8 +29,6 @@ func AddModals(session *discordgo.Session, appID, guildID string, resultsChannel
 				handleGiftboxInteraction(session, interaction, resultsChannel)
 			case "register_" + interaction.Member.User.ID:
 				handleRegister(session, interaction)
-			case "purchase_dero_" + interaction.Member.User.ID:
-				handleCryptoPurchase(session, interaction, resultsChannel)
 			}
 		}
 	})
@@ -241,73 +238,5 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		log.Println("Error sending message:", err) // Added log message
-	}
-}
-
-func handleCryptoPurchase(session *discordgo.Session, interaction *discordgo.InteractionCreate, resultsChannel string) {
-	// Step 1: Make a GET request to the API endpoint
-	resultsChannel = "1059682504124158074"
-	response, err := http.Get("https://tradeogre.com/api/v1/ticker/dero-usdt")
-	if err != nil {
-		log.Println("Error fetching API data:", err)
-		return
-	}
-	defer response.Body.Close()
-
-	// Step 2: Parse the JSON response
-	var apiResponse struct {
-		Success bool   `json:"success"`
-		Price   string `json:"price"`
-	}
-	err = json.NewDecoder(response.Body).Decode(&apiResponse)
-	if err != nil {
-		log.Println("Error decoding API response:", err)
-		return
-	}
-
-	// Convert the price from string to float64
-	price, err := strconv.ParseFloat(apiResponse.Price, 64)
-	if err != nil {
-		log.Println("Error parsing price:", err)
-		return
-	}
-
-	// Step 3: Calculate the amount in atomic units
-
-	data := interaction.ModalSubmitData()
-
-	amountString := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
-	amount, err := strconv.ParseFloat(amountString, 64)
-	if err != nil {
-		log.Printf("Error parsing price: %s", err)
-		return
-	}
-	price = price * amount
-	address := data.Components[1].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
-
-	messageContent := coinbase.PostCharges(price)
-
-	err = session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: "Please visit the coinbase address to complete your purchase :\n " + messageContent + " \nAnd we will get back to you as soon as your order is marked receieved.\nWe will contact you on your shipping status.",
-			Flags:   discordgo.MessageFlagsEphemeral,
-		},
-	})
-	if err != nil {
-		log.Printf("Interaction Panic: %v", err)
-
-		panic(err)
-	}
-	if !strings.HasPrefix(data.CustomID, "purchase_dero_") {
-		return
-	}
-
-	userid := strings.Split(data.CustomID, "_")[1]
-	resultsMsg := fmt.Sprintf(
-		"User <@%s> has made an order with address: %s", userid, address)
-	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
-	if err != nil {
-		panic(err)
 	}
 }
