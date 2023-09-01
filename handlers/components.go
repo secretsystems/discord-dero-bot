@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"discord-dero-bot/utils/dero"
 	"log"
 
 	"github.com/bwmarrin/discordgo"
@@ -23,6 +24,10 @@ var (
 		{
 			Name:        "register",
 			Description: "Register you DERO wallet address/name with the server!",
+		},
+		{
+			Name:        "membership",
+			Description: "Obtain your membership with the server",
 		},
 	}
 )
@@ -53,8 +58,23 @@ var (
 			}
 		},
 	}
-
 	commandsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string){
+		"membership": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
+			userID := interaction.Interaction.Member.User.ID
+			startMonitoringForTransfer(session, guildID, userID)
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "To begin membership, please pay the provided integrated DERO address```" +
+						dero.MakeIntegratedAddress(deroWalletAddress, deroMembershipAmount, userID, 1337) +
+						"```Memberships are set at 5 USD per month and are payable with DERO",
+					Flags: discordgo.MessageFlagsEphemeral,
+				},
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
 		"encode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,

@@ -22,6 +22,7 @@ func RegisterSlashCommands(session *discordgo.Session, appID, guildID string) {
 		}
 		log.Printf("Registered Slash Commands: %v", command.Name)
 		commandIDs[registeredCommands.ID] = registeredCommands.Name
+		time.Sleep(2)
 	}
 }
 

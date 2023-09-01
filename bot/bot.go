@@ -66,6 +66,9 @@ func (bot *Bot) OnGeneric(s *discordgo.Session, event interface{}) {
 		log.Printf("TYPING EVENT: User %v is typing on channel %v\n", cast.UserID, cast.ChannelID)
 	case *discordgo.MessageCreate:
 		log.Printf("MESSAGE EVENT: %v | %v", cast.Author, cast.Content)
+	case *discordgo.RateLimit:
+		log.Printf("RATE LIMIT EVENT: %v ", cast.RetryAfter, cast.)
+
 	}
 }
 
