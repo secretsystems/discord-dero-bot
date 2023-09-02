@@ -153,10 +153,10 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	if !strings.HasPrefix(data.CustomID, "giftbox_") {
 		return
 	}
-
+	shopkeeper := "706842280828469260"
 	userid := strings.Split(data.CustomID, "_")[1]
 	resultsMsg := fmt.Sprintf(
-		"User <@%s> has made an integrated address for a Giftbox", userid)
+		"User <@%s> has made an integrated address for <@%s>'s a Giftbox,", userid, shopkeeper)
 	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		panic(err)

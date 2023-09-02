@@ -126,7 +126,7 @@ var (
 						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
 							discordgo.TextInput{
 								CustomID:    "address",
-								Label:       "Address",
+								Label:       "Address of where funds will be sent",
 								Style:       discordgo.TextInputShort,
 								Placeholder: "dero1q wallet address",
 								Required:    true,
@@ -138,9 +138,9 @@ var (
 						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
 							discordgo.TextInput{
 								CustomID:    "amount",
-								Label:       "Amount; minimum 2 DERI",
+								Label:       "Amount in atomic units; minimum 2 DERI",
 								Style:       discordgo.TextInputShort,
-								Placeholder: "How much in atomic units? 1 DERO = 100000",
+								Placeholder: "1 DERO = 100000 ; 2 DERI = 2",
 								Required:    true,
 								MaxLength:   64,
 								MinLength:   1,
@@ -150,22 +150,24 @@ var (
 						discordgo.ActionsRow{
 							Components: []discordgo.MessageComponent{
 								discordgo.TextInput{
-									CustomID:  "comment",
-									Label:     "What would you include in your encoding?",
-									Style:     discordgo.TextInputParagraph,
-									Required:  false,
-									MaxLength: 128,
+									CustomID:    "comment",
+									Label:       "Comment/subject/details",
+									Style:       discordgo.TextInputParagraph,
+									Placeholder: "",
+									Required:    false,
+									MaxLength:   128,
 								},
 							},
 						},
 						discordgo.ActionsRow{
 							Components: []discordgo.MessageComponent{
 								discordgo.TextInput{
-									CustomID:  "destionation",
-									Label:     "What port you want to send this too?, ex 1337",
-									Style:     discordgo.TextInputShort,
-									Required:  false,
-									MaxLength: 128,
+									CustomID:    "destionation",
+									Label:       "What port you want to send this too?, ",
+									Style:       discordgo.TextInputShort,
+									Placeholder: "ex. 1337",
+									Required:    false,
+									MaxLength:   128,
 								},
 							},
 						},

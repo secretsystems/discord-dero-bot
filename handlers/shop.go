@@ -16,7 +16,7 @@ func HandleShop(session *discordgo.Session, interaction *discordgo.MessageCreate
 		// Send the general help message with a list of available commands
 		helpMsg := "# Welcome to the Secret Discord Server Shop!\n"
 		helpMsg += "## Available Product and Services(?):\n\n"
-		helpMsg += "- !shop giftbox:\n\n"
+		helpMsg += "- !shop giftbox\n\n"
 
 		session.ChannelMessageSend(interaction.ChannelID, helpMsg)
 	case "giftbox":
