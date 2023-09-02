@@ -17,6 +17,7 @@ var (
 func RegisterSlashCommands(session *discordgo.Session, appID, guildID string) {
 	log.Println("Adding Registering Slash Commands")
 	for _, command := range Commands {
+		time.Sleep(3)
 		registeredCommands, err := session.ApplicationCommandCreate(appID, guildID, &command)
 		if err != nil {
 			log.Fatalf("Cannot create %v slash command: %v", command.Name, err)
@@ -30,11 +31,11 @@ func Cleanup(session *discordgo.Session, appID, guildID string) {
 	log.Println("Adding Cleaning up")
 
 	for id, name := range commandIDs {
+		time.Sleep(3)
 		err := session.ApplicationCommandDelete(appID, guildID, id)
 		fmt.Println("Say something")
 		if err != nil {
 			log.Fatalf("Cannot delete slash command %q: %v", name, err)
 		}
-		time.Sleep(2)
 	}
 }

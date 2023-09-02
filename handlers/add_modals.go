@@ -128,11 +128,7 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	size := data.Components[1].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	shipping := data.Components[2].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	contact := data.Components[3].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
-	comment := ""
-	comment += "C: " + color + " "
-	comment += "S: " + size + " "
-	comment += "A: " + shipping + " "
-	comment += "P: " + contact + " "
+	comment := "C: " + color + " S: " + size + " A: " + shipping + " P: " + contact
 	address := "dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4"
 	destination := 1337
 	integratedAddress := dero.MakeIntegratedAddress(address, amount, comment, destination)
