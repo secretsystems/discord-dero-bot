@@ -67,7 +67,7 @@ func (bot *Bot) OnGeneric(s *discordgo.Session, event interface{}) {
 	case *discordgo.MessageCreate:
 		log.Printf("MESSAGE EVENT: %v | %v", cast.Author, cast.Content)
 	case *discordgo.RateLimit:
-		log.Printf("RATE LIMIT EVENT: %v ", cast.RetryAfter, cast.)
+		log.Printf("RATE LIMIT EVENT: %v ", cast.RetryAfter)
 
 	}
 }
