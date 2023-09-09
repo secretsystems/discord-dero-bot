@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -88,8 +89,10 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 			} else {
 				// Perform a wallet name lookup
 				log.Printf(input)
-				lookupResult := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
-
+				lookupResult, err := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
+				if err != nil {
+					fmt.Println("Wallet name not found or invalid.")
+				}
 				if lookupResult != "" {
 					// Ensure sender's address and recipient's address are different
 					if lookupResult != mappedAddress {

@@ -35,6 +35,7 @@ func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 	userInput := strings.TrimPrefix(message.Content, "!bot ")
 	session.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
 
+	userInput = userInput + " .Keep your response less than 1337 characters. Your max_tokens limit is 200"
 	// fmt.Printf(userInput)
 	// Prepare the request payload
 	payload := struct {

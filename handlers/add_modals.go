@@ -30,7 +30,7 @@ func AddModals(session *discordgo.Session, appID, guildID string, resultsChannel
 				handleGiftboxInteraction(session, interaction, resultsChannel)
 			case "register_" + interaction.Member.User.ID:
 				handleRegister(session, interaction)
-			case "purchase_dero_" + interaction.Member.User.ID:
+			case "trade_dero_" + interaction.Member.User.ID:
 				handleCryptoPurchase(session, interaction, resultsChannel)
 			}
 		}
@@ -162,9 +162,51 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 func handleRegister(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 	loadUserMappings()
 	data := interaction.ModalSubmitData()
-	address := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
-
+	input := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	username := interaction.Member.User.ID
+
+	// Check if the input meets the criteria for a DERO address
+	isDeroAddress := isValidDeroAddress(input)
+
+	var address, walletType string
+
+	if isDeroAddress {
+		address = input
+		walletType = "address"
+	} else {
+		walletType = "name"
+		var err error
+		address, err = dero.WalletNameToAddress(input) // Implement the wallet name lookup function
+
+		if err != nil {
+			errMessage := fmt.Sprintf("Error: %s", err.Error())
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: errMessage,
+					Flags:   discordgo.MessageFlagsEphemeral,
+				},
+			})
+			if err != nil {
+				log.Println("Error responding to decode interaction:", err)
+			}
+			return
+		}
+
+		if address == "" {
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: fmt.Sprintf("<@%s> was looked up and is not registered to the DERO network. You need to register it with DERO first.", username),
+					Flags:   discordgo.MessageFlagsEphemeral,
+				},
+			})
+			if err != nil {
+				log.Println("Error responding to decode interaction:", err)
+			}
+			return
+		}
+	}
 
 	userMappingsMutex.Lock()
 	defer userMappingsMutex.Unlock()
@@ -219,7 +261,7 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	}
 
 	// Respond to the interaction
-	responseText := fmt.Sprintf("Successfully registered wallet input `%s` for <@%s>.", address, username)
+	responseText := fmt.Sprintf("Successfully registered wallet %s `%s` for <@%s>.", walletType, address, username)
 	err = session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
@@ -295,15 +337,19 @@ func handleCryptoPurchase(session *discordgo.Session, interaction *discordgo.Int
 
 		panic(err)
 	}
-	if !strings.HasPrefix(data.CustomID, "purchase_dero_") {
+	if !strings.HasPrefix(data.CustomID, "trade_dero_") {
 		return
 	}
 
-	userid := strings.Split(data.CustomID, "_")[1]
+	userid := strings.Split(data.CustomID, "_")[2]
 	resultsMsg := fmt.Sprintf(
 		"User <@%s> has made an order with address: %s", userid, address)
 	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		panic(err)
 	}
+}
+func isValidDeroAddress(address string) bool {
+	// Check if the address starts with "dero1" and has 66 characters
+	return strings.HasPrefix(address, "dero1") && len(address) == 66
 }

@@ -31,7 +31,11 @@ var (
 		},
 		{
 			Name:        "buy-dero-with-crypto",
-			Description: "Purchase DERO from the secret-wallet with crypto",
+			Description: "Purchase DERO from the `secret-wallet` with crypto",
+		},
+		{
+			Name:        "buy-dero-with-fiat",
+			Description: "Purchase DERO from the `secret-wallet` with FIAT",
 		},
 	}
 )
@@ -68,7 +72,7 @@ var (
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "DERO-XMR is trading at: " + utils.ExchangeRateString() + "\nWould you like to trade? \nTrades have a fee of 1%",
+					Content: "DERO-XMR is trading at: " + utils.DeroXmrExchangeRateString() + "\nWould you like to trade? \nTrades have a fee of 1%",
 					Flags:   discordgo.MessageFlagsEphemeral,
 					Components: []discordgo.MessageComponent{
 						discordgo.ActionsRow{
@@ -99,7 +103,7 @@ var (
 									Label:    "Walkthru",
 									Style:    discordgo.LinkButton,
 									Disabled: false,
-									URL:      "https://youtu.be/x_EZ3BdpyyY",
+									URL:      "https://youtu.be/OGuV7jSAccE",
 								},
 								discordgo.Button{
 									Label:    "Github Repo",
@@ -291,7 +295,7 @@ var (
 			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseModal,
 				Data: &discordgo.InteractionResponseData{
-					CustomID: "purchase_dero_" + interaction.Interaction.Member.User.ID,
+					CustomID: "trade_dero_" + interaction.Interaction.Member.User.ID,
 					Title:    "Purchase a DERO with Crypto",
 					Components: []discordgo.MessageComponent{
 						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
@@ -318,6 +322,19 @@ var (
 							},
 						},
 					},
+				},
+			})
+			if err != nil {
+				panic(err)
+			}
+		},
+		"buy-dero-with-fiat": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
+			stripePaymentLink := "https://buy.stripe.com/7sI4k5bIp69HdI4cMN"
+			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "DERO-USDT is trading at: " + utils.GetDeroUsdtAskString() + "\nWould you like to purcahse DERO with Fiat? \nDisclosure: Limit of $100 and purchases have a fee of 8%\n" + stripePaymentLink,
+					Flags:   discordgo.MessageFlagsEphemeral,
 				},
 			})
 			if err != nil {

@@ -48,12 +48,16 @@ func getAsk(pair string) float64 {
 	return parsed
 }
 
-func ExchangeRate() float64 {
+func GetDeroUsdtAskString() string {
+	return fmt.Sprintf("%f", getAsk("dero-usdt"))
+}
+
+func DeroXmrExchangeRate() float64 {
 	xmr := getAsk("xmr-usdt")
 	dero := getAsk("dero-usdt")
 	return dero / xmr
 }
 
-func ExchangeRateString() string {
-	return fmt.Sprintf("%f", ExchangeRate())
+func DeroXmrExchangeRateString() string {
+	return fmt.Sprintf("%f", DeroXmrExchangeRate())
 }

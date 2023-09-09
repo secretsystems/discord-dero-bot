@@ -24,7 +24,7 @@ func init() {
 	}
 	// monero
 	moneroServerIP = os.Getenv("MONERO_SERVER_IP")
-	moneroServerPort = os.Getenv("MONERO_SERVER_PORT")
+	moneroServerPort = os.Getenv("MONERO_NODE_PORT")
 	moneroWalletPort = os.Getenv("MONERO_WALLET_PORT")
 	moneroUser = os.Getenv("MONERO_WALLET_USER")
 	moneroPass = os.Getenv("MONERO_WALLET_PASS")

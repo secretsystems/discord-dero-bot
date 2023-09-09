@@ -14,7 +14,7 @@ type WalletInfo struct {
 	IsRegistered bool
 }
 
-func WalletNameToAddress(input string) string {
+func WalletNameToAddress(input string) (string, error) {
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "1",
@@ -27,7 +27,7 @@ func WalletNameToAddress(input string) string {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		log.Printf("Error marshaling JSON data: %v", err)
-		return ""
+		return "", err
 	}
 
 	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroServerPort)
@@ -35,7 +35,7 @@ func WalletNameToAddress(input string) string {
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating request: %v", err)
-		return ""
+		return "", err
 	}
 
 	request.SetBasicAuth(deroUser, deroPass)
@@ -45,7 +45,7 @@ func WalletNameToAddress(input string) string {
 	response, err := client.Do(request)
 	if err != nil {
 		log.Printf("Error sending HTTP Post request: %v", err)
-		return ""
+		return "", err
 	}
 
 	defer response.Body.Close()
@@ -58,17 +58,25 @@ func WalletNameToAddress(input string) string {
 		err = json.Unmarshal(responseBody, &mapResponse)
 		if err != nil {
 			log.Printf("Error decoding response JSON: %v", err)
-			return ""
+			return "", err
+		}
+
+		errorObj, errorExists := mapResponse["error"].(map[string]interface{})
+		if errorExists {
+			errorMessage, messageExists := errorObj["message"].(string)
+			if messageExists {
+				return "", fmt.Errorf("DERO API Error: %s", errorMessage)
+			}
 		}
 
 		result, resultExists := mapResponse["result"].(map[string]interface{})
 		if resultExists {
 			addr, addrExists := result["address"].(string)
 			if addrExists {
-				return addr
+				return addr, nil
 			}
 		}
 	}
 
-	return ""
+	return "", fmt.Errorf("Invalid wallet name: %s", input)
 }

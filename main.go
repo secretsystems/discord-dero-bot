@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -32,6 +33,8 @@ func init() {
 	guildID = os.Getenv("GUILD_ID")
 	appID = os.Getenv("APP_ID")
 	resultsChannel = os.Getenv("RESULTS_CHANNEL")
+	// Initialize a token bucket for registration and cleanup
+
 }
 
 func main() {
@@ -53,10 +56,6 @@ func main() {
 		log.Printf("Fetched and parsed %d transfer entries.\n", len(transferEntries))
 	}
 
-	bot.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
-		log.Println("Bot is up!")
-	})
-
 	err = bot.Open()
 	if err != nil {
 		log.Fatalf("Error opening Discord bot connection: %v", err)
@@ -70,9 +69,12 @@ func main() {
 
 	handlers.AddHandlers(session, appID, guildID)
 	handlers.AddModals(session, appID, guildID, resultsChannel)
-	handlers.RegisterSlashCommands(session, appID, guildID)
+	registrationBucket := handlers.NewTokenBucket(1, 1, time.Second*4) // Allow 1 request every 5 seconds
+	handlers.RegisterSlashCommands(session, appID, guildID, registrationBucket)
 
-	log.Println("Bot is running. Press Ctrl+C to stop.")
+	bot.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
+		log.Println("Bot is up!")
+	})
 
 	// Set up a channel to capture the Ctrl+C signal
 	channel := make(chan os.Signal, 1)
@@ -80,7 +82,8 @@ func main() {
 
 	// Wait for an interrupt signal to close the program
 	<-channel
-	handlers.Cleanup(session, appID, guildID)
+	cleanupBucket := handlers.NewTokenBucket(1, 1, time.Second*4) // Allow 1 request every 5 seconds
+	handlers.Cleanup(session, appID, guildID, cleanupBucket)
 	log.Println("Bot is cleaning up.")
 
 }
