@@ -100,16 +100,26 @@ var (
 									URL:      "https://www.tradingview.com/chart/XAuuVNP7/",
 								},
 								discordgo.Button{
-									Label:    "Walkthru",
+									Label:    "Github Repo",
+									Style:    discordgo.LinkButton,
+									Disabled: false,
+									URL:      "https://github.com/secretnamebasis/dero-xmr-swap",
+								},
+							},
+						},
+						discordgo.ActionsRow{
+							Components: []discordgo.MessageComponent{
+								discordgo.Button{
+									Label:    "Walkthru: Buy DERO",
 									Style:    discordgo.LinkButton,
 									Disabled: false,
 									URL:      "https://youtu.be/OGuV7jSAccE",
 								},
 								discordgo.Button{
-									Label:    "Github Repo",
+									Label:    "Walkthru: Sell DERO",
 									Style:    discordgo.LinkButton,
 									Disabled: false,
-									URL:      "https://github.com/secretnamebasis/dero-xmr-swap",
+									URL:      "https://youtu.be/RLeN03QC6jE",
 								},
 							},
 						},

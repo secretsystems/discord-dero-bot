@@ -206,6 +206,7 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 			}
 			return
 		}
+		address = input
 	}
 
 	userMappingsMutex.Lock()
