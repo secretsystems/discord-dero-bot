@@ -109,12 +109,8 @@ func respondWithMessageAndComponents(session *discordgo.Session, interaction *di
 	}
 }
 
-func NewModal(
-	session *discordgo.Session,
-	interaction *discordgo.InteractionCreate,
-	customID, title string,
-	components []discordgo.MessageComponent,
-) *Modal {
+// NewModal creates a new Modal instance.
+func NewModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, customID, title string, components []discordgo.MessageComponent) *Modal {
 	return &Modal{
 		Session:     session,
 		Interaction: interaction,

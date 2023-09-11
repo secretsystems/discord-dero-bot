@@ -1,6 +1,12 @@
 package handlers
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"discord-dero-bot/utils/dero"
+	"log"
+	"strconv"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 func handleEncode(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 	components := createEncodeModalComponents()
@@ -52,4 +58,32 @@ func createEncodeModalComponents() []discordgo.MessageComponent {
 			},
 		}},
 	}
+}
+
+func handleEncodeInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	data := interaction.ModalSubmitData()
+
+	// Helper function to get a TextInput value by index
+	getTextInputValue := func(index int) string {
+		return data.Components[index].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+	}
+
+	address := getTextInputValue(0)
+	amountString := getTextInputValue(1)
+	amount, err := strconv.Atoi(amountString)
+	if err != nil {
+		log.Printf("Error converting amount to int: %v", err)
+		RespondWithMessage(session, interaction, "Error: Invalid amount")
+		return
+	}
+	comment := getTextInputValue(2)
+	destinationString := getTextInputValue(3)
+	destination, err := strconv.Atoi(destinationString)
+	if err != nil {
+		log.Printf("Error converting amount to int: %v", err)
+		RespondWithMessage(session, interaction, "Error: Invalid destination")
+		return
+	}
+	integratedAddress := dero.MakeIntegratedAddress(address, amount, comment, destination)
+	RespondWithMessage(session, interaction, "```"+integratedAddress+"```")
 }

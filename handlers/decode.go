@@ -1,6 +1,10 @@
 package handlers
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"discord-dero-bot/utils/dero"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 func handleDecode(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
 	components := createDecodeModalComponents()
@@ -19,4 +23,11 @@ func createDecodeModalComponents() []discordgo.MessageComponent {
 			},
 		}},
 	}
+}
+
+func handleDecodeInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	data := interaction.ModalSubmitData()
+	address := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
+	splitIntegratedAddress := dero.SplitIntegratedAddress(address)
+	RespondWithMessage(session, interaction, "```"+splitIntegratedAddress+"```")
 }

@@ -34,7 +34,7 @@ func getJson(pair string, target interface{}) error {
 }
 
 // well I want the price from trade ogre for dero-usdt
-func getAsk(pair string) float64 {
+func GetAsk(pair string) float64 {
 	result := Response{}
 	err := getJson(pair, &result)
 	if err != nil {
@@ -49,12 +49,12 @@ func getAsk(pair string) float64 {
 }
 
 func GetDeroUsdtAskString() string {
-	return fmt.Sprintf("%f", getAsk("dero-usdt"))
+	return fmt.Sprintf("%f", GetAsk("dero-usdt"))
 }
 
 func DeroXmrExchangeRate() float64 {
-	xmr := getAsk("xmr-usdt")
-	dero := getAsk("dero-usdt")
+	xmr := GetAsk("xmr-usdt")
+	dero := GetAsk("dero-usdt")
 	return dero / xmr
 }
 
