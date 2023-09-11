@@ -1,355 +1,138 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils"
 	"log"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-var (
-	Commands = []discordgo.ApplicationCommand{
-		{
-			Name:        "encode",
-			Description: "Encode Integrated Address",
-		},
-		{
-			Name:        "trade-dero-xmr",
-			Description: "Trade DERO-XMR",
-		},
-		{
-			Name:        "decode",
-			Description: "Decode Integrated Address",
-		},
-		{
-			Name:        "giftbox",
-			Description: "Get a DERO gift box!",
-		},
-		{
-			Name:        "register",
-			Description: "Register you DERO wallet address/name with the server!",
-		},
-		{
-			Name:        "buy-dero-with-crypto",
-			Description: "Purchase DERO from the `secret-wallet` with crypto",
-		},
-		{
-			Name:        "buy-dero-with-fiat",
-			Description: "Purchase DERO from the `secret-wallet` with FIAT",
-		},
-	}
-)
-var (
-	componentsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string){
-		"fd_yes": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Use the following addr in your DERO wallet to obtain instructions on how to Buy DERO with XMR ```deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zat9hh2grpwfjjqcn4095kueeqg3z4yneqwa5hg6pqtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgs8gunpv3jjqctyv3ezqar0yp3x2gryv4kxjan9wfjkggr5dus8jmm4wgs8wctvd3jhgcjy25vs2wtzfe2sqcjk25pqrm2pm2```",
-					Flags:   discordgo.MessageFlagsEphemeral,
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
-		"fd_no": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Use the following addr in your DERO wallet to obtain instructions on how to sell DERO for XMR ```deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7z7t9hh2grpwfjjqarjv9jxjmn8ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezqarjv9jx2grfdeehgun4vd68xgr5dusxyefqv3jkc6tkv4ex2epqw3hjq7t0w4ezqampd3kx2arzg323j89rvf892qrz2e2sygeaw9a```",
-					Flags:   discordgo.MessageFlagsEphemeral,
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
-	}
+type Modal struct {
+	Session     *discordgo.Session
+	Interaction *discordgo.InteractionCreate
+	CustomID    string
+	Title       string
+	Components  []discordgo.MessageComponent
+}
 
-	commandsHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string){
-		"trade-dero-xmr": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "DERO-XMR is trading at: " + utils.DeroXmrExchangeRateString() + "\nWould you like to trade? \nTrades have a fee of 1%",
-					Flags:   discordgo.MessageFlagsEphemeral,
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.Button{
-									Label:    "BUY DERO with XMR",
-									Style:    discordgo.SuccessButton,
-									Disabled: false,
-									CustomID: "fd_yes",
-								},
-								discordgo.Button{
-									Label:    "SELL DERO for XMR",
-									Style:    discordgo.DangerButton,
-									Disabled: false,
-									CustomID: "fd_no",
-								},
-							},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.Button{
-									Label:    "DERO-XMR chart",
-									Style:    discordgo.LinkButton,
-									Disabled: false,
-									URL:      "https://www.tradingview.com/chart/XAuuVNP7/",
-								},
-								discordgo.Button{
-									Label:    "Github Repo",
-									Style:    discordgo.LinkButton,
-									Disabled: false,
-									URL:      "https://github.com/secretnamebasis/dero-xmr-swap",
-								},
-							},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.Button{
-									Label:    "Walkthru: Buy DERO",
-									Style:    discordgo.LinkButton,
-									Disabled: false,
-									URL:      "https://youtu.be/OGuV7jSAccE",
-								},
-								discordgo.Button{
-									Label:    "Walkthru: Sell DERO",
-									Style:    discordgo.LinkButton,
-									Disabled: false,
-									URL:      "https://youtu.be/RLeN03QC6jE",
-								},
-							},
-						},
-					},
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
+// Commands represents the application commands.
+var Commands = []discordgo.ApplicationCommand{
+	{
+		Name:        "encode",
+		Description: "Encode Integrated Address",
+	},
+	{
+		Name:        "trade-dero-xmr",
+		Description: "Trade DERO-XMR",
+	},
+	{
+		Name:        "decode",
+		Description: "Decode Integrated Address",
+	},
+	{
+		Name:        "giftbox",
+		Description: "Get a DERO gift box!",
+	},
+	{
+		Name:        "register",
+		Description: "Register your DERO wallet address/name with the server!",
+	},
+	{
+		Name:        "buy-dero-with-crypto",
+		Description: "Purchase DERO from the `secret-wallet` with crypto",
+	},
+	{
+		Name:        "buy-dero-with-fiat",
+		Description: "Purchase DERO from the `secret-wallet` with FIAT",
+	},
+}
+
+// DefineHandlers defines the component and command handlers.
+func DefineHandlers(session *discordgo.Session, appID, guildID string) map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
+	handlers := make(map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string))
+
+	// Add your command handlers
+	handlers["encode"] = handleEncode
+	handlers["trade-dero-xmr"] = handleTradeDeroXmr
+	handlers["decode"] = handleDecode
+	handlers["giftbox"] = handleGiftbox
+	handlers["register"] = handleRegistration
+	handlers["buy-dero-with-crypto"] = handleBuyDeroWithCrypto
+	handlers["buy-dero-with-fiat"] = handleBuyDeroWithFiat
+
+	// Add your component handlers
+	handlers["fd_yes"] = handleFdYes
+	handlers["fd_no"] = handleFdNo
+
+	return handlers
+}
+
+// RespondWithMessage sends a response message to the interaction.
+func RespondWithMessage(session *discordgo.Session, interaction *discordgo.InteractionCreate, message string) {
+	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: message,
+			Flags:   discordgo.MessageFlagsEphemeral,
 		},
-		"encode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseModal,
-				Data: &discordgo.InteractionResponseData{
-					CustomID: "encode_" + interaction.Interaction.Member.User.ID,
-					Title:    "Encode a DERO Integrated Address",
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
-							discordgo.TextInput{
-								CustomID:    "address",
-								Label:       "Address of where funds will be sent",
-								Style:       discordgo.TextInputShort,
-								Placeholder: "dero1q wallet address",
-								Required:    true,
-								MaxLength:   66,
-								MinLength:   66,
-							},
-						},
-						},
-						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
-							discordgo.TextInput{
-								CustomID:    "amount",
-								Label:       "Amount in atomic units; minimum 2 DERI",
-								Style:       discordgo.TextInputShort,
-								Placeholder: "1 DERO = 100000 ; 2 DERI = 2",
-								Required:    true,
-								MaxLength:   64,
-								MinLength:   1,
-							},
-						},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.TextInput{
-									CustomID:    "comment",
-									Label:       "Comment/subject/details",
-									Style:       discordgo.TextInputParagraph,
-									Placeholder: "",
-									Required:    false,
-									MaxLength:   128,
-								},
-							},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.TextInput{
-									CustomID:    "destionation",
-									Label:       "What port you want to send this too?, ",
-									Style:       discordgo.TextInputShort,
-									Placeholder: "ex. 1337",
-									Required:    false,
-									MaxLength:   128,
-								},
-							},
-						},
-					},
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
-		"giftbox": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseModal,
-				Data: &discordgo.InteractionResponseData{
-					CustomID: "giftbox_" + interaction.Interaction.Member.User.ID,
-					Title:    "Purchase a DERO Gift Box",
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
-							discordgo.TextInput{
-								CustomID:    "color",
-								Label:       "Shirt Color",
-								Style:       discordgo.TextInputShort,
-								Placeholder: "black or white?",
-								Required:    true,
-							},
-						},
-						},
-						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
-							discordgo.TextInput{
-								CustomID:    "size",
-								Label:       "Shirt Size",
-								Style:       discordgo.TextInputShort,
-								Placeholder: "What size fits you: S,M,L,XL,XXL,XXXL",
-								Required:    true,
-							},
-						},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.TextInput{
-									CustomID:  "address",
-									Label:     "Shipping Address?",
-									Style:     discordgo.TextInputParagraph,
-									Required:  false,
-									MaxLength: 80,
-								},
-							},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.TextInput{
-									CustomID:  "Contact Info",
-									Label:     "If we need to reach you?",
-									Style:     discordgo.TextInputShort,
-									Required:  false,
-									MaxLength: 128,
-								},
-							},
-						},
-					},
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
-		"decode": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseModal,
-				Data: &discordgo.InteractionResponseData{
-					CustomID: "decode_" + interaction.Interaction.Member.User.ID,
-					Title:    "Decode DERO Integrated Addr",
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
-							discordgo.TextInput{
-								CustomID:    "integrated_address",
-								Label:       "Integrated Address",
-								Style:       discordgo.TextInputShort,
-								Placeholder: "integrated wallet address",
-								Required:    true,
-								// MaxLength:   500,
-								// MinLength:   66,
-							},
-						},
-						},
-					},
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
-		"register": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseModal,
-				Data: &discordgo.InteractionResponseData{
-					CustomID: "register_" + interaction.Interaction.Member.User.ID,
-					Title:    "Secret Discord Server Registration",
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
-							discordgo.TextInput{
-								CustomID:    "register",
-								Label:       "Register DERO addr/name with the server",
-								Style:       discordgo.TextInputShort,
-								Placeholder: "dero1q wallet address or wallet-name",
-								Required:    true,
-								// MaxLength:   500,
-								// MinLength:   66,
-							},
-						},
-						},
-					},
-				},
-			})
-			if err != nil {
-				log.Printf("Component Panic: %v", err)
-				panic(err)
-			}
-		},
-		"buy-dero-with-crypto": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseModal,
-				Data: &discordgo.InteractionResponseData{
-					CustomID: "trade_dero_" + interaction.Interaction.Member.User.ID,
-					Title:    "Purchase a DERO with Crypto",
-					Components: []discordgo.MessageComponent{
-						discordgo.ActionsRow{Components: []discordgo.MessageComponent{
-							discordgo.TextInput{
-								CustomID:    "amount",
-								Label:       "How much DERO would you like",
-								Style:       discordgo.TextInputShort,
-								Placeholder: "Please keep in amounts under 100 DERO",
-								Required:    true,
-							},
-						},
-						},
-						discordgo.ActionsRow{
-							Components: []discordgo.MessageComponent{
-								discordgo.TextInput{
-									CustomID:    "address",
-									Label:       "Wallet Address?",
-									Style:       discordgo.TextInputShort,
-									Placeholder: "Please provide full dero1q address",
-									Required:    false,
-									MaxLength:   66,
-									MinLength:   66,
-								},
-							},
-						},
-					},
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
-		"buy-dero-with-fiat": func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-			stripePaymentLink := "https://buy.stripe.com/7sI4k5bIp69HdI4cMN"
-			err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "DERO-USDT is trading at: " + utils.GetDeroUsdtAskString() + "\nWould you like to purcahse DERO with Fiat? \nDisclosure: Limit of $100 and purchases have a fee of 8%\n" + stripePaymentLink,
-					Flags:   discordgo.MessageFlagsEphemeral,
-				},
-			})
-			if err != nil {
-				panic(err)
-			}
-		},
+	})
+	if err != nil {
+		panic(err)
 	}
-)
+}
+
+// RespondWithModal sends a modal response to the interaction.
+func RespondWithModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, customID, title string, components []discordgo.MessageComponent) {
+	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseModal,
+		Data: &discordgo.InteractionResponseData{
+			CustomID:   customID,
+			Title:      title,
+			Components: components,
+		},
+	})
+	if err != nil {
+		log.Printf("Response Error: %v", err)
+	}
+}
+
+func respondWithMessageAndComponents(session *discordgo.Session, interaction *discordgo.InteractionCreate, message string, components []discordgo.MessageComponent) {
+	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content:    message,
+			Flags:      discordgo.MessageFlagsEphemeral,
+			Components: components,
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func NewModal(
+	session *discordgo.Session,
+	interaction *discordgo.InteractionCreate,
+	customID, title string,
+	components []discordgo.MessageComponent,
+) *Modal {
+	return &Modal{
+		Session:     session,
+		Interaction: interaction,
+		CustomID:    customID,
+		Title:       title,
+		Components:  components,
+	}
+}
+func (m *Modal) Show() {
+	err := m.Session.InteractionRespond(m.Interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseModal,
+		Data: &discordgo.InteractionResponseData{
+			CustomID:   m.CustomID,
+			Title:      m.Title,
+			Components: m.Components,
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+}

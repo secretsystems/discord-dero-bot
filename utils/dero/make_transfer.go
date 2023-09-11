@@ -9,7 +9,14 @@ import (
 	"net/http"
 )
 
-func MakeTransfer(address string, amnt int, comment string) {
+type deroResponse struct {
+	JSONRPC string                 `json:"jsonrpc"`
+	ID      string                 `json:"id"`
+	TxID    string                 `json:"txid"` // Adjust this field to match the actual JSON structure
+	Error   map[string]interface{} `json:"error"`
+}
+
+func MakeTransfer(address string, amnt int, comment string) (string, error) {
 	// Define payload data
 	addr := address
 
@@ -72,9 +79,16 @@ func MakeTransfer(address string, amnt int, comment string) {
 	var response map[string]interface{}
 	err = json.Unmarshal(responseBody, &response)
 	if err != nil {
-		log.Fatalf("Error decoding response JSON: %v", err)
+		return "", fmt.Errorf("Error decoding response JSON: %v", err)
 	}
 
-	// Assuming you want to print the parsed response
-	fmt.Printf("Parsed Response: %+v\n", response)
+	if responseError, ok := response["error"].(map[string]interface{}); ok {
+		return "", fmt.Errorf("DERO wallet error: %v", responseError)
+	}
+
+	if txID, ok := response["result"].(map[string]interface{})["txid"].(string); ok {
+		return txID, nil
+	}
+
+	return "", fmt.Errorf("No transaction ID found in the response")
 }

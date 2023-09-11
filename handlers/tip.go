@@ -2,124 +2,157 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
-	"discord-dero-bot/utils/dero" // Import the dero package from your project
+	"discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 var (
-	// Initialize variables to store user information
-	userID           string
-	mappedAddress    string
-	exists           bool
-	recipientAddress string
+	secretMemberRoleID = "1057328486211145810"
+	registeredRoleID   = "1144842099653623839"
+	unregisteredRoleID = "1144846590687838309"
+	specialAddresses   = []string{
+		"secret-wallet",
+		"dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4",
+	}
 )
+
+func init() {
+	loadUserMappings()
+}
 
 func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
-	// fmt.Println("CONTENT: %s", content)
+
 	if content == "!tip" {
 		session.ChannelMessageSend(message.ChannelID, "To send a tip, use the format: `!tip <@user_mention or <wallet_address> or <wallet_name>`")
 		return
+	}
 
-	} else if strings.HasPrefix(content, "!tip ") {
-
-		// Extract the address or wallet name from the content
+	if strings.HasPrefix(content, "!tip ") {
 		input := strings.TrimPrefix(content, "!tip ")
 
-		// Check if the input contains a mention
-		mentionRegex := regexp.MustCompile("<@!?([0-9]+)>")
-		mentionedUserIDs := mentionRegex.FindStringSubmatch(input)
-
-		log.Println("Checking for mention id")
-		loadUserMappings()
-
-		if len(mentionedUserIDs) == 2 {
-			// A user was mentioned, look up their registered wallet address
-			mentionedUserID := mentionedUserIDs[1]
-			log.Printf("Mentioned User ID: %v", mentionedUserID)
-
-			userMappingsMutex.Lock()
-			mappedAddress, exists = userMappings[mentionedUserID]
-			userMappingsMutex.Unlock()
-			log.Println("Checking for map of addresses")
-
-			if exists {
-				input = mappedAddress
-			} else {
-				userMention := "<@" + mentionedUserIDs[1] + ">"
-				session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `/register`")
-				return
-			}
-		}
-		log.Println("Checking user map")
-
-		// Check if the user input is in the userMappings
-		userID = message.Author.ID
-		userMappingsMutex.Lock()
-		mappedAddress, exists = userMappings[userID]
-		userMappingsMutex.Unlock()
-
-		// Special addresses that should not receive tips
-		specialAddresses := []string{
-			"secret-wallet",
-			"dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4",
-		}
-		log.Println("checking against special address")
-
-		// Check if the input address matches any special addresses
-		for _, addr := range specialAddresses {
-			if addr == input || (exists && addr == mappedAddress) {
-				session.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
-				return
-			}
+		// Check for mentions and resolve user IDs
+		mentionedUserIDs := resolveMentions(input)
+		if len(mentionedUserIDs) > 0 {
+			handleMention(session, message, mentionedUserIDs)
+			return
 		}
 
-		// Check if the input is a valid DERO wallet address
-		if len(input) == 66 && strings.HasPrefix(input, "dero") {
-			recipientAddress = input
-		} else {
-			// Check if the input is a valid wallet name from the JSON
-			if addr, ok := userMappings[input]; ok && len(addr) == 66 && strings.HasPrefix(addr, "dero") {
-				recipientAddress = addr
-			} else {
-				// Perform a wallet name lookup
-				log.Printf(input)
-				lookupResult, err := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
-				if err != nil {
-					fmt.Println("Wallet name not found or invalid.")
-				}
-				if lookupResult != "" {
-					// Ensure sender's address and recipient's address are different
-					if lookupResult != mappedAddress {
-						recipientAddress = lookupResult
-					} else {
-						session.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
-						return
-					}
-				} else {
-					// Mention the mentioned user and provide the message
-					if len(mentionedUserIDs) == 2 {
-						userMention := "<@" + mentionedUserIDs[1] + ">"
-						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\n"+userMention+" Please consider using `/register`")
-					} else {
-						session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name.\n\nPlease consider using `/register`")
-					}
-					return
-				}
-			}
+		// Resolve wallet address or name
+		recipientAddress := resolveWalletAddress(input, message.Author.ID)
+
+		if recipientAddress == "" {
+			session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name. Please consider using `/register`")
+			return
+		}
+
+		// Check if the address is special
+		if isSpecialAddress(recipientAddress) {
+			session.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
+			return
 		}
 
 		// Send the tip
-		// fmt.Println(recipientAddress)
-		session.ChannelMessageSend(message.ChannelID, "`secret-wallet` is sending 0.00002 DERO, or 2 DERI\nThis process takes roughly 18 seconds; or 1 block interval.")
-		amnt := 2
-		comment := "secret_pong_bot sends secret'a love"
-		dero.MakeTransfer(recipientAddress, amnt, comment)
-		session.ChannelMessageSend(message.ChannelID, "Tip sent!\n\nFeed the bot by sending DERO to `secret-wallet`")
+		handleTip(session, message, recipientAddress)
 	}
+}
+
+func resolveMentions(input string) []string {
+	mentionRegex := regexp.MustCompile("<@!?([0-9]+)>")
+	mentionedUserIDs := mentionRegex.FindStringSubmatch(input)
+	if len(mentionedUserIDs) == 2 {
+		return mentionedUserIDs
+	}
+	return nil
+}
+
+func handleMention(session *discordgo.Session, message *discordgo.MessageCreate, mentionedUserIDs []string) {
+	userID := mentionedUserIDs[1]
+	mappedAddress := getUserAddress(userID)
+
+	if mappedAddress == "" {
+		userMention := "<@" + userID + ">"
+		session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `/register`")
+		return
+	}
+
+	handleTip(session, message, mappedAddress)
+}
+
+func resolveWalletAddress(input, userID string) string {
+	if len(input) == 66 && strings.HasPrefix(input, "dero") {
+		return input
+	}
+
+	mappedAddress := getUserAddress(userID)
+	if addr, ok := userMappings[input]; ok && len(addr) == 66 && strings.HasPrefix(addr, "dero") {
+		return addr
+	}
+
+	lookupResult, err := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
+	if err != nil || lookupResult == "" || lookupResult == mappedAddress {
+		return ""
+	}
+
+	return lookupResult
+}
+
+func isSpecialAddress(address string) bool {
+	for _, addr := range specialAddresses {
+		if addr == address {
+			return true
+		}
+	}
+	return false
+}
+
+func getUserAddress(userID string) string {
+	userMappingsMutex.Lock()
+	defer userMappingsMutex.Unlock()
+	return userMappings[userID]
+}
+
+func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, recipientAddress string) {
+	// Get the user's roles
+	userRoles := message.Member.Roles
+
+	// Define default tip amount and message
+	amnt := 2
+	amntmsg := "0.00002 DERO, or 2 DERI"
+
+	// Check user roles and adjust tip amount based on role priority
+	for _, roleID := range userRoles {
+		switch roleID {
+		case secretMemberRoleID:
+			amnt = 200
+			amntmsg = "0.00200 DERO, or 200 DERI"
+		case registeredRoleID:
+			if amnt != 200 {
+				amnt = 20
+				amntmsg = "0.00020 DERO, or 20 DERI"
+			}
+		case unregisteredRoleID:
+			if amnt != 200 && amnt != 20 {
+				amnt = 2
+				amntmsg = "0.00002 DERO, or 2 DERI"
+			}
+		}
+	}
+
+	// Rest of the function remains the same as in the previous examples
+	session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("`secret-wallet` is sending %s\nThis process takes roughly 18 seconds; or 1 block interval.", amntmsg))
+
+	comment := "secret_pong_bot sends secret's love"
+	txid, err := dero.MakeTransfer(recipientAddress, amnt, comment)
+	if err != nil {
+		session.ChannelMessageSend(message.ChannelID, "Error sending tip: "+err.Error())
+		return
+	}
+
+	// Display the txid along with the success message
+	session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("Tip status:\n```TxID: %s```Feed the bot by sending DERO to `secret-wallet`", txid))
 }
