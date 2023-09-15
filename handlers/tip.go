@@ -44,9 +44,10 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 		// Iterate through user mappings and create TransferInfo objects
 		for discordID, address := range userMappings {
 			address = resolveWalletAddress(address)
+			amnt, _ := handleUserPermissions(session, message)
 			transfer := dero.TransferInfo{
 				Destination: address,
-				Amount:      200, // Set the desired tip amount
+				Amount:      amnt, // Set the desired tip amount
 			}
 			transfers = append(transfers, transfer)
 
