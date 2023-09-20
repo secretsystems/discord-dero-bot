@@ -21,28 +21,20 @@ var Commands = []discordgo.ApplicationCommand{
 		Description: "Encode Integrated Address",
 	},
 	{
-		Name:        "trade-dero-xmr",
-		Description: "Trade DERO-XMR",
-	},
-	{
 		Name:        "decode",
 		Description: "Decode Integrated Address",
-	},
-	{
-		Name:        "giftbox",
-		Description: "Get a DERO gift box!",
 	},
 	{
 		Name:        "register",
 		Description: "Register your DERO wallet address/name with the server!",
 	},
 	{
-		Name:        "buy-dero-with-crypto",
-		Description: "Purchase DERO from the `secret-wallet` with crypto",
+		Name:        "giftbox",
+		Description: "Get a DERO gift box!",
 	},
 	{
-		Name:        "buy-dero-with-fiat",
-		Description: "Purchase DERO from the `secret-wallet` with FIAT",
+		Name:        "trade-dero-xmr",
+		Description: "Trade DERO-XMR",
 	},
 }
 

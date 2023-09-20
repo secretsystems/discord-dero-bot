@@ -17,23 +17,26 @@ var chatGPTAPI string
 
 const (
 	secretMembersRoleID = "1057328486211145810"
+	secretGuildID       = "986112940660891678"
 	openAIURL           = "https://api.openai.com/v1/chat/completions"
 )
 
 func init() {
 	chatGPTAPI = os.Getenv("OPEN_AI_TOKEN")
 	if chatGPTAPI == "" {
-		log.Println("OpenAI API token not found in environment")
+		log.Println("OpenAI API token not found in the environment")
 	}
 }
 
-func hasSecretMembersRole(member *discordgo.Member) bool {
-	if member == nil {
+func hasSecretMembersRole(session *discordgo.Session, guildID, roleID, userID string) bool {
+	member, err := session.GuildMember(secretGuildID, userID)
+	if err != nil {
+		log.Printf("Error getting guild member: %v", err)
 		return false
 	}
 
-	for _, roleID := range member.Roles {
-		if roleID == secretMembersRoleID {
+	for _, memberRoleID := range member.Roles {
+		if memberRoleID == roleID {
 			return true
 		}
 	}
@@ -54,10 +57,8 @@ type Message struct {
 
 func preparePayload(userInput string) ([]byte, error) {
 	payload := ChatPayload{
-		Model: "gpt-3.5-turbo",
-		Messages: []Message{
-			{Role: "user", Content: userInput},
-		},
+		Model:       "gpt-3.5-turbo",
+		Messages:    []Message{{Role: "user", Content: userInput}},
 		Temperature: 0.7,
 		MaxTokens:   200,
 	}
@@ -94,22 +95,20 @@ func makeOpenAIRequest(payload []byte) ([]byte, error) {
 }
 
 func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
-	// Check if the message is sent in a DM channel
 	if message.GuildID == "" {
-		// This is a DM channel
 		session.ChannelMessageSend(message.ChannelID, "You can't use the `!bot` command in DMs.")
 		return
 	}
 
-	if !hasSecretMembersRole(message.Member) {
-		session.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member`")
+	if !hasSecretMembersRole(session, message.GuildID, secretMembersRoleID, message.Author.ID) {
+		session.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member` in https://discord.gg/BKdX9qHkgu")
 		return
 	}
 
 	userInput := strings.TrimPrefix(message.Content, "!bot ")
 	session.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
 
-	userInput = userInput + " . Keep your response less than 1337 characters. Your max_tokens limit is 200"
+	userInput = userInput + ". Keep your response less than 1337 characters. Your max_tokens limit is 200"
 
 	payload, err := preparePayload(userInput)
 	if err != nil {
