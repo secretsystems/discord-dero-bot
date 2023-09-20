@@ -4,7 +4,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func AddModals(session *discordgo.Session, appID, guildID string, resultsChannel string) {
+func AddModals(session *discordgo.Session, appID string) {
 	session.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 		if interaction.Type == discordgo.InteractionModalSubmit {
 
@@ -17,11 +17,9 @@ func AddModals(session *discordgo.Session, appID, guildID string, resultsChannel
 			case "decode_" + interaction.Member.User.ID:
 				handleDecodeInteraction(session, interaction)
 			case "giftbox_" + interaction.Member.User.ID:
-				handleGiftboxInteraction(session, interaction, resultsChannel)
+				handleGiftboxInteraction(session, interaction)
 			case "register_" + interaction.Member.User.ID:
 				handleRegister(session, interaction)
-			case "trade_dero_" + interaction.Member.User.ID:
-				handleCryptoPurchase(session, interaction, resultsChannel)
 			}
 		}
 	})

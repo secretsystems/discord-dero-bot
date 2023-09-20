@@ -47,8 +47,8 @@ var Commands = []discordgo.ApplicationCommand{
 }
 
 // DefineHandlers defines the component and command handlers.
-func DefineHandlers(session *discordgo.Session, appID, guildID string) map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
-	handlers := make(map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string))
+func DefineHandlers(session *discordgo.Session, appID string) map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	handlers := make(map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string))
 
 	// Add your command handlers
 	handlers["encode"] = handleEncode
@@ -56,8 +56,6 @@ func DefineHandlers(session *discordgo.Session, appID, guildID string) map[strin
 	handlers["decode"] = handleDecode
 	handlers["giftbox"] = handleGiftbox
 	handlers["register"] = handleRegistration
-	handlers["buy-dero-with-crypto"] = handleBuyDeroWithCrypto
-	handlers["buy-dero-with-fiat"] = handleBuyDeroWithFiat
 
 	// Add your component handlers
 	handlers["fd_yes"] = handleFdYes

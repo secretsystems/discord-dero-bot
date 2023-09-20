@@ -9,7 +9,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func handleGiftbox(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
+func handleGiftbox(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	components := createGiftBoxModalComponents()
 	modal := NewModal(session, interaction, "giftbox_"+interaction.Interaction.Member.User.ID, "Purchase a DERO Gift Box", components)
 	modal.Show()
@@ -55,7 +55,7 @@ func createGiftBoxModalComponents() []discordgo.MessageComponent {
 	}
 }
 
-func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate, resultsChannel string) {
+func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 	price := utils.GetAsk("dero-usdt")
 	amount := int((55 / price) * 100000)
 
@@ -79,7 +79,7 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	userid := strings.Split(data.CustomID, "_")[1]
 	resultsMsg := fmt.Sprintf(
 		"User <@%s> has made an integrated address for <@%s>'s a Giftbox,", userid, shopkeeper)
-	_, err := session.ChannelMessageSend(resultsChannel, resultsMsg)
+	_, err := session.ChannelMessageSend(interaction.ChannelID, resultsMsg)
 	if err != nil {
 		panic(err)
 	}

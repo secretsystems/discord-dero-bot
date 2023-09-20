@@ -28,8 +28,6 @@ var HelpData = []CommandHelp{
 	{"/trade-dero-xmr", "Trade DERO-XMR by way of the DERO-XMR swap integrated addresses", false},
 	{"/encode", "Encode a DERO integrated Address using wallet address, amount, and comment", false},
 	{"/decode", "Decode an integrated address and receive a DM of the output", false},
-	{"/buy-dero-with-crypto", "Purchase DERO from the `secret-wallet` using crypto", false},
-	{"/buy-dero-with-fiat", "Purchase DERO from the `secret-wallet` using fiat", false},
 	{"/register", "Register your wallet address or wallet name for tipping", false},
 }
 
@@ -45,7 +43,7 @@ func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
 				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)
 			}
 		}
-		helpMsg += "```\n### (/) Private/Ephemeral Commands:\n```\n"
+		helpMsg += "```\n### (/) Private/Ephemeral Commands Please visit :\n```\n"
 		for _, cmd := range HelpData {
 			if !cmd.IsPublic {
 				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)

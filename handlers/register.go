@@ -9,7 +9,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func handleRegistration(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID, guildID string) {
+func handleRegistration(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	components := createRegisterModalComponents()
 	modal := NewModal(session, interaction, "register_"+interaction.Interaction.Member.User.ID, "Secret Discord Server Registration", components)
 	modal.Show()
@@ -98,7 +98,7 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	RespondWithMessage(session, interaction, content)
 
 	userID := strings.Split(data.CustomID, "_")[1]
-	resultsChannel := "1060312629505167362"
+	resultsChannel := interaction.ChannelID
 	resultsMsg := fmt.Sprintf("<@%s> has registered with the server!", userID)
 	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
