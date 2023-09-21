@@ -12,7 +12,6 @@ import (
 )
 
 var (
-	secretMemberRoleID = "1057328486211145810"
 	registeredRoleID   = "1144842099653623839"
 	unregisteredRoleID = "1144846590687838309"
 	specialAddresses   = []string{
@@ -163,7 +162,7 @@ func handleMention(session *discordgo.Session, message *discordgo.MessageCreate,
 
 	if mappedAddress == "" {
 		userMention := "<@" + userID + ">"
-		session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot, please consider using `/register`")
+		session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot.\n\nPlease pair a DERO address with your profile consider by using the `/register` command.")
 		return
 	}
 
@@ -204,36 +203,57 @@ func getUserAddress(userID string) string {
 
 func handleUserPermissions(session *discordgo.Session, message *discordgo.MessageCreate) (amnt int, amntmsg string) {
 	// Get the user's roles
-	userRoles := message.Member.Roles
+	member, err := session.GuildMember(secretGuildID, message.Author.ID)
+	if err != nil {
+		log.Printf("Error getting guild member: %v", err)
+		return
+	}
 
-	// Define default tip amount and message
-	amnt = 2
-	amntmsg = "0.00002 DERO, or 2 DERI"
+	userRoles := member.Roles
+	log.Printf("User has: %v", userRoles)
+
+	// Flags to track if specific roles are found
+	foundSecretMembers := false
+	foundRegistered := false
 
 	// Check user roles and adjust tip amount based on role priority
 	for _, roleID := range userRoles {
+		fmt.Printf("Role ID: %s\n", roleID)
 		switch roleID {
-		case secretMemberRoleID:
+		case secretMembersRoleID:
 			amnt = 200
 			amntmsg = "0.00200 DERO, or 200 DERI"
+			log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)
+			foundSecretMembers = true
+
 		case registeredRoleID:
-			if amnt != 200 {
+			if !foundSecretMembers || foundRegistered {
 				amnt = 20
 				amntmsg = "0.00020 DERO, or 20 DERI"
+				log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)
+				foundRegistered = true
 			}
+
 		case unregisteredRoleID:
-			if amnt != 200 && amnt != 20 {
+			if !foundSecretMembers && !foundRegistered {
 				amnt = 2
 				amntmsg = "0.00002 DERO, or 2 DERI"
+				log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)
 			}
 		}
 	}
+
 	return amnt, amntmsg
 }
+
 func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, recipientAddress string) {
 	amnt, amntmsg := handleUserPermissions(session, message)
+
+	waitingMessage := fmt.Sprintf("`secret-wallet` is sending %s\n"+
+		"This process takes roughly 18 seconds; or 1 block interval.", amntmsg)
+
 	// Rest of the function remains the same as in the previous examples
-	session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("`secret-wallet` is sending %s\nThis process takes roughly 18 seconds; or 1 block interval.", amntmsg))
+	session.ChannelMessageSend(message.ChannelID, waitingMessage)
 
 	comment := "secret_pong_bot sends secret's love"
 	txid, err := dero.MakeTransfer(recipientAddress, amnt, comment)
@@ -242,6 +262,11 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, rec
 		return
 	}
 
+	successMessage := fmt.Sprintf("TxID status:\n```%s```"+
+		"Explore this transaction by visiting: \n"+
+		"> http://explorer.dero.io/tx/%s\n"+
+		"Feed the bot by sending DERO to `secret-wallet`\n", txid, txid)
+
 	// Display the txid along with the success message
-	session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("Tip status:\n```TxID: %s```Feed the bot by sending DERO to `secret-wallet`", txid))
+	session.ChannelMessageSend(message.ChannelID, successMessage)
 }
