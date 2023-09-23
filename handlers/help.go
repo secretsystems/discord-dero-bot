@@ -25,6 +25,7 @@ var HelpData = []CommandHelp{
 	{"!markets", "Get the current list of markets provided by Trade Ogre", true},
 	{"!quote", "Get the current quote of a pair provided by Trade Ogre", true},
 	{"!derostats", "Get DERO stats from derostats.io", true},
+	{"!music", "Play music in the voice channel you are in", true},
 	{"/trade-dero-xmr", "Trade DERO-XMR by way of the DERO-XMR swap integrated addresses", false},
 	{"/encode", "Encode a DERO integrated Address using wallet address, amount, and comment", false},
 	{"/decode", "Decode an integrated address and receive a DM of the output", false},
@@ -38,12 +39,14 @@ func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
 		// Send a formatted list of available commands, separated by public (!) and private (/)
 		helpMsg := "## Available Commands:\n"
 		helpMsg += "### (!) Public Commands:\n```\n"
+		helpMsg += "These commands can be done in any server that the bot is in and everyone can see the results"
 		for _, cmd := range HelpData {
 			if cmd.IsPublic {
 				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)
 			}
 		}
-		helpMsg += "```\n### (/) Private/Ephemeral Commands Please visit :\n```\n"
+		helpMsg += "```\n### (/) Private/Ephemeral Commands:\n```\n"
+		helpMsg += "These commands can be done in any server that the bot is in and only you can see the results"
 		for _, cmd := range HelpData {
 			if !cmd.IsPublic {
 				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)

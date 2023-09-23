@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"os/exec"
@@ -88,7 +89,7 @@ func stopMusic(session *discordgo.Session, guildID string) {
 }
 
 func playAudioFromURL(session *discordgo.Session, userID, guildID, audioURL string) error {
-	fmt.Printf("Playing audio from URL: %s\n", audioURL)
+	log.Printf("Playing audio from URL: %s\n", audioURL)
 
 	// Validate the audio URL
 	if audioURL == "" {
