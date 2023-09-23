@@ -82,28 +82,43 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	userMappings[username] = address
 	saveUserMappings()
 
-	registeredRole := "1144842099653623839"
-	err := session.GuildMemberRoleAdd(interaction.GuildID, username, registeredRole)
-	if err != nil {
-		log.Println("Error adding role to member:", err)
-	}
+	// Get the user ID
+	userID := strings.Split(data.CustomID, "_")[1]
 
-	unregisteredRole := "1144846590687838309"
-	err = session.GuildMemberRoleRemove(interaction.GuildID, username, unregisteredRole)
-	if err != nil {
-		log.Println("Error removing role from member:", err)
-	}
+	// Check if the interaction is in the desired guild (secretGuildID)
+	if IsMemberInGuild(session, username, secretGuildID) {
+		registeredRole := "1144842099653623839"
+		err := session.GuildMemberRoleAdd(secretGuildID, username, registeredRole)
+		if err != nil {
+			log.Printf("Error adding role for Guild %v to member:%v", secretGuildID, err)
+		}
 
+		unregisteredRole := "1144846590687838309"
+		err = session.GuildMemberRoleRemove(secretGuildID, username, unregisteredRole)
+		if err != nil {
+			log.Printf("Error removing role Guild %v to member:%v", secretGuildID, err)
+		}
+	}
 	content := fmt.Sprintf("Successfully registered wallet %s `%s` for <@%s>.", walletType, address, username)
 	RespondWithMessage(session, interaction, content)
 
-	userID := strings.Split(data.CustomID, "_")[1]
 	resultsChannel := interaction.ChannelID
 	resultsMsg := fmt.Sprintf("<@%s> has registered with the server!", userID)
-	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
+	_, err := session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		log.Println("Error sending message:", err)
 	}
+}
+
+func IsMemberInGuild(session *discordgo.Session, userID, guildID string) bool {
+	member, err := session.GuildMember(guildID, userID)
+	log.Println("Member is: ", member)
+	if err != nil {
+		log.Println("Error getting guild member:", err)
+		return false
+	}
+
+	return member != nil
 }
 
 func isValidDeroAddress(address string) bool {

@@ -162,7 +162,8 @@ func handleMention(session *discordgo.Session, message *discordgo.MessageCreate,
 
 	if mappedAddress == "" {
 		userMention := "<@" + userID + ">"
-		session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot.\n\nPlease pair a DERO address with your profile consider by using the `/register` command.")
+		session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot.\n"+
+			"Please pair a DERO address with your profile by using the `/register` command.")
 		return
 	}
 
