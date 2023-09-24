@@ -8,7 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func handleEncode(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+func handleEncodeModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	components := createEncodeModalComponents()
 	modal := NewModal(session, interaction, "encode_"+interaction.Interaction.Member.User.ID, "Encode a DERO Integrated Address", components)
 	modal.Show()

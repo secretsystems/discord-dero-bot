@@ -20,6 +20,8 @@ func AddModals(session *discordgo.Session, appID string) {
 				handleGiftboxInteraction(session, interaction)
 			case "register_" + interaction.Member.User.ID:
 				handleRegister(session, interaction)
+			case "qr_" + interaction.Member.User.ID:
+				handleQRInteraction(session, interaction)
 			}
 		}
 	})

@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func handleDecode(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+func handleDecodeModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	components := createDecodeModalComponents()
 	modal := NewModal(session, interaction, "decode_"+interaction.Interaction.Member.User.ID, "Decode DERO Integrated Address", components)
 	modal.Show()

@@ -36,6 +36,10 @@ var Commands = []discordgo.ApplicationCommand{
 		Name:        "trade-dero-xmr",
 		Description: "Trade DERO-XMR",
 	},
+	{
+		Name:        "qr",
+		Description: "Create QR Code",
+	},
 }
 
 // DefineHandlers defines the component and command handlers.
@@ -43,11 +47,12 @@ func DefineHandlers(session *discordgo.Session, appID string) map[string]func(se
 	handlers := make(map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string))
 
 	// Add your command handlers
-	handlers["encode"] = handleEncode
-	handlers["trade-dero-xmr"] = handleTradeDeroXmr
-	handlers["decode"] = handleDecode
-	handlers["giftbox"] = handleGiftbox
-	handlers["register"] = handleRegistration
+	handlers["encode"] = handleEncodeModal
+	handlers["trade-dero-xmr"] = handleTradeDeroXmrComponent
+	handlers["decode"] = handleDecodeModal
+	handlers["giftbox"] = handleGiftboxModal
+	handlers["register"] = handleRegistrationModal
+	handlers["qr"] = handleQRModal
 
 	// Add your component handlers
 	handlers["fd_yes"] = handleFdYes

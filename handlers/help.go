@@ -30,6 +30,7 @@ var HelpData = []CommandHelp{
 	{"/encode", "Encode a DERO integrated Address using wallet address, amount, and comment", false},
 	{"/decode", "Decode an integrated address and receive a DM of the output", false},
 	{"/register", "Register your wallet address or wallet name for tipping", false},
+	{"/qr", "Create a qr code from any string of of numbers and letters", false},
 }
 
 func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {

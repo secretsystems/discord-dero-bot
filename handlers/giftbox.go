@@ -9,7 +9,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func handleGiftbox(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+func handleGiftboxModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	components := createGiftBoxModalComponents()
 	modal := NewModal(session, interaction, "giftbox_"+interaction.Interaction.Member.User.ID, "Purchase a DERO Gift Box", components)
 	modal.Show()

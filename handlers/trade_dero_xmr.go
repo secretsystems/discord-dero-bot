@@ -15,7 +15,7 @@ func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCr
 	RespondWithMessage(session, interaction, message)
 }
 
-func handleTradeDeroXmr(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+func handleTradeDeroXmrComponent(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	message := "DERO-XMR is trading at: " + utils.DeroXmrExchangeRateString() + "\nWould you like to trade? \nTrades have a fee of 1%"
 
 	buttons := []discordgo.MessageComponent{

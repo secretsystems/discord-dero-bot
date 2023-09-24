@@ -9,7 +9,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func handleRegistration(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+func handleRegistrationModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	components := createRegisterModalComponents()
 	modal := NewModal(session, interaction, "register_"+interaction.Interaction.Member.User.ID, "Secret Discord Server Registration", components)
 	modal.Show()
