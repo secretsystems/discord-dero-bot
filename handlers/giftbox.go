@@ -4,13 +4,22 @@ import (
 	"discord-dero-bot/utils"
 	"discord-dero-bot/utils/dero"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func handleGiftboxModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Command invoked in DM")
+		RespondWithMessage(session, interaction, "This command cannot be used in DMs.")
+		return
+	}
 	components := createGiftBoxModalComponents()
+
 	modal := NewModal(session, interaction, "giftbox_"+interaction.Interaction.Member.User.ID, "Purchase a DERO Gift Box", components)
 	modal.Show()
 }
@@ -56,6 +65,13 @@ func createGiftBoxModalComponents() []discordgo.MessageComponent {
 }
 
 func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Interaction received in DM")
+		RespondWithMessage(session, interaction, "This interaction cannot be processed in DMs.")
+		return
+	}
 	price := utils.GetAsk("dero-usdt")
 	amount := int((55 / price) * 100000)
 
@@ -79,7 +95,8 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	userid := strings.Split(data.CustomID, "_")[1]
 	resultsMsg := fmt.Sprintf(
 		"User <@%s> has made an integrated address for <@%s>'s a Giftbox,", userid, shopkeeper)
-	_, err := session.ChannelMessageSend(interaction.ChannelID, resultsMsg)
+	resultsChannel := "1156571722384953466"
+	_, err := session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
 		panic(err)
 	}

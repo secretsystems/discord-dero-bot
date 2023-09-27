@@ -9,8 +9,19 @@ import (
 )
 
 func handleEncodeModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Command invoked in DM")
+		// You may want to handle DM-specific behavior here
+		return
+	}
 	components := createEncodeModalComponents()
-	modal := NewModal(session, interaction, "encode_"+interaction.Interaction.Member.User.ID, "Encode a DERO Integrated Address", components)
+
+	memberID := interaction.Interaction.Member.User.ID
+
+	log.Printf("The member's ID of this interaction is %s", memberID)
+	modal := NewModal(session, interaction, "encode_"+memberID, "Encode a DERO Integrated Address", components)
 	modal.Show()
 }
 func createEncodeModalComponents() []discordgo.MessageComponent {
@@ -61,6 +72,13 @@ func createEncodeModalComponents() []discordgo.MessageComponent {
 }
 
 func handleEncodeInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Interaction received in DM")
+		RespondWithMessage(session, interaction, "This interaction cannot be processed in DMs.")
+		return
+	}
 	data := interaction.ModalSubmitData()
 
 	// Helper function to get a TextInput value by index

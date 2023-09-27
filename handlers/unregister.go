@@ -38,7 +38,9 @@ func HandleUnregister(session *discordgo.Session, message *discordgo.MessageCrea
 					log.Println("Error adding role to member:", err)
 				}
 			}
-			_, err := session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> has been successfully unregistered.", userID)) // Added "successfully"
+			resultsChannel := "1156576030442655785"
+
+			_, err := session.ChannelMessageSend(resultsChannel, fmt.Sprintf("<@%s> has been successfully unregistered.", userID)) // Added "successfully"
 			if err != nil {
 				log.Printf("Error sending message: %v\n", err) // Used log.Printf
 			}

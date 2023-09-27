@@ -9,6 +9,13 @@ import (
 )
 
 func handleQRModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Command invoked in DM")
+		RespondWithMessage(session, interaction, "This command cannot be used in DMs.")
+		return
+	}
 	components := createQRModalComponents()
 	modal := NewModal(session, interaction, "qr_"+interaction.Interaction.Member.User.ID, "Create a qr code", components)
 	modal.Show()
@@ -31,6 +38,13 @@ func createQRModalComponents() []discordgo.MessageComponent {
 }
 
 func handleQRInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Interaction received in DM")
+		RespondWithMessage(session, interaction, "This interaction cannot be processed in DMs.")
+		return
+	}
 	data := interaction.ModalSubmitData()
 
 	// Helper function to get a TextInput value by index

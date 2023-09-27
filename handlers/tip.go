@@ -39,6 +39,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 		// Create an array to store transfer information
 		var transfers []dero.TransferInfo
 		var discordIDs []string // To store Discord user IDs involved in transfers
+		session.ChannelMessageSend(message.ChannelID, "All registered users are being tipped. This process takes time.")
 
 		// Iterate through user mappings and create TransferInfo objects
 		for discordID, address := range userMappings {
@@ -54,7 +55,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 			discordIDs = append(discordIDs, discordID)
 
 			// If we have 8 transfers, perform the bulk transfer and reset the transfers slice
-			if len(transfers) == 8 {
+			if len(transfers) == 10 {
 				log.Printf("Before processing transfers: %v", transfers)
 				processTransfers(session, message, transfers, discordIDs)
 				log.Printf("After processing transfers")

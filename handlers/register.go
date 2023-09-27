@@ -10,6 +10,13 @@ import (
 )
 
 func handleRegistrationModal(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Command invoked in DM")
+		RespondWithMessage(session, interaction, "This command cannot be used in DMs.")
+		return
+	}
 	components := createRegisterModalComponents()
 	modal := NewModal(session, interaction, "register_"+interaction.Interaction.Member.User.ID, "Secret Discord Server Registration", components)
 	modal.Show()
@@ -30,6 +37,13 @@ func createRegisterModalComponents() []discordgo.MessageComponent {
 }
 
 func handleRegister(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+	// Check if Member is nil (indicating DM)
+	if interaction.Interaction.Member == nil {
+		// Handle DM scenario
+		log.Println("Interaction received in DM")
+		RespondWithMessage(session, interaction, "This interaction cannot be processed in DMs.")
+		return
+	}
 	loadUserMappings()
 	data := interaction.ModalSubmitData()
 	input := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
@@ -102,7 +116,7 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	content := fmt.Sprintf("Successfully registered wallet %s `%s` for <@%s>.", walletType, address, username)
 	RespondWithMessage(session, interaction, content)
 
-	resultsChannel := interaction.ChannelID
+	resultsChannel := "1156576030442655785"
 	resultsMsg := fmt.Sprintf("<@%s> has registered with the server!", userID)
 	_, err := session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {
