@@ -2,6 +2,10 @@ package handlers
 
 import (
 	"discord-dero-bot/utils"
+	"discord-dero-bot/utils/dero"
+	"discord-dero-bot/utils/monero"
+	"fmt"
+	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -16,7 +20,17 @@ func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCr
 }
 
 func handleTradeDeroXmrComponent(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
-	message := "DERO-XMR is trading at: " + utils.DeroXmrExchangeRateString() + "\nWould you like to trade? \nTrades have a fee of 1%"
+	moneroBal, _ := monero.GetWalletBalance()
+	deroBal, _ := dero.GetDeroWalletBalance()
+
+	// Convert balances to the desired decimal precision
+	deroBalStr := strconv.FormatFloat(float64(deroBal)/100000, 'f', 5, 64)
+	moneroBalStr := strconv.FormatFloat(float64(moneroBal)/1000000000000, 'f', 12, 64)
+
+	message := fmt.Sprintf(
+		"DERO-XMR is trading at: %s\nThe `secret-wallet` has:\nDERO %s\nXMR %s\nWould you like to trade?\nTrades have a fee of 1%%",
+		utils.DeroXmrExchangeRateString(), deroBalStr, moneroBalStr,
+	)
 
 	buttons := []discordgo.MessageComponent{
 		discordgo.ActionsRow{Components: []discordgo.MessageComponent{

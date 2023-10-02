@@ -4,6 +4,7 @@ import (
 	"discord-dero-bot/bot"      // Update with the correct import path for your bot package
 	"discord-dero-bot/handlers" // Update with the correct import path for your handlers package
 	"discord-dero-bot/utils/dero"
+	"discord-dero-bot/utils/monero"
 	"log"
 	"os"
 	"os/signal"
@@ -42,7 +43,8 @@ func init() {
 		// Process the fetched and parsed transfer entries
 		log.Printf("Fetched and parsed %d transfer entries.\n", len(transferEntries))
 	}
-
+	dero.GetDeroWalletBalance()
+	monero.GetWalletBalance()
 }
 
 func main() {

@@ -29,6 +29,7 @@ var (
 	ErrEncoding         = errors.New("error encoding audio")
 	ErrFetchingPlaylist = errors.New("error fetching playlist")
 	ErrReadingPlaylist  = errors.New("error reading playlist")
+	ErrOpusFrame        = errors.New("error handling Opus audio frame")
 )
 
 func HandleMusic(session *discordgo.Session, message *discordgo.MessageCreate) {
@@ -188,6 +189,8 @@ func playAudio(session *discordgo.Session, guildID, voiceChannelID, audioURL str
 	// Set up the encoding options
 	opts := dca.StdEncodeOptions
 	opts.RawOutput = true
+	opts.Bitrate = 96
+	opts.Application = "lowdelay"
 
 	// Encode and stream the audio
 	encodeSession, err := dca.EncodeFile(audioURL, opts)
@@ -199,14 +202,30 @@ func playAudio(session *discordgo.Session, guildID, voiceChannelID, audioURL str
 	// Start speaking
 	vc.Speaking(true)
 
+	// Variables to handle consecutive EOF errors
+	consecutiveEOFCount := 0
+	maxConsecutiveEOF := 5 // Adjust this value as needed
+
 	// Stream audio frames
 	for {
 		frame, err := encodeSession.OpusFrame()
 		if err != nil {
-			break
+			if err == io.EOF {
+				consecutiveEOFCount++
+				if consecutiveEOFCount >= maxConsecutiveEOF {
+					log.Printf("Consecutive EOF errors reached the limit. Stopping audio playback.")
+					break
+				}
+			} else {
+				log.Printf("Error getting Opus frame: %v\n", err)
+				session.ChannelMessageSend(voiceChannelID, "Error playing audio: Unable to process audio frames")
+				break
+			}
+		} else {
+			// Reset the consecutive EOF counter when a frame is received
+			consecutiveEOFCount = 0
+			vc.OpusSend <- frame
 		}
-
-		vc.OpusSend <- frame
 	}
 
 	// Stop speaking
