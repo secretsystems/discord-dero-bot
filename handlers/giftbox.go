@@ -54,11 +54,12 @@ func createGiftBoxModalComponents() []discordgo.MessageComponent {
 		}},
 		discordgo.ActionsRow{Components: []discordgo.MessageComponent{
 			discordgo.TextInput{
-				CustomID:  "contact_info",
-				Label:     "If we need to reach you?",
-				Style:     discordgo.TextInputShort,
-				Required:  false,
-				MaxLength: 128,
+				CustomID:    "name",
+				Label:       "Name for the order?",
+				Style:       discordgo.TextInputShort,
+				Required:    false,
+				Placeholder: "Please use your real name",
+				MaxLength:   128,
 			},
 		}},
 	}

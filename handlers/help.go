@@ -31,6 +31,7 @@ var HelpData = []CommandHelp{
 	{"/decode", "Decode an integrated address and receive a DM of the output", false},
 	{"/register", "Register your wallet address or wallet name for tipping", false},
 	{"/qr", "Create a qr code from any string of of numbers and letters", false},
+	{"/giftbox", "Order a dero branded merch giftbox: 1 shirt, 4 sticker packs, and 20 pens", false},
 }
 
 func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
