@@ -11,7 +11,7 @@ import (
 // Rest of your FetchDeroTransfers function and other code ...
 
 func FetchDeroTransfers() ([]byte, error) {
-	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroWalletPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, deroWalletPort)
 
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",

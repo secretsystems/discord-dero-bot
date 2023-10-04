@@ -26,7 +26,7 @@ func SplitIntegratedAddress(userInput string) string {
 	}
 
 	// Construct the URL using the retrieved IP address and wallet port
-	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroWalletPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, deroWalletPort)
 
 	// Define request for node
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))

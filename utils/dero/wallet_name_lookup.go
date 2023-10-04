@@ -30,7 +30,7 @@ func WalletNameToAddress(input string) (string, error) {
 		return "", err
 	}
 
-	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroServerPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, DeroServerPort)
 
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {

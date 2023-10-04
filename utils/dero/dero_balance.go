@@ -27,7 +27,7 @@ func GetDeroWalletBalance() (uint64, error) {
 		return 0, fmt.Errorf("error marshaling JSON data: %v", err)
 	}
 
-	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroWalletPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, deroWalletPort)
 
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
