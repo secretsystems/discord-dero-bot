@@ -44,6 +44,10 @@ func HandleUnregister(session *discordgo.Session, message *discordgo.MessageCrea
 			if err != nil {
 				log.Printf("Error sending message: %v\n", err) // Used log.Printf
 			}
+			_, err = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> has been successfully unregistered.", userID)) // Added "successfully"
+			if err != nil {
+				log.Printf("Error sending message: %v\n", err) // Used log.Printf
+			}
 		} else {
 			_, err := session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> was not registered.", userID))
 			if err != nil {

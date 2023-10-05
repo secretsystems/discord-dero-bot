@@ -212,11 +212,19 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 	}
 
 	userRoles := member.Roles
-	log.Printf("User has: %v", userRoles)
+	log.Printf("User has roles: %v", userRoles)
 
-	// Flags to track if specific roles are found
-	foundSecretMembers := false
-	foundRegistered := false
+	amnt = 2
+	amntmsg = "0.00002 DERO, or 2 DERI"
+
+	// Check if the user ID is in userMappings
+	userID := message.Author.ID
+	if _, ok := userMappings[userID]; ok {
+		// If the user ID is found in userMappings, adjust the tip amount accordingly
+		amnt = 20 // Set the desired tip amount for registered users
+		amntmsg = "0.00020 DERO, or 20 DERI"
+		log.Printf("User ID: %s | Amount: %v | Message: %v", userID, amnt, amntmsg)
+	}
 
 	// Check user roles and adjust tip amount based on role priority
 	for _, roleID := range userRoles {
@@ -226,22 +234,6 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 			amnt = 200
 			amntmsg = "0.00200 DERO, or 200 DERI"
 			log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)
-			foundSecretMembers = true
-
-		case registeredRoleID:
-			if !foundSecretMembers || foundRegistered {
-				amnt = 20
-				amntmsg = "0.00020 DERO, or 20 DERI"
-				log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)
-				foundRegistered = true
-			}
-
-		case unregisteredRoleID:
-			if !foundSecretMembers && !foundRegistered {
-				amnt = 2
-				amntmsg = "0.00002 DERO, or 2 DERI"
-				log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)
-			}
 		}
 	}
 
