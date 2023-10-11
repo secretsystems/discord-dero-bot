@@ -98,8 +98,6 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 			return
 		}
 
-		// Send the tip
-		handleTip(session, message, recipientAddress)
 	}
 }
 
@@ -168,7 +166,7 @@ func handleMention(session *discordgo.Session, message *discordgo.MessageCreate,
 		return
 	}
 
-	handleTip(session, message, mappedAddress)
+	handleTip(session, message, userID, mappedAddress)
 }
 
 func resolveWalletAddress(input string) string {
@@ -240,27 +238,28 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 	return amnt, amntmsg
 }
 
-func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, recipientAddress string) {
+func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, userID, recipientAddress string) {
 	amnt, amntmsg := handleUserPermissions(session, message)
 
-	waitingMessage := fmt.Sprintf("`secret-wallet` is sending %s\n"+
-		"This process takes roughly 18 seconds; or 1 block interval.", amntmsg)
+	waitingMessage := fmt.Sprintf("`secret-wallet` is sending %s to <@%s>\n"+
+		"This process takes roughly 18 seconds; or 1 block interval.", amntmsg, userID)
 
 	// Rest of the function remains the same as in the previous examples
 	session.ChannelMessageSend(message.ChannelID, waitingMessage)
 
 	comment := "secret_pong_bot sends secret's love"
+	channel := "1161399751808385044"
 	txid, err := dero.MakeTransfer(recipientAddress, amnt, comment)
 	if err != nil {
 		session.ChannelMessageSend(message.ChannelID, "Error sending tip: "+err.Error())
 		return
 	}
 
-	successMessage := fmt.Sprintf("TxID status:\n```%s```"+
+	successMessage := fmt.Sprintf("TxID status for <@%s>:\n```%s```"+
 		"Explore this transaction by visiting: \n"+
 		"> http://explorer.dero.io/tx/%s\n"+
-		"Feed the bot by sending DERO to `secret-wallet`\n", txid, txid)
+		"Feed the bot by sending DERO to `secret-wallet`\n", userID, txid, txid)
 
 	// Display the txid along with the success message
-	session.ChannelMessageSend(message.ChannelID, successMessage)
+	session.ChannelMessageSend(channel, successMessage)
 }

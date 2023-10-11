@@ -40,15 +40,15 @@ func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
 	if helpCommand == "list" {
 		// Send a formatted list of available commands, separated by public (!) and private (/)
 		helpMsg := "## Available Commands:\n"
-		helpMsg += "### (!) Public Commands:\n```\n"
-		helpMsg += "These commands can be done in any server that the bot is in and everyone can see the results.\n"
+		helpMsg += "### (!) Public Commands:\n```"
+		helpMsg += "These commands can be done in any server that the bot is in and everyone can see the results.\n\n"
 		for _, cmd := range HelpData {
 			if cmd.IsPublic {
 				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)
 			}
 		}
-		helpMsg += "```\n### (/) Private/Ephemeral Commands:\n```\n"
-		helpMsg += "These commands can be done in any server that the bot is in and only you can see the results.\n"
+		helpMsg += "```\n### (/) Private/Ephemeral Commands:\n```"
+		helpMsg += "These commands can be done in any server that the bot is in and only you can see the results.\n\n"
 		for _, cmd := range HelpData {
 			if !cmd.IsPublic {
 				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)
