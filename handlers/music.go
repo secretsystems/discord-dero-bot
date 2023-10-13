@@ -15,6 +15,8 @@ import (
 	"github.com/jonas747/dca"
 )
 
+var encodeSessions = make(map[string]*dca.EncodeSession)
+
 type VoiceState struct {
 	GuildID        string
 	VoiceChannelID string
@@ -80,13 +82,33 @@ func isMusicPlaying(session *discordgo.Session, guildID string) bool {
 	}
 	return false
 }
+
 func stopMusic(session *discordgo.Session, guildID string) {
-	for _, vs := range session.VoiceConnections {
-		if vs.GuildID == guildID {
-			vs.Disconnect()
-			break
-		}
+	// Get the encodeSession for the specified guild
+	encodeSession, found := encodeSessions[guildID]
+	if !found {
+		log.Printf("No active encodeSession found for guild %s\n", guildID)
+		return
 	}
+
+	// Cleanup the encodeSession
+	encodeSession.Cleanup()
+
+	// Remove the encodeSession from the map
+	delete(encodeSessions, guildID)
+
+	// Get the voice connection for the specified guild
+	vc, found := session.VoiceConnections[guildID]
+	if !found {
+		log.Printf("No active voice connection found for guild %s\n", guildID)
+		return
+	}
+
+	// Disconnect the voice connection
+	vc.Disconnect()
+
+	// Remove the voice connection from the map
+	delete(session.VoiceConnections, guildID)
 }
 
 func playAudioFromURL(session *discordgo.Session, userID, guildID, audioURL string) error {
@@ -197,6 +219,10 @@ func playAudio(session *discordgo.Session, guildID, voiceChannelID, audioURL str
 	if err != nil {
 		return ErrEncoding
 	}
+
+	// Store the encodeSession for later cleanup
+	encodeSessions[guildID] = encodeSession
+
 	defer encodeSession.Cleanup()
 
 	// Start speaking
