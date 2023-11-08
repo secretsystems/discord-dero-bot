@@ -8,6 +8,11 @@ import (
 	"net/http"
 )
 
+type TransferInfo struct {
+	Destination string `json:"destination"`
+	Amount      int    `json:"amount"`
+}
+
 func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 	// Define payload data
 	payloadData := map[string]interface{}{
@@ -69,9 +74,4 @@ func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 	}
 
 	return "", fmt.Errorf("No transaction ID found in the response")
-}
-
-type TransferInfo struct {
-	Destination string `json:"destination"`
-	Amount      int    `json:"amount"`
 }

@@ -14,6 +14,7 @@ import (
 var (
 	registeredRoleID   = "1144842099653623839"
 	unregisteredRoleID = "1144846590687838309"
+	tipChannel         = "1161399751808385044"
 	specialAddresses   = []string{
 		"secret-wallet",
 		"dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4",
@@ -33,45 +34,49 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 	}
 
 	if content == "!tip_registered" {
-		// Load user mappings from the JSON file
-		loadUserMappings()
+		if message.Author.ID == "867976566716629092" {
+			// Load user mappings from the JSON file
+			loadUserMappings()
 
-		// Create an array to store transfer information
-		var transfers []dero.TransferInfo
-		var discordIDs []string // To store Discord user IDs involved in transfers
-		session.ChannelMessageSend(message.ChannelID, "All registered users are being tipped. This process takes time.")
+			// Create an array to store transfer information
+			var transfers []dero.TransferInfo
+			var discordIDs []string // To store Discord user IDs involved in transfers
+			session.ChannelMessageSend(message.ChannelID, "All registered users are being tipped. This process takes time.")
 
-		// Iterate through user mappings and create TransferInfo objects
-		for discordID, address := range userMappings {
-			address = resolveWalletAddress(address)
-			amnt, _ := handleUserPermissions(session, message)
-			transfer := dero.TransferInfo{
-				Destination: address,
-				Amount:      amnt, // Set the desired tip amount
+			// Iterate through user mappings and create TransferInfo objects
+			for discordID, address := range userMappings {
+				address = resolveWalletAddress(address)
+				amnt, _ := handleUserPermissions(session, message)
+				transfer := dero.TransferInfo{
+					Destination: address,
+					Amount:      amnt, // Set the desired tip amount
+				}
+				transfers = append(transfers, transfer)
+
+				// Add the Discord user ID to the list of users involved
+				discordIDs = append(discordIDs, discordID)
+
+				// If we have transfers, perform the bulk transfer and reset the transfers slice
+				if len(transfers) == 10 {
+					log.Printf("Before processing transfers: %v", transfers)
+					processTransfers(session, message, transfers, discordIDs)
+					log.Printf("After processing transfers")
+					transfers = nil
+					discordIDs = nil
+				}
 			}
-			transfers = append(transfers, transfer)
 
-			// Add the Discord user ID to the list of users involved
-			discordIDs = append(discordIDs, discordID)
-
-			// If we have 8 transfers, perform the bulk transfer and reset the transfers slice
-			if len(transfers) == 10 {
+			// Process any remaining transfers
+			if len(transfers) > 0 {
 				log.Printf("Before processing transfers: %v", transfers)
 				processTransfers(session, message, transfers, discordIDs)
 				log.Printf("After processing transfers")
-				transfers = nil
-				discordIDs = nil
 			}
-		}
 
-		// Process any remaining transfers
-		if len(transfers) > 0 {
-			log.Printf("Before processing transfers: %v", transfers)
-			processTransfers(session, message, transfers, discordIDs)
-			log.Printf("After processing transfers")
+			return
+		} else {
+			session.ChannelMessageSend(message.ChannelID, "You don't have secret clearance.")
 		}
-
-		return
 	}
 
 	if strings.HasPrefix(content, "!tip ") {
@@ -139,10 +144,10 @@ func processTransfers(session *discordgo.Session, message *discordgo.MessageCrea
 	// Optionally, you can perform additional actions based on whether the bulk transfer was successful or not.
 	if txIDReceived {
 		// Send the message to the Discord channel
-		session.ChannelMessageSend(message.ChannelID, messageToSend)
+		session.ChannelMessageSend(tipChannel, messageToSend)
 	} else {
 		messageToSend = "TX FAILED TO BUILD TRANSFER"
-		session.ChannelMessageSend(message.ChannelID, messageToSend) // Handle the case where the bulk transfer failed.
+		session.ChannelMessageSend(tipChannel, messageToSend) // Handle the case where the bulk transfer failed.
 	}
 }
 
@@ -248,7 +253,7 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 	session.ChannelMessageSend(message.ChannelID, waitingMessage)
 
 	comment := "secret_pong_bot sends secret's love"
-	channel := "1161399751808385044"
+
 	txid, err := dero.MakeTransfer(recipientAddress, amnt, comment)
 	if err != nil {
 		session.ChannelMessageSend(message.ChannelID, "Error sending tip: "+err.Error())
@@ -261,5 +266,5 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 		"Feed the bot by sending DERO to `secret-wallet`\n", userID, txid, txid)
 
 	// Display the txid along with the success message
-	session.ChannelMessageSend(channel, successMessage)
+	session.ChannelMessageSend(tipChannel, successMessage)
 }

@@ -13,7 +13,7 @@ func handleEncodeModal(session *discordgo.Session, interaction *discordgo.Intera
 	if interaction.Interaction.Member == nil {
 		// Handle DM scenario
 		log.Println("Command invoked in DM")
-		// You may want to handle DM-specific behavior here
+		RespondWithMessage(session, interaction, "This command cannot be used in DMs.")
 		return
 	}
 	components := createEncodeModalComponents()
