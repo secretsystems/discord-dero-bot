@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	owner              = "867976566716629092"
 	registeredRoleID   = "1144842099653623839"
 	unregisteredRoleID = "1144846590687838309"
 	tipChannel         = "1161399751808385044"
@@ -25,55 +26,59 @@ func init() {
 	loadUserMappings()
 }
 
+func HandleBigTip(session *discordgo.Session, message *discordgo.MessageCreate) {
+	// Load user mappings from the JSON file
+	loadUserMappings()
+
+	// Create an array to store transfer information
+	var transfers []dero.TransferInfo
+	var discordIDs []string // To store Discord user IDs involved in transfers
+	session.ChannelMessageSend(message.ChannelID, "All registered users are being tipped. This process takes time.")
+
+	// Iterate through user mappings and create TransferInfo objects
+	for discordID, address := range userMappings {
+		address = resolveWalletAddress(address)
+		amnt, _ := handleUserPermissions(session, message, discordID)
+		transfer := dero.TransferInfo{
+			Destination: address,
+			Amount:      amnt, // Set the desired tip amount
+		}
+		transfers = append(transfers, transfer)
+
+		// Add the Discord user ID to the list of users involved
+		discordIDs = append(discordIDs, discordID)
+
+		// If we have transfers, perform the bulk transfer and reset the transfers slice
+		if len(transfers) == 10 {
+			log.Printf("Before processing transfers: %v", transfers)
+			processTransfers(session, message, transfers, discordIDs)
+			log.Printf("After processing transfers")
+			transfers = nil
+			discordIDs = nil
+		}
+	}
+
+	// Process any remaining transfers
+	if len(transfers) > 0 {
+		log.Printf("Before processing transfers: %v", transfers)
+		processTransfers(session, message, transfers, discordIDs)
+		log.Printf("After processing transfers")
+	}
+
+	return
+}
+
 func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
 
 	if content == "!tip" {
-		session.ChannelMessageSend(message.ChannelID, "To send a tip, use the format: `!tip <@user_mention or <wallet_address> or <wallet_name>`")
+		session.ChannelMessageSend(message.ChannelID, "To send a tip, use the format: `!tip <@user_mention>`")
 		return
 	}
 
 	if content == "!tip_registered" {
-		if message.Author.ID == "867976566716629092" {
-			// Load user mappings from the JSON file
-			loadUserMappings()
-
-			// Create an array to store transfer information
-			var transfers []dero.TransferInfo
-			var discordIDs []string // To store Discord user IDs involved in transfers
-			session.ChannelMessageSend(message.ChannelID, "All registered users are being tipped. This process takes time.")
-
-			// Iterate through user mappings and create TransferInfo objects
-			for discordID, address := range userMappings {
-				address = resolveWalletAddress(address)
-				amnt, _ := handleUserPermissions(session, message)
-				transfer := dero.TransferInfo{
-					Destination: address,
-					Amount:      amnt, // Set the desired tip amount
-				}
-				transfers = append(transfers, transfer)
-
-				// Add the Discord user ID to the list of users involved
-				discordIDs = append(discordIDs, discordID)
-
-				// If we have transfers, perform the bulk transfer and reset the transfers slice
-				if len(transfers) == 10 {
-					log.Printf("Before processing transfers: %v", transfers)
-					processTransfers(session, message, transfers, discordIDs)
-					log.Printf("After processing transfers")
-					transfers = nil
-					discordIDs = nil
-				}
-			}
-
-			// Process any remaining transfers
-			if len(transfers) > 0 {
-				log.Printf("Before processing transfers: %v", transfers)
-				processTransfers(session, message, transfers, discordIDs)
-				log.Printf("After processing transfers")
-			}
-
-			return
+		if message.Author.ID == owner {
+			HandleBigTip(session, message)
 		} else {
 			session.ChannelMessageSend(message.ChannelID, "You don't have secret clearance.")
 		}
@@ -123,7 +128,7 @@ func processTransfers(session *discordgo.Session, message *discordgo.MessageCrea
 	}()
 
 	// Display the txid along with the success message and mention Discord users by their IDs
-	messageToSend := "Bulk tip status:\n```"
+	messageToSend := "Bulk tip status:\n"
 	txIDReceived := false
 
 	// Wait for the result from the goroutine
@@ -132,7 +137,8 @@ func processTransfers(session *discordgo.Session, message *discordgo.MessageCrea
 		if strings.HasPrefix(result, "Error") {
 			messageToSend += result
 		} else {
-			messageToSend += fmt.Sprintf("TxID: %s```\nExplore this transaction by visiting http://explorer.dero.io/tx/%s \nTips went to these registered badasses:\n", result, result)
+			messageToSend += fmt.Sprintf("Explore this transaction by visiting http://explorer.dero.io/tx/%s"+
+				"\nTips went to these registered badasses:\n", result)
 			txIDReceived = true
 		}
 	}
@@ -206,9 +212,9 @@ func getUserAddress(userID string) string {
 	return userMappings[userID]
 }
 
-func handleUserPermissions(session *discordgo.Session, message *discordgo.MessageCreate) (amnt int, amntmsg string) {
+func handleUserPermissions(session *discordgo.Session, message *discordgo.MessageCreate, userID string) (amnt int, amntmsg string) {
 	// Get the user's roles
-	member, err := session.GuildMember(secretGuildID, message.Author.ID)
+	member, err := session.GuildMember(secretGuildID, userID)
 	if err != nil {
 		log.Printf("Error getting guild member: %v", err)
 		return
@@ -221,7 +227,6 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 	amntmsg = "0.00002 DERO, or 2 DERI"
 
 	// Check if the user ID is in userMappings
-	userID := message.Author.ID
 	if _, ok := userMappings[userID]; ok {
 		// If the user ID is found in userMappings, adjust the tip amount accordingly
 		amnt = 20 // Set the desired tip amount for registered users
@@ -244,9 +249,9 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 }
 
 func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, userID, recipientAddress string) {
-	amnt, amntmsg := handleUserPermissions(session, message)
+	amnt, amntmsg := handleUserPermissions(session, message, userID)
 
-	waitingMessage := fmt.Sprintf("`secret-wallet` is sending %s to <@%s>\n"+
+	waitingMessage := fmt.Sprintf("`secret-wallet` is sending %s to <@%s> "+
 		"This process takes roughly 18 seconds; or 1 block interval.", amntmsg, userID)
 
 	// Rest of the function remains the same as in the previous examples
