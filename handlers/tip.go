@@ -76,7 +76,7 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	if content == "!tip_registered" {
+	if content == "!tips" {
 		if message.Author.ID == owner {
 			HandleBigTip(session, message)
 		} else {
