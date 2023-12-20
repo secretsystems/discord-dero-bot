@@ -33,7 +33,7 @@ func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 
 	// Define HTTP client and request
 	client := &http.Client{}
-	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, deroWalletPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, deroTipsPort)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadJSON))
 	if err != nil {
