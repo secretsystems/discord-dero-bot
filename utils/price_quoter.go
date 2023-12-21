@@ -49,9 +49,13 @@ func getAsk(pair string) float64 {
 }
 
 func ExchangeRate() float64 {
-	xmr := getAsk("xmr-usdt")
 	dero := getAsk("dero-usdt")
-	return dero / xmr
+	fmt.Printf("The Price of DERO: %v", dero)
+	return dero
+}
+
+func ExchangeRateInt(f float64) int {
+	return int(f)
 }
 
 func ExchangeRateString() string {

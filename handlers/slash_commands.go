@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"log"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -21,6 +22,7 @@ func RegisterSlashCommands(session *discordgo.Session, appID, guildID string) {
 		}
 		log.Printf("Registered Slash Commands: %v", command.Name)
 		commandIDs[registeredCommands.ID] = registeredCommands.Name
+		time.Sleep(2)
 	}
 }
 
@@ -32,5 +34,6 @@ func Cleanup(session *discordgo.Session, appID, guildID string) {
 		if err != nil {
 			log.Fatalf("Cannot delete slash command %q: %v", name, err)
 		}
+		time.Sleep(2)
 	}
 }

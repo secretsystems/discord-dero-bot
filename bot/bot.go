@@ -15,16 +15,10 @@ var PingHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate)
 	"!insult":     handlers.HandleMessage,
 	"!lookup":     handlers.HandleWalletName,
 	"!derod":      handlers.HandleGetInfoDerod,
-	"!monerod":    handlers.HandleGetInfoMonerod,
-	"!quote":      handlers.HandleQuoteRequest,
-	"!markets":    handlers.HandleMarketsRequest,
 	"!help":       handlers.HandleHelp,
-	"!bot":        handlers.HandleChat,
 	"!tip":        handlers.HandleTip,
-	// "!register":   handlers.HandleRegister,
 	"!unregister": handlers.HandleUnregister,
 	"!shop":       handlers.HandleShop,
-	// "!membership"  handlers.HandleMembership
 }
 
 type Bot struct {
@@ -72,6 +66,9 @@ func (bot *Bot) OnGeneric(s *discordgo.Session, event interface{}) {
 		log.Printf("TYPING EVENT: User %v is typing on channel %v\n", cast.UserID, cast.ChannelID)
 	case *discordgo.MessageCreate:
 		log.Printf("MESSAGE EVENT: %v | %v", cast.Author, cast.Content)
+	case *discordgo.RateLimit:
+		log.Printf("RATE LIMIT EVENT: %v ", cast.RetryAfter)
+
 	}
 }
 

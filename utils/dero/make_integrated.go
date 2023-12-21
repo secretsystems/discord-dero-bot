@@ -59,7 +59,7 @@ func MakeIntegratedAddress(address string, amount int, comment string, destinati
 	// Set basic authentication for the request
 	request.SetBasicAuth(deroUser, deroPass)
 	request.Header.Set("Content-type", "application/json")
-	fmt.Println("\nRequest: ", request)
+	// fmt.Println("\nRequest: ", request)
 
 	client := http.DefaultClient
 	response, err := client.Do(request)
@@ -70,7 +70,7 @@ func MakeIntegratedAddress(address string, amount int, comment string, destinati
 	defer response.Body.Close()
 
 	responseBody, _ := io.ReadAll(response.Body)
-	log.Printf("Response Body: %v", string(responseBody))
+	// log.Printf("Response Body: %v", string(responseBody))
 
 	var mapResponse map[string]interface{}
 	err = json.Unmarshal(responseBody, &mapResponse)

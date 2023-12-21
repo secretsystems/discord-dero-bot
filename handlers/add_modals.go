@@ -1,23 +1,17 @@
 package handlers
 
 import (
+	"discord-dero-bot/utils"
 	"discord-dero-bot/utils/dero"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
-	"os"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-var userMappings map[string]string
-var userMappingsMutex sync.Mutex
-
-func AddModals(session *discordgo.Session, appID, guildID string, resultsChannel string) {
+func AddModals(session *discordgo.Session, appID, guildID, resultsChannel string) {
 	session.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
 		// Check if the interaction type is ModalSubmitData
 		if interaction.Type == discordgo.InteractionModalSubmit {
@@ -33,7 +27,7 @@ func AddModals(session *discordgo.Session, appID, guildID string, resultsChannel
 			case "giftbox_" + interaction.Member.User.ID:
 				handleGiftboxInteraction(session, interaction, resultsChannel)
 			case "register_" + interaction.Member.User.ID:
-				handleRegister(session, interaction)
+				handleRegister(session, interaction, resultsChannel)
 			}
 		}
 	})
@@ -95,32 +89,8 @@ func handleDecodeInteraction(session *discordgo.Session, interaction *discordgo.
 }
 
 func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo.InteractionCreate, resultsChannel string) {
-	// Step 1: Make a GET request to the API endpoint
-	response, err := http.Get("https://tradeogre.com/api/v1/ticker/dero-usdt")
-	if err != nil {
-		log.Println("Error fetching API data:", err)
-		return
-	}
-	defer response.Body.Close()
 
-	// Step 2: Parse the JSON response
-	var apiResponse struct {
-		Success bool   `json:"success"`
-		Price   string `json:"price"`
-	}
-	err = json.NewDecoder(response.Body).Decode(&apiResponse)
-	if err != nil {
-		log.Println("Error decoding API response:", err)
-		return
-	}
-
-	// Convert the price from string to float64
-	price, err := strconv.ParseFloat(apiResponse.Price, 64)
-	if err != nil {
-		log.Println("Error parsing price:", err)
-		return
-	}
-
+	price := utils.ExchangeRate()
 	// Step 3: Calculate the amount in atomic units
 	amount := int((55 / price) * 100000)
 
@@ -135,12 +105,12 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	comment += "S: " + size + " "
 	comment += "A: " + shipping + " "
 	comment += "P: " + contact + " "
-	address := "dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4"
+	address := deroWalletAddress
 	destination := 1337
 	integratedAddress := dero.MakeIntegratedAddress(address, amount, comment, destination)
 	messageContent := integratedAddress
 
-	err = session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: "To purchase your giftbox, please use the following address :\n```" + messageContent + "```And we will get back to you as soon as your order is marked receieved.\nWe will contact you on your shipping status.",
@@ -165,49 +135,7 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	}
 }
 
-func loadUserMappings() {
-	file, err := os.OpenFile("userMappings.json", os.O_RDWR|os.O_CREATE, 0666)
-	if err != nil {
-		log.Printf("Error opening user mappings file: %v", err)
-		return
-	}
-	defer file.Close()
-
-	// Check if the file is empty before decoding
-	fileInfo, err := file.Stat()
-	if err != nil {
-		log.Printf("Error getting file info: %v", err)
-		return
-	}
-	if fileInfo.Size() == 0 {
-		userMappings = make(map[string]string)
-		return
-	}
-
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&userMappings)
-	if err != nil {
-		log.Printf("Error decoding user mappings: %v", err)
-	}
-}
-
-func saveUserMappings() {
-	file, err := os.Create("userMappings.json")
-	if err != nil {
-		log.Printf("Error creating user mappings file: %v", err)
-		return
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	err = encoder.Encode(userMappings)
-	if err != nil {
-		log.Printf("Error encoding user mappings: %v", err)
-	}
-}
-
-func handleRegister(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+func handleRegister(session *discordgo.Session, interaction *discordgo.InteractionCreate, resultsChannel string) {
 	loadUserMappings()
 	data := interaction.ModalSubmitData()
 	address := data.Components[0].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
@@ -252,18 +180,10 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	userMappings[username] = address
 	saveUserMappings()
 
-	registeredRole := "1144842099653623839"
 	// Add the registered role to the member
 	err := session.GuildMemberRoleAdd(interaction.GuildID, username, registeredRole)
 	if err != nil {
 		log.Println("Error adding role to member:", err)
-	}
-
-	unregisteredRole := "1144846590687838309"
-	// Remove the unregistered role from the member
-	err = session.GuildMemberRoleRemove(interaction.GuildID, username, unregisteredRole)
-	if err != nil {
-		log.Println("Error removing role from member:", err) // Updated log message
 	}
 
 	// Respond to the interaction
@@ -280,7 +200,7 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	}
 
 	userID := strings.Split(data.CustomID, "_")[1]
-	resultsChannel := "1060312629505167362"
+
 	resultsMsg := fmt.Sprintf("<@%s> has registered with the server!", userID)
 	_, err = session.ChannelMessageSend(resultsChannel, resultsMsg)
 	if err != nil {

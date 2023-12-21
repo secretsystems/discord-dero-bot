@@ -22,5 +22,14 @@ func FetchAndParseTransfers() ([]TransferEntry, error) {
 		return nil, err
 	}
 
-	return entries, nil
+	// Filter transactions with a PayloadRPC
+	filteredEntries := []TransferEntry{}
+	for _, entry := range entries {
+		if len(entry.PayloadRPC) > 0 {
+			// This transaction has a PayloadRPC, include it in the filtered list
+			filteredEntries = append(filteredEntries, entry)
+		}
+	}
+
+	return filteredEntries, nil
 }

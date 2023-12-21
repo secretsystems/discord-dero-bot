@@ -13,37 +13,29 @@ func HandleUnregister(session *discordgo.Session, message *discordgo.MessageCrea
 	if content == "!unregister" {
 		loadUserMappings()
 		// Extract the user ID
-		userID := message.Author.ID
-		log.Printf("User ID: %s", userID) // Added "User ID:"
+
+		log.Printf("User ID: %s", message.Author.ID) // Added "User ID:"
 
 		userMappingsMutex.Lock()
 		defer userMappingsMutex.Unlock()
 
 		// Check if the user is registered
-		if _, exists := userMappings[userID]; exists {
+		if _, exists := userMappings[message.Author.ID]; exists {
 			delete(userMappings, userID)
 			saveUserMappings()
 
-			registeredRole := "1144842099653623839"
-			unregisteredRole := "1144846590687838309"
-
 			// Remove the registered role and add the unregistered role
-			err := session.GuildMemberRoleRemove(message.GuildID, userID, registeredRole)
+			err := session.GuildMemberRoleRemove(message.GuildID, message.Author.ID, desiredRole)
 			if err != nil {
-				log.Println("Error removing role from member:", err) // Updated log message
+				log.Println("Error removing role from member:", err)
 			}
 
-			err = session.GuildMemberRoleAdd(message.GuildID, userID, unregisteredRole)
+			_, err = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> has been successfully unregistered.", message.Author.ID)) // Added "successfully"
 			if err != nil {
-				log.Println("Error adding role to member:", err)
-			}
-
-			_, err = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> has been successfully unregistered.", userID)) // Added "successfully"
-			if err != nil {
-				log.Printf("Error sending message: %v\n", err) // Used log.Printf
+				log.Printf("Error sending message: %v\n", err)
 			}
 		} else {
-			_, err := session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> was not registered.", userID))
+			_, err := session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> was not registered.", message.Author.ID))
 			if err != nil {
 				log.Printf("Error sending message: %v\n", err)
 			}
