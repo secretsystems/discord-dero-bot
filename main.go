@@ -1,8 +1,8 @@
 package main
 
 import (
-	"discord-dero-bot/bot"      // Update with the correct import path for your bot package
-	"discord-dero-bot/handlers" // Update with the correct import path for your handlers package
+	"discord-dero-bot/bot"      
+	"discord-dero-bot/handlers" 
 	"discord-dero-bot/utils/dero"
 	"discord-dero-bot/utils/monero"
 	"log"

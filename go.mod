@@ -1,3 +1,4 @@
+
 module github.com/secretsystems/discord-dero-bot
 
 go 1.20
