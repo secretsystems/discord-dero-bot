@@ -1,9 +1,11 @@
 package main
 
 import (
-	"discord-dero-bot/bot"
-	"discord-dero-bot/handlers"
-	"discord-dero-bot/utils"
+
+	"discord-dero-bot/bot"      
+	"discord-dero-bot/handlers" 
+	"discord-dero-bot/utils/coinbase"
+
 	"discord-dero-bot/utils/dero"
 	"log"
 	"os"
