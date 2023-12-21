@@ -4,9 +4,11 @@ import (
 	"discord-dero-bot/bot"      
 	"discord-dero-bot/handlers" 
 	"discord-dero-bot/utils/dero"
+	"discord-dero-bot/utils/monero"
 	"log"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -14,10 +16,9 @@ import (
 
 var (
 	// discord
-	botToken       string
-	guildID        string
-	appID          string
-	resultsChannel string
+	botToken string
+	guildID  string
+	appID    string
 )
 
 func init() {
@@ -31,16 +32,6 @@ func init() {
 	botToken = os.Getenv("BOT_TOKEN")
 	guildID = os.Getenv("GUILD_ID")
 	appID = os.Getenv("APP_ID")
-	resultsChannel = os.Getenv("RESULTS_CHANNEL")
-}
-
-func main() {
-	// Initialize the bot
-
-	bot, err := bot.NewBot(botToken) // Replace with the actual initialization function
-	if err != nil {
-		log.Fatalf("Error initializing Discord bot: %v", err)
-	}
 
 	log.Printf("Initializing DERO\n")
 	// Call FetchAndParseTransfers function from the utils package
@@ -52,10 +43,17 @@ func main() {
 		// Process the fetched and parsed transfer entries
 		log.Printf("Fetched and parsed %d transfer entries.\n", len(transferEntries))
 	}
+	dero.GetDeroWalletBalance()
+	monero.GetWalletBalance()
+}
 
-	bot.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
-		log.Println("Bot is up!")
-	})
+func main() {
+	// Initialize the bot
+
+	bot, err := bot.NewBot(botToken) // Replace with the actual initialization function
+	if err != nil {
+		log.Fatalf("Error initializing Discord bot: %v", err)
+	}
 
 	err = bot.Open()
 	if err != nil {
@@ -68,11 +66,14 @@ func main() {
 
 	// Register interaction handlers
 
-	handlers.AddHandlers(session, appID, guildID)
-	handlers.AddModals(session, appID, guildID, resultsChannel)
-	handlers.RegisterSlashCommands(session, appID, guildID)
+	handlers.AddHandlers(session, appID)
+	handlers.AddModals(session, appID)
+	registrationBucket := handlers.NewTokenBucket(1, 1, time.Second*4) // Allow 1 request every 5 seconds
+	handlers.RegisterSlashCommands(session, appID, guildID, registrationBucket)
 
-	log.Println("Bot is running. Press Ctrl+C to stop.")
+	bot.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
+		log.Println("Bot is up!")
+	})
 
 	// Set up a channel to capture the Ctrl+C signal
 	channel := make(chan os.Signal, 1)
@@ -80,7 +81,8 @@ func main() {
 
 	// Wait for an interrupt signal to close the program
 	<-channel
-	handlers.Cleanup(session, appID, guildID)
+	cleanupBucket := handlers.NewTokenBucket(1, 1, time.Second*4) // Allow 1 request every 5 seconds
+	handlers.Cleanup(session, appID, guildID, cleanupBucket)
 	log.Println("Bot is cleaning up.")
 
 }

@@ -9,8 +9,9 @@ import (
 
 var (
 	// dero
-	deroServerIP     string
-	deroServerPort   string
+	DeroServerIP     string
+	DeroServerPort   string
+	deroTipsPort     string
 	deroWalletPort   string
 	deroUser         string
 	deroPass         string
@@ -28,9 +29,10 @@ func init() {
 	}
 
 	//dero
-	deroServerIP = os.Getenv("DERO_SERVER_IP")
+	DeroServerIP = os.Getenv("DERO_SERVER_IP")
 	deroWalletPort = os.Getenv("DERO_WALLET_PORT")
-	deroServerPort = os.Getenv("DERO_NODE_PORT")
+	deroTipsPort = os.Getenv("DERO_TIPS_PORT")
+	DeroServerPort = os.Getenv("DERO_NODE_PORT")
 	deroUser = os.Getenv("USER")
 	deroPass = os.Getenv("PASS")
 	homeDir, _ := os.UserHomeDir()

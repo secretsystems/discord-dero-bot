@@ -24,7 +24,7 @@ func GetInfoDerod() string {
 	}
 
 	// Construct the URL using the retrieved IP address and wallet port
-	url := fmt.Sprintf("http://%s:%s/json_rpc", deroServerIP, deroServerPort)
+	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, DeroServerPort)
 
 	// Define request for node
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))

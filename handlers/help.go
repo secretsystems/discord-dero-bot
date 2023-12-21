@@ -1,91 +1,78 @@
 package handlers
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
 
+// CommandHelp represents information about a specific command
+type CommandHelp struct {
+	Command  string
+	Usage    string
+	IsPublic bool
+}
+
+// HelpData stores information about available commands
+var HelpData = []CommandHelp{
+	{"!bot", "Get information from the bot based on your query", true},
+	{"!unregister", "Unregister your wallet address or wallet name for tipping", true},
+	{"!lookup", "Look up the DERO address associated with a username or wallet name", true},
+	{"!tip", "Send a tip to the specified user or DERO address", true},
+	{"!derod", "Get the current status of the DERO Network", true},
+	{"!monerod", "Get the current status of the Monero Network", true},
+	{"!markets", "Get the current list of markets provided by Trade Ogre", true},
+	{"!quote", "Get the current quote of a pair provided by Trade Ogre", true},
+	{"!derostats", "Get DERO stats from derostats.io", true},
+	{"!music", "Play music in the voice channel you are in", true},
+	{"/trade-dero-xmr", "Trade DERO-XMR by way of the DERO-XMR swap integrated addresses", false},
+	{"/encode", "Encode a DERO integrated Address using wallet address, amount, and comment", false},
+	{"/decode", "Decode an integrated address and receive a DM of the output", false},
+	{"/register", "Register your wallet address or wallet name for tipping", false},
+	{"/qr", "Create a qr code from any string of of numbers and letters", false},
+	{"/giftbox", "Order a dero branded merch giftbox: 1 shirt, 4 sticker packs, and 20 pens", false},
+}
+
 func HandleHelp(session *discordgo.Session, message *discordgo.MessageCreate) {
 	helpCommand := strings.TrimPrefix(message.Content, "!help ")
 
-	switch helpCommand {
-	case "list":
-		// Send the general help message with a list of available commands
-		helpMsg := "# Welcome to the Secret Discord Server!\n"
-		helpMsg += "```We share our knowledge, insights and relationships we earned from our research and development using DERO.```\n"
-		helpMsg += "## Available Commands:\n\n"
-		helpMsg += "**Server:**\n"
-		helpMsg += "```!help <!command>``````!bot <query>``````/register``````!unregister``````/trade-dero-xmr```\n"
-		helpMsg += "**DERO Wallet:**\n"
-		helpMsg += "```!lookup <@username or wallet name>``````!tip <@username, dero1q or wallet-name>``````/decode``````/encode```\n"
-		helpMsg += "**Node**\n"
-		helpMsg += "```!derod``````!monerod```\n"
-		helpMsg += "**Markets**\n"
-		helpMsg += "```!markets``````!quote <insert base-pair>```\n"
+	if helpCommand == "list" {
+		// Send a formatted list of available commands, separated by public (!) and private (/)
+		helpMsg := "## Available Commands:\n"
+		helpMsg += "### (!) Public Commands:\n```"
+		helpMsg += "These commands can be done in any server that the bot is in and everyone can see the results.\n\n"
+		for _, cmd := range HelpData {
+			if cmd.IsPublic {
+				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)
+			}
+		}
+		helpMsg += "```\n### (/) Private/Ephemeral Commands:\n```"
+		helpMsg += "These commands can be done in any server that the bot is in and only you can see the results.\n\n"
+		for _, cmd := range HelpData {
+			if !cmd.IsPublic {
+				helpMsg += fmt.Sprintf("%s: %s\n\n", cmd.Command, cmd.Usage)
+			}
+		}
+		helpMsg += "```\n"
 		session.ChannelMessageSend(message.ChannelID, helpMsg)
-	case "!bot":
-		// Send a breakdown of the bot command and its usage
-		botHelpMsg := "Usage: `!bot <query>`\n" +
-			"Get information from the bot based on your query."
-		session.ChannelMessageSend(message.ChannelID, botHelpMsg)
-	case "/register":
-		// Send a breakdown of the register command and its usage
-		registerHelpMsg := "Usage: `/register`\n" +
-			"Register your wallet address or wallet name for tipping."
-		session.ChannelMessageSend(message.ChannelID, registerHelpMsg)
-	case "!unregister":
-		// Send a breakdown of the register command and its usage
-		unregisterHelpMsg := "Usage: `!unregister`\n" +
-			"Unregister your wallet address or wallet name for tipping."
-		session.ChannelMessageSend(message.ChannelID, unregisterHelpMsg)
-	case "!lookup":
-		// Send a breakdown of the lookup command and its usage
-		lookupHelpMsg := "Usage: `!lookup <@username or wallet name>`\n" +
-			"Look up the DERO address associated with a username or wallet name."
-		session.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
-	case "/decode":
-		// Send a breakdown of the lookup command and its usage
-		lookupHelpMsg := "Usage: `/decode`\n" +
-			"Decode an integrated address and receive a DM of the output."
-		session.ChannelMessageSend(message.ChannelID, lookupHelpMsg)
-	case "!tip":
-		// Send a breakdown of the tip command and its usage
-		tipHelpMsg := "Usage: `!tip <@username, dero1q, or wallet-name>`\n" +
-			"Send a tip to the specified user or DERO address."
-		session.ChannelMessageSend(message.ChannelID, tipHelpMsg)
-	case "!derod":
-		// Send a breakdown of the derod command and its usage
-		derodHelpMsg := "Usage: `!derod`\n" +
-			"Get the current status of the DERO Network."
-		session.ChannelMessageSend(message.ChannelID, derodHelpMsg)
-	case "!monerod":
-		// Send a breakdown of the monerod command and its usage
-		monerodHelpMsg := "Usage: `!monerod`\n" +
-			"Get the current status of the Monero Network."
-		session.ChannelMessageSend(message.ChannelID, monerodHelpMsg)
-	case "!markets":
-		// Send a breakdown of the markets command and its usage
-		marketsHelpMsg := "Usage: !markets\n" +
-			"Get the current list of markets provided by Trade Ogre."
-		session.ChannelMessageSend(message.ChannelID, marketsHelpMsg)
-	case "!quote":
-		// Send a breakdown of the quote command and its usage
-		quoteHelpMsg := "Usage: `!quote <insert base-pair>`\n" +
-			"Get the current quote of a pair provided by Trade Ogre."
-		session.ChannelMessageSend(message.ChannelID, quoteHelpMsg)
-	case "/trade-dero-xmr":
-		// Send a breakdown of the quote command and its usage
-		tradeHelpMsg := "Usage: `/trade-dero-xmr`\n" +
-			"Trade DERO-XMR by way of the DERO-XMR swap integrated addresses."
-		session.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
-	case "/encode":
-		// Send a breakdown of the quote command and its usage
-		tradeHelpMsg := "Usage: `/encode`\n" +
-			"Encode a DERO integrated Address using wallet address, amount and comment."
-		session.ChannelMessageSend(message.ChannelID, tradeHelpMsg)
-	default:
-		// Send a message indicating the help command is not recognized
-		session.ChannelMessageSend(message.ChannelID, "You have activated the !help menu. Use `!help list` to see available commands.")
+		return
 	}
+
+	for _, cmd := range HelpData {
+		if helpCommand == cmd.Command {
+			// Send the usage information for the specific command and indicate public or private
+			helpMsg := fmt.Sprintf("Usage: `%s`\n%s\n", cmd.Command, cmd.Usage)
+			if cmd.IsPublic {
+				helpMsg += "This is a public command."
+			} else {
+				helpMsg += "This is a private/ephemeral command."
+			}
+			session.ChannelMessageSend(message.ChannelID, helpMsg)
+			return
+		}
+	}
+
+	// If the specified command is not found, send a message indicating the help menu
+	session.ChannelMessageSend(message.ChannelID, "You have activated the !help menu. Use `!help list` to see available commands.")
 }

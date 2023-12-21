@@ -21,14 +21,16 @@ var PingHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate)
 	"!help":       handlers.HandleHelp,
 	"!bot":        handlers.HandleChat,
 	"!tip":        handlers.HandleTip,
-	// "!register":   handlers.HandleRegister,
+	"!derostats":  handlers.HandleDerostats,
 	"!unregister": handlers.HandleUnregister,
-	"!shop":       handlers.HandleShop,
+	// "!shop":       handlers.HandleShop,
+	"!music": handlers.HandleMusic,
 	// "!membership"  handlers.HandleMembership
 }
 
 type Bot struct {
-	DiscordSession *discordgo.Session // Exported field for accessing the session session
+	DiscordSession  *discordgo.Session // Exported field for accessing the session session
+	VoiceConnection *discordgo.VoiceConnection
 }
 
 func NewBot(BotToken string) (*Bot, error) {

@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -14,88 +15,112 @@ import (
 
 var chatGPTAPI string
 
-func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
-	chatGPTAPI = os.Getenv("OPEN_AI_TOKEN")
+const (
+	secretMembersRoleID = "1057328486211145810"
+	secretGuildID       = "986112940660891678"
+	openAIURL           = "https://api.openai.com/v1/chat/completions"
+)
 
-	// Check if the user has the required role
-	hasSecretMembersRole := false
-	for _, roleID := range message.Member.Roles {
-		if roleID == "1057328486211145810" { // Change this to the actual role ID
-			hasSecretMembersRole = true
-			break
+func init() {
+	chatGPTAPI = os.Getenv("OPEN_AI_TOKEN")
+	if chatGPTAPI == "" {
+		log.Println("OpenAI API token not found in the environment")
+	}
+}
+
+func hasSecretMembersRole(session *discordgo.Session, guildID, roleID, userID string) bool {
+	member, err := session.GuildMember(secretGuildID, userID)
+	if err != nil {
+		log.Printf("Error getting guild member: %v", err)
+		return false
+	}
+
+	for _, memberRoleID := range member.Roles {
+		if memberRoleID == roleID {
+			return true
 		}
 	}
+	return false
+}
 
-	if !hasSecretMembersRole {
-		// The user doesn't have the required role, return or send an error message
-		session.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member`")
-		return
-	}
+type ChatPayload struct {
+	Model       string    `json:"model"`
+	Messages    []Message `json:"messages"`
+	Temperature float64   `json:"temperature"`
+	MaxTokens   int       `json:"max_tokens"`
+}
 
-	userInput := strings.TrimPrefix(message.Content, "!bot ")
-	session.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
+type Message struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
 
-	// fmt.Printf(userInput)
-	// Prepare the request payload
-	payload := struct {
-		Model    string `json:"model"`
-		Messages []struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
-		} `json:"messages"`
-		Temperature float64 `json:"temperature"`
-		MaxTokens   int     `json:"max_tokens"`
-	}{
-		Model: "gpt-3.5-turbo",
-		Messages: []struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
-		}{
-			{Role: "user", Content: userInput},
-		},
+func preparePayload(userInput string) ([]byte, error) {
+	payload := ChatPayload{
+		Model:       "gpt-3.5-turbo",
+		Messages:    []Message{{Role: "user", Content: userInput}},
 		Temperature: 0.7,
 		MaxTokens:   200,
 	}
 
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		log.Printf("Error encoding payload: %v", err)
-		return
-	}
+	return json.Marshal(payload)
+}
 
-	// fmt.Printf(apiToken)
+func makeOpenAIRequest(payload []byte) ([]byte, error) {
 	if chatGPTAPI == "" {
-		log.Println("OpenAI API token not found in environment")
-		return
+		return nil, fmt.Errorf("OpenAI API token not found")
 	}
 
-	// Make the API request to OpenAI
-	url := "https://api.openai.com/v1/chat/completions"
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequest("POST", openAIURL, bytes.NewBuffer(payload))
 	if err != nil {
-		log.Printf("Error creating HTTP request: %v", err)
-		return
+		return nil, err
 	}
-	// fmt.Printf("requst: %v\n", req)
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+chatGPTAPI)
 
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("Error sending HTTP request: %v", err)
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// Read and parse the response
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Error reading response body: %v", err)
+		return nil, err
+	}
+
+	return respBody, nil
+}
+
+func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
+	if message.GuildID == "" {
+		session.ChannelMessageSend(message.ChannelID, "You can't use the `!bot` command in DMs.")
 		return
 	}
 
-	// fmt.Printf("Response Body: %s\n", respBody)
+	if !hasSecretMembersRole(session, message.GuildID, secretMembersRoleID, message.Author.ID) {
+		session.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member` in https://discord.gg/BKdX9qHkgu")
+		return
+	}
+
+	userInput := strings.TrimPrefix(message.Content, "!bot ")
+	session.ChannelMessageSend(message.ChannelID, "Bot is processing your request:")
+
+	userInput = userInput + ". Keep your response less than 1337 characters. Your max_tokens limit is 200"
+
+	payload, err := preparePayload(userInput)
+	if err != nil {
+		log.Printf("Error encoding payload: %v", err)
+		return
+	}
+
+	respBody, err := makeOpenAIRequest(payload)
+	if err != nil {
+		log.Printf("Error making OpenAI request: %v", err)
+		return
+	}
 
 	var chatResponse struct {
 		ID      string `json:"id"`
@@ -109,13 +134,12 @@ func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 		} `json:"choices"`
 	}
 
-	err = json.Unmarshal(respBody, &chatResponse) // Use Unmarshal instead of NewDecoder
+	err = json.Unmarshal(respBody, &chatResponse)
 	if err != nil {
 		log.Printf("Error decoding response JSON: %v", err)
 		return
 	}
 
-	// Send the response to session
 	if len(chatResponse.Choices) > 0 {
 		responseContent := chatResponse.Choices[0].Message.Content
 		session.ChannelMessageSend(message.ChannelID, responseContent)
