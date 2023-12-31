@@ -1,11 +1,13 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils"
-	"discord-dero-bot/utils/dero"
-	"discord-dero-bot/utils/monero"
 	"fmt"
 	"strconv"
+
+	"github.com/secretsystems/discord-dero-bot/utils"
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
+
+	"github.com/secretsystems/discord-dero-bot/utils/monero"
 
 	"github.com/bwmarrin/discordgo"
 )

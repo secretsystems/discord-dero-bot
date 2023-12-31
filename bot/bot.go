@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"discord-dero-bot/handlers"
+	"github.com/secretsystems/discord-dero-bot/handlers"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -26,6 +26,7 @@ var PingHandlers = map[string]func(*discordgo.Session, *discordgo.MessageCreate)
 	// "!shop":       handlers.HandleShop,
 	"!music": handlers.HandleMusic,
 	// "!membership"  handlers.HandleMembership
+	"!grok": handlers.HandleGrok,
 }
 
 type Bot struct {

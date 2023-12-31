@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"bytes"
-	"discord-dero-bot/utils/dero"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )

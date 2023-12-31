@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"discord-dero-bot/utils/dero"
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )

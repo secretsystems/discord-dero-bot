@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils/monero"
+	"github.com/secretsystems/discord-dero-bot/utils/monero"
 
 	"github.com/bwmarrin/discordgo"
 )

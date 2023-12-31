@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils/dero"
 	"log"
 	"strconv"
+
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )

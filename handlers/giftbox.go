@@ -1,11 +1,12 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils"
-	"discord-dero-bot/utils/dero"
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/secretsystems/discord-dero-bot/utils"
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )
