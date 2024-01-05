@@ -1,6 +1,6 @@
-# discord-dero-bot
+# github.com/secretsystems/discord-dero-bot
 
-This example demonstrates how to utilize the secret-discord-server's secret_pong_bot with DERO functions built in. 
+This example demonstrates how to utilize the secret-discord-server's secret_pong_bot with DERO functions built in.
 
 Such as message components, buttons, modals and pongs to user !pings; while also demonstrating ChatGPT's helpful bot, and DERO's wallet API functionality for its permissionless, private by default, cryptocurrency.
 
@@ -28,13 +28,13 @@ This example assumes the following about your set up:
 So first you will need to
 
 ```sh
-git clone https://github.com/secretnamebasis/discord-dero-bot
+git clone https://github.com/secretsystems/discord-dero-bot
 ```
 
 Afterwords you are going to want to set up your `.env` file for loading enviroment dependent variables.
 
 ```sh
-cd discord-dero-bot
+cd github.com/secretsystems/discord-dero-bot
 touch .env
 vim .env
 ```

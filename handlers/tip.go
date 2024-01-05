@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"discord-dero-bot/utils/dero"
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -213,18 +213,18 @@ func getUserAddress(userID string) string {
 }
 
 func handleUserPermissions(session *discordgo.Session, message *discordgo.MessageCreate, userID string) (amnt int, amntmsg string) {
+	amnt = 2
+	amntmsg = "0.00002 DERO, or 2 DERI"
+
 	// Get the user's roles
 	member, err := session.GuildMember(secretGuildID, userID)
 	if err != nil {
 		log.Printf("Error getting guild member: %v", err)
-		return
+		return amnt, amntmsg
 	}
 
 	userRoles := member.Roles
 	log.Printf("User has roles: %v", userRoles)
-
-	amnt = 2
-	amntmsg = "0.00002 DERO, or 2 DERI"
 
 	// Check if the user ID is in userMappings
 	if _, ok := userMappings[userID]; ok {

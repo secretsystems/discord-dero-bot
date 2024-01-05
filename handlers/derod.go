@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils/dero"
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
 )

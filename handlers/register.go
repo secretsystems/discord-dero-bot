@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"bytes"
-	"discord-dero-bot/utils/dero"
 	"encoding/json"
 	"fmt"
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
 	"log"
 	"net/http"
 	"strings"

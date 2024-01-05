@@ -1,14 +1,15 @@
 package main
 
 import (
-	"discord-dero-bot/bot"      
-	"discord-dero-bot/handlers" 
-	"discord-dero-bot/utils/dero"
-	"discord-dero-bot/utils/monero"
 	"log"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/secretsystems/discord-dero-bot/bot"      // Update with the correct import path for your bot package
+	"github.com/secretsystems/discord-dero-bot/handlers" // Update with the correct import path for your handlers package
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
+	"github.com/secretsystems/discord-dero-bot/utils/monero"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"

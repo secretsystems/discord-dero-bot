@@ -1,21 +1,26 @@
 package handlers
 
 import (
-	"discord-dero-bot/utils"
-	"discord-dero-bot/utils/dero"
-	"discord-dero-bot/utils/monero"
 	"fmt"
+	"github.com/secretsystems/discord-dero-bot/utils"
+	"github.com/secretsystems/discord-dero-bot/utils/dero"
+	"github.com/secretsystems/discord-dero-bot/utils/monero"
 	"strconv"
 
 	"github.com/bwmarrin/discordgo"
 )
 
+var (
+	buyDero  = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zd23exzer9ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgsxzerywgs8gmeqvfjjqer9d35hvetjv4jzqar0ypuk7atjypmkzmrvv46xy3z4ryznjcjw25qxy4j4qgszhplu"
+	sellDero = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zv23exzerfdenjqkzd2gsxvmmjypzy25j0yqar5gzrdakhqmr9w3jjqarcypnx7u3qw3exzer9yp6x7gryv4kxjan9wgsxjmnxdus8gmeq09hh2u3qwaskcmr9w33yg4gerj3kynj4qp39v4gzxtqv8j"
+)
+
 func handleFdYes(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
-	message := "Use the following address in your DERO wallet to obtain instructions on how to Buy DERO with XMR```deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zat9hh2grpwfjjqcn4095kueeqg3z4yneqwa5hg6pqtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgs8gunpv3jjqctyv3ezqar0yp3x2gryv4kxjan9wfjkggr5dus8jmm4wgs8wctvd3jhgcjy25vs2wtzfe2sqcjk25pqrm2pm2```"
+	message := "Use the following address in your DERO wallet to obtain instructions on how to Buy DERO with XMR```" + buyDero + "```"
 	RespondWithMessage(session, interaction, message)
 }
 func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
-	message := "Use the following address in your DERO wallet to obtain instructions on how to sell DERO for XMR```deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7z7t9hh2grpwfjjqarjv9jxjmn8ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezqarjv9jx2grfdeehgun4vd68xgr5dusxyefqv3jkc6tkv4ex2epqw3hjq7t0w4ezqampd3kx2arzg323j89rvf892qrz2e2sygeaw9a```"
+	message := "Use the following address in your DERO wallet to obtain instructions on how to sell DERO for XMR```" + sellDero + "```"
 	RespondWithMessage(session, interaction, message)
 }
 

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"discord-dero-bot/handlers"
+	"github.com/secretsystems/discord-dero-bot/handlers"
 
 	"github.com/bwmarrin/discordgo"
 )
