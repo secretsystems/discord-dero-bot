@@ -29,7 +29,7 @@ func HandleWalletName(session *discordgo.Session, message *discordgo.MessageCrea
 		userID = strings.TrimSuffix(userID, ">")
 
 		userMappingsMutex.Lock()
-		mappedAddress, exists := userMappings[userID]
+		mappedAddress, exists := userMappings[userID] // userid : registered wallet addr / name
 		userMappingsMutex.Unlock()
 
 		if exists {

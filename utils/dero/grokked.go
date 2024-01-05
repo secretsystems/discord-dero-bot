@@ -4,12 +4,18 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/SixofClubsss/Grokked/grok"
 	drpc "github.com/dReam-dApps/dReams/rpc"
 	"github.com/deroproject/derohe/rpc"
 )
+
+const SIX_OF_CLUBS_DISCORD_USER_ID = "767476835558096928"
+
+var userMappings map[string]string
+var userMappingsMutex sync.Mutex
 
 // Get single string key result from scid
 func GetStringKey(scid, key string) interface{} {
@@ -55,7 +61,7 @@ func GetUintKey(scid, key string) interface{} {
 func GetGrok() string {
 	if f, ok := GetStringKey(grok.GROKSCID, "grok").(float64); ok {
 		if raw, ok := GetUintKey(grok.GROKSCID, strconv.FormatFloat(f, 'f', 0, 64)).(string); ok {
-			left := "I am not sure how much time is left? contact the dev"
+			left := "I am not sure how much time is left? contact the dev <@" + SIX_OF_CLUBS_DISCORD_USER_ID + ">"
 			now := float64(time.Now().Unix())
 			if last, ok := GetStringKey(grok.GROKSCID, "last").(float64); ok {
 				if dur, ok := GetStringKey(grok.GROKSCID, "duration").(float64); ok {
@@ -68,9 +74,9 @@ func GetGrok() string {
 				}
 			}
 
-			return fmt.Sprintf("Grok is currently:\n\n%s\n\n%s", drpc.DeroAddressFromKey(raw), left)
+			return fmt.Sprintf("# Grok is...\n```%s```\n> Time: ```%s```\n> **dApp by: https://dreamdapps.io**", drpc.DeroAddressFromKey(raw), left)
 		}
 	}
 
-	return "I am not sure? contact the dev"
+	return "I am not sure? contact the dev <@" + SIX_OF_CLUBS_DISCORD_USER_ID + ">"
 }
