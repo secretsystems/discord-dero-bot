@@ -14,7 +14,7 @@ import (
 
 const SIX_OF_CLUBS_DISCORD_USER_ID = "767476835558096928"
 
-var userMappings map[string]string
+var userAddressMap = make(map[string]string)
 var userMappingsMutex sync.Mutex
 
 // Get single string key result from scid
@@ -74,9 +74,21 @@ func GetGrok() string {
 				}
 			}
 
-			return fmt.Sprintf("# Grok is...\n```%s```\n> Time: ```%s```\n> **dApp by: https://dreamdapps.io**", drpc.DeroAddressFromKey(raw), left)
+			lbl := drpc.DeroAddressFromKey(raw)
+			mappedAddress := getUserAddress(lbl)
+
+			if mappedAddress != "" {
+				lbl = "<@" + mappedAddress + ">"
+			}
+			return fmt.Sprintf("# Grok is...\n> %s \n> Time: ```%s```\n> **dApp by: https://dreamdapps.io**", lbl, left)
 		}
 	}
 
 	return "I am not sure? contact the dev <@" + SIX_OF_CLUBS_DISCORD_USER_ID + ">"
+}
+
+func getUserAddress(lbl string) string {
+	userMappingsMutex.Lock()
+	defer userMappingsMutex.Unlock()
+	return userAddressMap[lbl]
 }

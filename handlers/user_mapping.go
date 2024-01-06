@@ -7,8 +7,11 @@ import (
 	"sync"
 )
 
-var userMappings map[string]string
-var userMappingsMutex sync.Mutex
+var (
+	userMappings      = make(map[string]string)
+	addressMappings   = make(map[string]string)
+	userMappingsMutex sync.Mutex
+)
 
 func loadUserMappings() {
 	file, err := os.OpenFile("userMappings.json", os.O_RDWR|os.O_CREATE, 0666)

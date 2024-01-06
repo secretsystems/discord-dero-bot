@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 
@@ -24,6 +26,7 @@ var (
 
 func init() {
 	loadUserMappings()
+	loadUserMap()
 }
 
 func HandleBigTip(session *discordgo.Session, message *discordgo.MessageCreate) {
@@ -90,21 +93,10 @@ func HandleTip(session *discordgo.Session, message *discordgo.MessageCreate) {
 		// Check for mentions and resolve user IDs
 		mentionedUserIDs := resolveMentions(input)
 		if len(mentionedUserIDs) > 0 {
-			handleMention(session, message, mentionedUserIDs)
+			handleTip(session, message, mentionedUserIDs[1], getUserMappings(mentionedUserIDs[1]))
 			return
-		}
-
-		// Resolve wallet address or name
-		recipientAddress := resolveWalletAddress(input)
-
-		if recipientAddress == "" {
-			session.ChannelMessageSend(message.ChannelID, "Invalid address or wallet name. Please consider using `/register`")
-			return
-		}
-
-		// Check if the address is special
-		if isSpecialAddress(recipientAddress) {
-			session.ChannelMessageSend(message.ChannelID, "To tip the secret-bot, send funds to `secret-wallet`.")
+		} else {
+			handleTip(session, message, input, input)
 			return
 		}
 
@@ -166,27 +158,23 @@ func resolveMentions(input string) []string {
 	return nil
 }
 
-func handleMention(session *discordgo.Session, message *discordgo.MessageCreate, mentionedUserIDs []string) {
+func handleMention(session *discordgo.Session, message *discordgo.MessageCreate, mentionedUserIDs []string) string {
 	userID := mentionedUserIDs[1]
-	mappedAddress := getUserAddress(userID)
+	mappedAddress := getUserMappings(userID)
 
 	if mappedAddress == "" {
-		userMention := "<@" + userID + ">"
-		session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot.\n"+
-			"Please pair a DERO address with your profile by using the `/register` command.")
-		return
+		// userMention := "<@" + userID + ">"
+		// session.ChannelMessageSend(message.ChannelID, userMention+", you are not registered with tip bot.\n"+
+		// 	"Please pair a DERO address with your profile by using the `/register` command.")
+		return ""
 	}
 
-	handleTip(session, message, userID, mappedAddress)
+	return mappedAddress
 }
 
 func resolveWalletAddress(input string) string {
 	if len(input) == 66 && strings.HasPrefix(input, "dero") {
 		return input
-	}
-
-	if addr, ok := userMappings[input]; ok && len(addr) == 66 && strings.HasPrefix(addr, "dero") {
-		return addr
 	}
 
 	lookupResult, err := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
@@ -206,13 +194,22 @@ func isSpecialAddress(address string) bool {
 	return false
 }
 
-func getUserAddress(userID string) string {
+func getAddressMappings(address string) string {
+	userMappingsMutex.Lock()
+	defer userMappingsMutex.Unlock()
+	return addressMappings[address]
+}
+
+func getUserMappings(userID string) string {
 	userMappingsMutex.Lock()
 	defer userMappingsMutex.Unlock()
 	return userMappings[userID]
 }
 
 func handleUserPermissions(session *discordgo.Session, message *discordgo.MessageCreate, userID string) (amnt int, amntmsg string) {
+
+	amnt = 2
+	amntmsg = "0.00002 DERO, or 2 DERI"
 	// Get the user's roles
 	member, err := session.GuildMember(secretGuildID, userID)
 	if err != nil {
@@ -222,9 +219,6 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 
 	userRoles := member.Roles
 	log.Printf("User has roles: %v", userRoles)
-
-	amnt = 2
-	amntmsg = "0.00002 DERO, or 2 DERI"
 
 	// Check if the user ID is in userMappings
 	if _, ok := userMappings[userID]; ok {
@@ -249,27 +243,87 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 }
 
 func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, userID, recipientAddress string) {
-	amnt, amntmsg := handleUserPermissions(session, message, userID)
+	var amnt int
+	var amntmsg string
 
-	waitingMessage := fmt.Sprintf("`secret-wallet` is sending %s to <@%s> "+
-		"This process takes roughly 18 seconds; or 1 block interval.", amntmsg, userID)
+	switch {
+	case userID == "":
+		session.ChannelMessageSend(message.ChannelID, "userID cannot be empty")
+		return
+	case getUserMappings(userID) != "":
+		amnt, amntmsg = handleUserPermissions(session, message, userID)
+		userID = fmt.Sprintf("<@%s>", userID)
 
-	// Rest of the function remains the same as in the previous examples
+	case getAddressMappings(resolveWalletAddress(userID)) != "":
+		amnt, amntmsg = handleUserPermissions(
+			session,
+			message,
+			getAddressMappings(
+				resolveWalletAddress(userID),
+			),
+		)
+		userID = fmt.Sprintf(
+			"<@%s>",
+			getAddressMappings(
+				resolveWalletAddress(userID),
+			),
+		)
+
+	case isValidDeroAddress(resolveWalletAddress(userID)) != false:
+		amnt, amntmsg = handleUserPermissions(session, message, userID)
+		userID = fmt.Sprintf("%s", userID)
+	}
+
+	waitingMessage := fmt.Sprintf("`secret-wallet` is sending %s to %s "+
+		"This process takes roughly 18 seconds, or 1 block interval.",
+		amntmsg,
+		userID)
+
 	session.ChannelMessageSend(message.ChannelID, waitingMessage)
 
 	comment := "secret_pong_bot sends secret's love"
 
-	txid, err := dero.MakeTransfer(recipientAddress, amnt, comment)
+	txid, err := dero.MakeTransfer(resolveWalletAddress(recipientAddress), amnt, comment)
 	if err != nil {
 		session.ChannelMessageSend(message.ChannelID, "Error sending tip: "+err.Error())
 		return
 	}
 
-	successMessage := fmt.Sprintf("TxID status for <@%s>:\n```%s```"+
+	successMessage := fmt.Sprintf("TxID status for %s:\n```%s```\n"+
 		"Explore this transaction by visiting: \n"+
 		"> http://explorer.dero.io/tx/%s\n"+
 		"Feed the bot by sending DERO to `secret-wallet`\n", userID, txid, txid)
 
 	// Display the txid along with the success message
 	session.ChannelMessageSend(tipChannel, successMessage)
+}
+
+func loadUserMap() error {
+	data, err := os.ReadFile("userMappings.json")
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(data, &userMappings)
+	if err != nil {
+		return err
+	}
+
+	// Build the reverse map for address-based lookup
+	for userID, address := range userMappings {
+		addressMappings[address] = userID
+	}
+
+	// Ensure keys in the maps are trimmed and in lowercase
+	// Modify the content of userMappings
+	for k, v := range userMappings {
+		delete(userMappings, k)
+		userMappings[strings.TrimSpace(strings.ToLower(k))] = strings.TrimSpace(strings.ToLower(v))
+	}
+
+	// Log the contents of userMappings and addressMappings for inspection
+	fmt.Println("userMappings:", userMappings)
+	fmt.Println("addressMappings:", addressMappings)
+
+	return nil
 }
