@@ -83,7 +83,6 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 			RespondWithMessage(session, interaction, errMessage)
 			return
 		}
-		address = input
 	}
 
 	userMappingsMutex.Lock()
