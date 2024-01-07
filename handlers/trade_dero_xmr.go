@@ -12,21 +12,32 @@ import (
 )
 
 var (
-	buyDero             = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zd23exzer9ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgsxzerywgs8gmeqvfjjqer9d35hvetjv4jzqar0ypuk7atjypmkzmrvv46xy3z4ryznjcjw25qxy4j4qgszhplu"
-	sellDero            = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zv23exzerfdenjqkzd2gsxvmmjypzy25j0yqar5gzrdakhqmr9w3jjqarcypnx7u3qw3exzer9yp6x7gryv4kxjan9wgsxjmnxdus8gmeq09hh2u3qwaskcmr9w33yg4gerj3kynj4qp39v4gzxtqv8j"
-	emojiForBuy         = discordgo.ComponentEmoji{Name: "🟢"}
-	emojiForSell        = discordgo.ComponentEmoji{Name: "🔴"}
-	emojiForYouTube     = discordgo.ComponentEmoji{Name: "🎥"}
-	emojiForGitHub      = discordgo.ComponentEmoji{Name: "💻"}
-	emojiForTradingView = discordgo.ComponentEmoji{Name: "📈"}
+	buyDero              = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zd23exzer9ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgsxzerywgs8gmeqvfjjqer9d35hvetjv4jzqar0ypuk7atjypmkzmrvv46xy3z4ryznjcjw25qxy4j4qgszhplu"
+	sellDero             = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zv23exzerfdenjqkzd2gsxvmmjypzy25j0yqar5gzrdakhqmr9w3jjqarcypnx7u3qw3exzer9yp6x7gryv4kxjan9wgsxjmnxdus8gmeq09hh2u3qwaskcmr9w33yg4gerj3kynj4qp39v4gzxtqv8j"
+	emojiForBuy          = discordgo.ComponentEmoji{Name: "🟢"}
+	emojiForSell         = discordgo.ComponentEmoji{Name: "🔴"}
+	emojiForYouTube      = discordgo.ComponentEmoji{Name: "🎥"}
+	emojiForGitHub       = discordgo.ComponentEmoji{Name: "💻"}
+	emojiForTradingView  = discordgo.ComponentEmoji{Name: "📈"}
+	emojiForConfirmation = discordgo.ComponentEmoji{Name: "✅"}
 )
+var confirm = false
 
-func handleFdYes(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
-	message := "Use the following address in your DERO wallet to obtain instructions on how to Buy DERO with XMR```" + buyDero + "```"
-
+func handleFdConfirmBuy(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	message := "An integrated address has been populated, please click confirm to continue\n" +
+		"> Note: After you click confirm, you will see an integrated address. Use this address " +
+		"in your DERO wallet of choice and complete the micro transfer. Once completed you will" +
+		" receive instructions in your DERO wallet transaction history for how **buy DERO for XMR**"
 	buttons := []discordgo.MessageComponent{
 		discordgo.ActionsRow{
 			Components: []discordgo.MessageComponent{
+				discordgo.Button{
+					Label:    "Confirm",
+					Style:    discordgo.PrimaryButton,
+					Disabled: false,
+					CustomID: "fd_yes",
+					Emoji:    emojiForConfirmation,
+				},
 				discordgo.Button{
 					Label:    "Walkthru: Buy DERO",
 					Style:    discordgo.LinkButton,
@@ -37,27 +48,23 @@ func handleFdYes(session *discordgo.Session, interaction *discordgo.InteractionC
 			},
 		},
 	}
-	buttons = append(
-		buttons,
-		discordgo.ActionsRow{
-			Components: []discordgo.MessageComponent{
-				discordgo.Button{
-					Label:    "Wallet: ENGRAM",
-					Style:    discordgo.LinkButton,
-					Disabled: false,
-					URL:      "https://github.com/DEROFDN/Engram/releases/latest",
-					Emoji:    emojiForGitHub,
-				},
-			},
-		},
-	)
 	respondWithMessageAndComponents(session, interaction, message, buttons)
 }
-func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
-	message := "Use the following address in your DERO wallet to obtain instructions on how to sell DERO for XMR```" + sellDero + "```"
+func handleFdConfirmSell(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	message := "An integrated address has been populated, please click confirm to continue\n" +
+		"> Note: After you click confirm, you will see an integrated address. Use this address " +
+		"in your DERO wallet of choice and complete the micro transfer. Once completed you will" +
+		" receive instructions in your DERO wallet transaction history for how **sell DERO for XMR**"
 	buttons := []discordgo.MessageComponent{
 		discordgo.ActionsRow{
 			Components: []discordgo.MessageComponent{
+				discordgo.Button{
+					Label:    "Confirm",
+					Style:    discordgo.PrimaryButton,
+					Disabled: false,
+					CustomID: "fd_no",
+					Emoji:    emojiForConfirmation,
+				},
 				discordgo.Button{
 					Label:    "Walkthru: Sell DERO",
 					Style:    discordgo.LinkButton,
@@ -68,10 +75,22 @@ func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCr
 			},
 		},
 	}
-	buttons = append(
-		buttons,
+	respondWithMessageAndComponents(session, interaction, message, buttons)
+}
+
+func handleFdYes(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	// message := "Use the following address in your DERO wallet to obtain instructions on how to Buy DERO with XMR```" + buyDero + "```"
+
+	buttons := []discordgo.MessageComponent{
 		discordgo.ActionsRow{
 			Components: []discordgo.MessageComponent{
+				discordgo.Button{
+					Label:    "Wallet: CLI",
+					Style:    discordgo.LinkButton,
+					Disabled: false,
+					URL:      "https://github.com/deroproject/derohe/releases/latest",
+					Emoji:    emojiForGitHub,
+				},
 				discordgo.Button{
 					Label:    "Wallet: ENGRAM",
 					Style:    discordgo.LinkButton,
@@ -81,8 +100,34 @@ func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCr
 				},
 			},
 		},
-	)
-	respondWithMessageAndComponents(session, interaction, message, buttons)
+	}
+
+	respondWithMessageAndComponents(session, interaction, buyDero, buttons)
+}
+func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	// message := "Use the following address in your DERO wallet to obtain instructions on how to sell DERO for XMR```" + sellDero + "```"
+	buttons := []discordgo.MessageComponent{
+		discordgo.ActionsRow{
+			Components: []discordgo.MessageComponent{
+				discordgo.Button{
+					Label:    "Wallet: CLI",
+					Style:    discordgo.LinkButton,
+					Disabled: false,
+					URL:      "https://github.com/deroproject/derohe/releases/latest",
+					Emoji:    emojiForGitHub,
+				},
+				discordgo.Button{
+					Label:    "Wallet: ENGRAM",
+					Style:    discordgo.LinkButton,
+					Disabled: false,
+					URL:      "https://github.com/DEROFDN/Engram/releases/latest",
+					Emoji:    emojiForGitHub,
+				},
+			},
+		},
+	}
+
+	respondWithMessageAndComponents(session, interaction, sellDero, buttons)
 }
 
 func handleTradeDeroXmrComponent(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
@@ -105,26 +150,20 @@ func handleTradeDeroXmrComponent(session *discordgo.Session, interaction *discor
 					Label:    "BUY DERO - XMR",
 					Style:    discordgo.SuccessButton,
 					Disabled: false,
-					CustomID: "fd_yes",
+					CustomID: "fd_confirm_buy",
 					Emoji:    emojiForBuy,
 				},
-			},
-		},
-	}
-	buttons = append(
-		buttons,
-		discordgo.ActionsRow{
-			Components: []discordgo.MessageComponent{
 				discordgo.Button{
 					Label:    "SELL DERO - XMR",
 					Style:    discordgo.SuccessButton,
 					Disabled: false,
-					CustomID: "fd_no",
+					CustomID: "fd_confirm_sell",
 					Emoji:    emojiForSell,
 				},
 			},
 		},
-	)
+	}
+
 	buttons = append(
 		buttons,
 		discordgo.ActionsRow{
@@ -136,13 +175,6 @@ func handleTradeDeroXmrComponent(session *discordgo.Session, interaction *discor
 					URL:      "https://github.com/secretnamebasis/dero-xmr-swap",
 					Emoji:    emojiForGitHub,
 				},
-			},
-		},
-	)
-	buttons = append(
-		buttons,
-		discordgo.ActionsRow{
-			Components: []discordgo.MessageComponent{
 				discordgo.Button{
 					Label:    "DERO - XMR chart",
 					Style:    discordgo.LinkButton,
