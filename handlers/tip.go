@@ -250,13 +250,12 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 	case userID == "":
 		session.ChannelMessageSend(message.ChannelID, "userID cannot be empty")
 		return
+	case getUserMappings(userID) == "" && getAddressMappings(resolveWalletAddress(userID)) == "" && isValidDeroAddress(resolveWalletAddress(userID)) == false:
+		session.ChannelMessageSend(message.ChannelID, "please consider using `/register`")
+		return
 	case getUserMappings(userID) != "":
 		amnt, amntmsg = handleUserPermissions(session, message, userID)
 		userID = fmt.Sprintf("<@%s>", userID)
-	case getUserMappings(userID) == "":
-		session.ChannelMessageSend(message.ChannelID, "please consider using `/register`")
-		return
-
 	case getAddressMappings(resolveWalletAddress(userID)) != "":
 		amnt, amntmsg = handleUserPermissions(
 			session,
@@ -323,10 +322,6 @@ func loadUserMap() error {
 		delete(userMappings, k)
 		userMappings[strings.TrimSpace(strings.ToLower(k))] = strings.TrimSpace(strings.ToLower(v))
 	}
-
-	// Log the contents of userMappings and addressMappings for inspection
-	fmt.Println("userMappings:", userMappings)
-	fmt.Println("addressMappings:", addressMappings)
 
 	return nil
 }
