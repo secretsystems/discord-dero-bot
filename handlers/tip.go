@@ -253,6 +253,9 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 	case getUserMappings(userID) != "":
 		amnt, amntmsg = handleUserPermissions(session, message, userID)
 		userID = fmt.Sprintf("<@%s>", userID)
+	case getUserMappings(userID) == "":
+		session.ChannelMessageSend(message.ChannelID, "please consider using `/register`")
+		return
 
 	case getAddressMappings(resolveWalletAddress(userID)) != "":
 		amnt, amntmsg = handleUserPermissions(
