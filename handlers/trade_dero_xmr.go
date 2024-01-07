@@ -23,6 +23,18 @@ var (
 )
 var confirm = false
 
+func handleFdWalkthrus(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+	message := "# Walktrhus\n" +
+		"## Android:\n" +
+		"Buy DERO on with ENGRAM: https://youtu.be/PsGW29X_ze8\n" +
+		"## macOS:\n" +
+		"Buy DERO on macOS with CLI: https://youtu.be/OGuV7jSAccE\n" +
+		"Sell DERO on macOS with CLI: https://youtu.be/RLeN03QC6jE\n" +
+		""
+
+	RespondWithMessage(session, interaction, message)
+}
+
 func handleFdConfirmBuy(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	message := "An integrated address has been populated, please click confirm to continue\n" +
 		"> Note: After you click confirm, you will see an integrated address. Use this address " +
@@ -39,10 +51,10 @@ func handleFdConfirmBuy(session *discordgo.Session, interaction *discordgo.Inter
 					Emoji:    emojiForConfirmation,
 				},
 				discordgo.Button{
-					Label:    "Walkthru: Buy DERO",
-					Style:    discordgo.LinkButton,
+					Label:    "Walkthrus",
+					Style:    discordgo.SecondaryButton,
 					Disabled: false,
-					URL:      "https://youtu.be/OGuV7jSAccE",
+					CustomID: "fd_walkthru",
 					Emoji:    emojiForYouTube,
 				},
 			},
@@ -66,10 +78,10 @@ func handleFdConfirmSell(session *discordgo.Session, interaction *discordgo.Inte
 					Emoji:    emojiForConfirmation,
 				},
 				discordgo.Button{
-					Label:    "Walkthru: Sell DERO",
-					Style:    discordgo.LinkButton,
+					Label:    "Walkthrus",
+					Style:    discordgo.SecondaryButton,
 					Disabled: false,
-					URL:      "https://youtu.be/RLeN03QC6jE",
+					CustomID: "fd_walkthru",
 					Emoji:    emojiForYouTube,
 				},
 			},

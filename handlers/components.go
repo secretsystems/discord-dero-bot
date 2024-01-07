@@ -59,6 +59,7 @@ func DefineHandlers(session *discordgo.Session, appID string) map[string]func(se
 	handlers["fd_no"] = handleFdNo
 	handlers["fd_confirm_buy"] = handleFdConfirmBuy
 	handlers["fd_confirm_sell"] = handleFdConfirmSell
+	handlers["fd_walkthru"] = handleFdWalkthrus
 	return handlers
 }
 
