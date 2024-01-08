@@ -1,9 +1,12 @@
 package dero
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,8 +17,11 @@ import (
 
 const SIX_OF_CLUBS_DISCORD_USER_ID = "767476835558096928"
 
-var userAddressMap = make(map[string]string)
-var userMappingsMutex sync.Mutex
+var (
+	userMappings      = make(map[string]string)
+	addressMappings   = make(map[string]string)
+	userMappingsMutex sync.Mutex
+)
 
 // Get single string key result from scid
 func GetStringKey(scid, key string) interface{} {
@@ -59,6 +65,7 @@ func GetUintKey(scid, key string) interface{} {
 
 // Get the current Grok and time frame on GROKSCID
 func GetGrok() string {
+	loadUserMap()
 	if f, ok := GetStringKey(grok.GROKSCID, "grok").(float64); ok {
 		if raw, ok := GetUintKey(grok.GROKSCID, strconv.FormatFloat(f, 'f', 0, 64)).(string); ok {
 			left := "I am not sure how much time is left? contact the dev <@" + SIX_OF_CLUBS_DISCORD_USER_ID + ">"
@@ -75,10 +82,10 @@ func GetGrok() string {
 			}
 
 			lbl := drpc.DeroAddressFromKey(raw)
-			mappedAddress := getUserAddress(lbl)
+			mappedID := getUserID(lbl)
 
-			if mappedAddress != "" {
-				lbl = "<@" + mappedAddress + ">"
+			if mappedID != "" {
+				lbl = "<@" + mappedID + ">"
 			}
 			return fmt.Sprintf("# Grok is...\n> %s \n> Time: ```%s```\n> **dApp by: https://dreamdapps.io**", lbl, left)
 		}
@@ -87,8 +94,34 @@ func GetGrok() string {
 	return "I am not sure? contact the dev <@" + SIX_OF_CLUBS_DISCORD_USER_ID + ">"
 }
 
-func getUserAddress(lbl string) string {
+func getUserID(lbl string) string {
 	userMappingsMutex.Lock()
 	defer userMappingsMutex.Unlock()
-	return userAddressMap[lbl]
+	return addressMappings[lbl]
+}
+
+func loadUserMap() error {
+	data, err := os.ReadFile("userMappings.json")
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(data, &userMappings)
+	if err != nil {
+		return err
+	}
+
+	// Build the reverse map for address-based lookup
+	for userID, address := range userMappings {
+		addressMappings[address] = userID
+	}
+
+	// Ensure keys in the maps are trimmed and in lowercase
+	// Modify the content of userMappings
+	for k, v := range userMappings {
+		delete(userMappings, k)
+		userMappings[strings.TrimSpace(strings.ToLower(k))] = strings.TrimSpace(strings.ToLower(v))
+	}
+
+	return nil
 }

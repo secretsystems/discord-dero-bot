@@ -25,13 +25,12 @@ var (
 )
 
 func init() {
-	loadUserMappings()
+
 	loadUserMap()
+
 }
 
 func HandleBigTip(session *discordgo.Session, message *discordgo.MessageCreate) {
-	// Load user mappings from the JSON file
-	loadUserMappings()
 
 	// Create an array to store transfer information
 	var transfers []dero.TransferInfo
