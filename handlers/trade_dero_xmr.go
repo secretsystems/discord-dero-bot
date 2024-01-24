@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	buyDero              = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zd23exzer9ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgsxzerywgs8gmeqvfjjqer9d35hvetjv4jzqar0ypuk7atjypmkzmrvv46xy3z4ryznjcjw25qxy4j4qgszhplu"
-	sellDero             = "deroi1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqdyvfp4x7zv23exzerfdenjqkzd2gsxvmmjypzy25j0yqar5gzrdakhqmr9w3jjqarcypnx7u3qw3exzer9yp6x7gryv4kxjan9wgsxjmnxdus8gmeq09hh2u3qwaskcmr9w33yg4gerj3kynj4qp39v4gzxtqv8j"
+	buyDero              = "deroi1qykz2fqtptcnvmr65042jwljpwmglnezax4wms5w4htat20vzsdauq9yvfp4x7zd23exzer9ypzy25j0ypnx7u3qtpx4ygp68gsyxmmdwpkx2ar9yp68sgrxdaezq7rdwgsxzerywgs8gmeqvfjjqer9d35hvetjv4jzqar0ypuk7atjypmkzmrvv46xy3z4ryznjcjw25qxy4j4qg94lam6"
+	sellDero             = "deroi1qykz2fqtptcnvmr65042jwljpwmglnezax4wms5w4htat20vzsdauq9yvfp4x7zv23exzerfdenjqkzd2gsxvmmjypzy25j0yqar5gzrdakhqmr9w3jjqarcypnx7u3qw3exzer9yp6x7gryv4kxjan9wgsxjmnxdus8gmeq09hh2u3qwaskcmr9w33yg4gerj3kynj4qp39v4gzwgckeh"
 	emojiForBuy          = discordgo.ComponentEmoji{Name: "🟢"}
 	emojiForSell         = discordgo.ComponentEmoji{Name: "🔴"}
 	emojiForYouTube      = discordgo.ComponentEmoji{Name: "🎥"}
