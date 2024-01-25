@@ -45,7 +45,6 @@ func NewBot(BotToken string) (*Bot, error) {
 	}
 
 	bot.AddHandler(bot.NewMessage)
-	bot.AddHandler(bot.OnReady) // Add this line to register the onReady handler
 	bot.AddHandler(bot.OnGeneric)
 	return bot, nil
 }
@@ -74,12 +73,8 @@ func (bot *Bot) OnGeneric(s *discordgo.Session, event interface{}) {
 	case *discordgo.TypingStart:
 		log.Printf("TYPING EVENT: User %v is typing on channel %v\n", cast.UserID, cast.ChannelID)
 	case *discordgo.MessageCreate:
-		log.Printf("MESSAGE EVENT: %v | %v", cast.Author, cast.Content)
+		log.Printf("MESSAGE EVENT: %v | %v", cast.Author.Username, cast.Content)
 	}
-}
-
-func (bot *Bot) OnReady(session *discordgo.Session, ready *discordgo.Ready) {
-
 }
 
 func (bot *Bot) NewMessage(session *discordgo.Session, message *discordgo.MessageCreate) {
