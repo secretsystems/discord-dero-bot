@@ -24,7 +24,7 @@ func init() {
 }
 
 func hasSecretMembersRole(session *discordgo.Session, guildID, roleID, userID string) bool {
-	member, err := session.GuildMember(exports.SecretMembersRoleID, userID)
+	member, err := session.GuildMember(exports.SecretGuildID, userID)
 	if err != nil {
 		log.Printf("Error getting guild member: %v", err)
 		return false

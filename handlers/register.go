@@ -111,14 +111,14 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	userID := strings.Split(data.CustomID, "_")[1]
 
 	// Check if the interaction is in the desired guild (secretGuildID)
-	if IsMemberInGuild(session, username, exports.SecretMembersRoleID) {
+	if IsMemberInGuild(session, username, exports.SecretGuildID) {
 
-		err := session.GuildMemberRoleAdd(exports.SecretMembersRoleID, username, exports.RegisteredRole)
+		err := session.GuildMemberRoleAdd(exports.SecretGuildID, username, exports.RegisteredRole)
 		if err != nil {
 			log.Printf("Error adding role for Guild %v to member:%v", exports.SecretMembersRoleID, err)
 		}
 
-		err = session.GuildMemberRoleRemove(exports.SecretMembersRoleID, username, exports.UnregisteredRole)
+		err = session.GuildMemberRoleRemove(exports.SecretGuildID, username, exports.UnregisteredRole)
 		if err != nil {
 			log.Printf("Error removing role Guild %v to member:%v", exports.SecretMembersRoleID, err)
 		}
