@@ -245,7 +245,7 @@ func playAudio(session *discordgo.Session, guildID, voiceChannelID, audioURL str
 			} else {
 				log.Printf("Error getting Opus frame: %v\n", err)
 				session.ChannelMessageSend(voiceChannelID, "Error playing audio: Unable to process audio frames")
-				break
+				continue
 			}
 		} else {
 			// Reset the consecutive EOF counter when a frame is received
