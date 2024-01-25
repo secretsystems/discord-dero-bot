@@ -34,8 +34,9 @@ func init() {
 	guildID = os.Getenv("GUILD_ID")
 	appID = os.Getenv("APP_ID")
 
-	log.Printf("Initializing DERO\n")
-	// Call FetchAndParseTransfers function from the utils package
+	//wallets
+	log.Printf("Initializing Wallets\n")
+
 	transferEntries, err := dero.FetchAndParseTransfers()
 
 	if err != nil {
@@ -50,8 +51,7 @@ func init() {
 
 func main() {
 	// Initialize the bot
-
-	bot, err := bot.NewBot(botToken) // Replace with the actual initialization function
+	bot, err := bot.NewBot(botToken)
 	if err != nil {
 		log.Fatalf("Error initializing Discord bot: %v", err)
 	}
@@ -62,13 +62,12 @@ func main() {
 	}
 	defer bot.Close()
 
-	// Get the Discord session from the bot instance
-	session := bot.GetDiscordSession()
-
-	// Register interaction handlers
+	session := bot.GetDiscordSession() // Get the Discord session from the bot instance
 
 	handlers.AddHandlers(session, appID)
 	handlers.AddModals(session, appID)
+
+	// discord has a rate limiter for slash commands
 	registrationBucket := handlers.NewTokenBucket(1, 1, time.Second*4) // Allow 1 request every 5 seconds
 	handlers.RegisterSlashCommands(session, appID, guildID, registrationBucket)
 
