@@ -1,12 +1,13 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
-	"github.com/secretsystems/discord-dero-bot/utils"
-
 	"github.com/bwmarrin/discordgo"
+	"github.com/secretsystems/discord-dero-bot/exports"
 )
 
 func HandleDerostats(session *discordgo.Session, message *discordgo.MessageCreate) {
@@ -16,7 +17,7 @@ func HandleDerostats(session *discordgo.Session, message *discordgo.MessageCreat
 	}
 
 	// Fetch JSON data from derostats.io
-	data, err := utils.GetJSON()
+	data, err := getJSON()
 	if err != nil {
 		session.ChannelMessageSend(message.ChannelID, "Failed to fetch JSON from derostats.io")
 		return
@@ -24,7 +25,7 @@ func HandleDerostats(session *discordgo.Session, message *discordgo.MessageCreat
 	response := "DEROSTATS:\n```"
 	// Construct a single message containing all the information
 	response += buildDerostatsInfo(data)
-	response += "```\nsource: https://derostats.io"
+	response += "```\nsource: " + exports.DeroStatsURL
 	session.ChannelMessageSend(message.ChannelID, response)
 }
 
@@ -61,6 +62,29 @@ func buildDerostatsInfo(data map[string]interface{}) string {
 	appendSection("Smart Contracts Deployed", data["scDeployed"])
 
 	return response.String()
+}
+
+func getJSON() (map[string]interface{}, error) {
+
+	// Send a GET request to the URL
+	response, err := http.Get(exports.DeroStatsURL)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("HTTP request failed with status code: %d", response.StatusCode)
+	}
+
+	// Decode the JSON response into a map
+	var data map[string]interface{}
+	decoder := json.NewDecoder(response.Body)
+	if err := decoder.Decode(&data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func convertNumberToReadable(value interface{}) string {

@@ -11,15 +11,10 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/secretsystems/discord-dero-bot/exports"
 )
 
 var chatGPTAPI string
-
-const (
-	secretMembersRoleID = "1057328486211145810"
-	secretGuildID       = "986112940660891678"
-	openAIURL           = "https://api.openai.com/v1/chat/completions"
-)
 
 func init() {
 	chatGPTAPI = os.Getenv("OPEN_AI_TOKEN")
@@ -29,7 +24,7 @@ func init() {
 }
 
 func hasSecretMembersRole(session *discordgo.Session, guildID, roleID, userID string) bool {
-	member, err := session.GuildMember(secretGuildID, userID)
+	member, err := session.GuildMember(exports.SecretMembersRoleID, userID)
 	if err != nil {
 		log.Printf("Error getting guild member: %v", err)
 		return false
@@ -71,7 +66,7 @@ func makeOpenAIRequest(payload []byte) ([]byte, error) {
 		return nil, fmt.Errorf("OpenAI API token not found")
 	}
 
-	req, err := http.NewRequest("POST", openAIURL, bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", exports.OpenAIURL, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +95,7 @@ func HandleChat(session *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
-	if !hasSecretMembersRole(session, message.GuildID, secretMembersRoleID, message.Author.ID) {
+	if !hasSecretMembersRole(session, message.GuildID, exports.SecretMembersRoleID, message.Author.ID) {
 		session.ChannelMessageSend(message.ChannelID, "You don't have permission to use this command.\nTo gain permission, please consider becoming a `@secret-member` in https://discord.gg/BKdX9qHkgu")
 		return
 	}

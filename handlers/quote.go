@@ -9,11 +9,12 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/secretsystems/discord-dero-bot/exports"
 )
 
 func HandleQuoteRequest(session *discordgo.Session, message *discordgo.MessageCreate) {
 	content := message.Content
-	// fmt.Println("CONTENT: %s", content)
+
 	if content == "!quote" {
 		session.ChannelMessageSend(message.ChannelID, "To get a quote from TradeOgre: `!quote <base-pair>`\n\n For a list of pairs, use `!markets`")
 		return
@@ -22,7 +23,7 @@ func HandleQuoteRequest(session *discordgo.Session, message *discordgo.MessageCr
 		ticker := strings.TrimPrefix(message.Content, "!quote ")
 		// log.Printf("User Input: " + ticker)
 
-		url := "https://tradeogre.com/api/v1/ticker/" + ticker
+		url := exports.TradeOgreTickerURL + ticker
 
 		// Create a GET request
 		response, err := http.Get(url)

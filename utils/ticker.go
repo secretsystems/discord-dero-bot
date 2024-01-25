@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/secretsystems/discord-dero-bot/exports"
 )
 
 var client = &http.Client{Timeout: 10 * time.Second}
@@ -24,7 +26,7 @@ type Response struct {
 
 func getJson(pair string, target interface{}) error {
 
-	resp, err := client.Get("https://tradeogre.com/api/v1/ticker/" + pair)
+	resp, err := client.Get(exports.TradeOgreTickerURL + pair)
 	if err != nil {
 		return err
 	}

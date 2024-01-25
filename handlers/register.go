@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/secretsystems/discord-dero-bot/exports"
 	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
@@ -110,25 +111,23 @@ func handleRegister(session *discordgo.Session, interaction *discordgo.Interacti
 	userID := strings.Split(data.CustomID, "_")[1]
 
 	// Check if the interaction is in the desired guild (secretGuildID)
-	if IsMemberInGuild(session, username, secretGuildID) {
-		registeredRole := "1144842099653623839"
-		err := session.GuildMemberRoleAdd(secretGuildID, username, registeredRole)
+	if IsMemberInGuild(session, username, exports.SecretMembersRoleID) {
+
+		err := session.GuildMemberRoleAdd(exports.SecretMembersRoleID, username, exports.RegisteredRole)
 		if err != nil {
-			log.Printf("Error adding role for Guild %v to member:%v", secretGuildID, err)
+			log.Printf("Error adding role for Guild %v to member:%v", exports.SecretMembersRoleID, err)
 		}
 
-		unregisteredRole := "1144846590687838309"
-		err = session.GuildMemberRoleRemove(secretGuildID, username, unregisteredRole)
+		err = session.GuildMemberRoleRemove(exports.SecretMembersRoleID, username, exports.UnregisteredRole)
 		if err != nil {
-			log.Printf("Error removing role Guild %v to member:%v", secretGuildID, err)
+			log.Printf("Error removing role Guild %v to member:%v", exports.SecretMembersRoleID, err)
 		}
 	}
 	content := fmt.Sprintf("Successfully registered wallet %s `%s` for <@%s>.", walletType, address, username)
 	RespondWithMessage(session, interaction, content)
 
-	resultsChannel := "1156576030442655785"
 	resultsMsg := fmt.Sprintf("<@%s> has registered with the server!", userID)
-	_, err := session.ChannelMessageSend(resultsChannel, resultsMsg)
+	_, err := session.ChannelMessageSend(exports.RegistrationChannel, resultsMsg)
 	if err != nil {
 		log.Println("Error sending message:", err)
 	}

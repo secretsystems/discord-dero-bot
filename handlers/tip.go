@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/secretsystems/discord-dero-bot/exports"
 	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
 	"github.com/bwmarrin/discordgo"
@@ -210,7 +211,7 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 	amnt = 2
 	amntmsg = "0.00002 DERO, or 2 DERI"
 	// Get the user's roles
-	member, err := session.GuildMember(secretGuildID, userID)
+	member, err := session.GuildMember(exports.SecretGuildID, userID)
 	if err != nil {
 		log.Printf("Error getting guild member: %v", err)
 		return
@@ -231,7 +232,7 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 	for _, roleID := range userRoles {
 		fmt.Printf("Role ID: %s\n", roleID)
 		switch roleID {
-		case secretMembersRoleID:
+		case exports.SecretMembersRoleID:
 			amnt = 200
 			amntmsg = "0.00200 DERO, or 200 DERI"
 			log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/secretsystems/discord-dero-bot/exports"
 )
 
 func HandleUnregister(session *discordgo.Session, message *discordgo.MessageCreate) {
@@ -14,7 +15,7 @@ func HandleUnregister(session *discordgo.Session, message *discordgo.MessageCrea
 		loadUserMappings()
 		// Extract the user ID
 		userID := message.Author.ID
-		log.Printf("User ID: %s", userID) // Added "User ID:"
+		log.Printf("User ID: %s", userID)
 
 		userMappingsMutex.Lock()
 		defer userMappingsMutex.Unlock()
@@ -24,29 +25,26 @@ func HandleUnregister(session *discordgo.Session, message *discordgo.MessageCrea
 			delete(userMappings, userID)
 			saveUserMappings()
 
-			registeredRole := "1144842099653623839"
-			unregisteredRole := "1144846590687838309"
-			if IsMemberInGuild(session, userID, secretGuildID) {
+			if IsMemberInGuild(session, userID, exports.SecretGuildID) {
 				// Remove the registered role and add the unregistered role
-				err := session.GuildMemberRoleRemove(secretGuildID, userID, registeredRole)
+				err := session.GuildMemberRoleRemove(exports.SecretGuildID, userID, exports.RegisteredRole)
 				if err != nil {
-					log.Println("Error removing role from member:", err) // Updated log message
+					log.Println("Error removing role from member:", err)
 				}
 
-				err = session.GuildMemberRoleAdd(secretGuildID, userID, unregisteredRole)
+				err = session.GuildMemberRoleAdd(exports.SecretGuildID, userID, exports.UnregisteredRole)
 				if err != nil {
 					log.Println("Error adding role to member:", err)
 				}
 			}
-			resultsChannel := "1156576030442655785"
 
-			_, err := session.ChannelMessageSend(resultsChannel, fmt.Sprintf("<@%s> has been successfully unregistered.", userID)) // Added "successfully"
+			_, err := session.ChannelMessageSend(exports.RegistrationChannel, fmt.Sprintf("<@%s> has been successfully unregistered.", userID)) // Added "successfully"
 			if err != nil {
-				log.Printf("Error sending message: %v\n", err) // Used log.Printf
+				log.Printf("Error sending message: %v\n", err)
 			}
 			_, err = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> has been successfully unregistered.", userID)) // Added "successfully"
 			if err != nil {
-				log.Printf("Error sending message: %v\n", err) // Used log.Printf
+				log.Printf("Error sending message: %v\n", err)
 			}
 		} else {
 			_, err := session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("<@%s> was not registered.", userID))

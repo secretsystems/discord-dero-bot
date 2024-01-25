@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/secretsystems/discord-dero-bot/exports"
 	"github.com/secretsystems/discord-dero-bot/utils"
 	"github.com/secretsystems/discord-dero-bot/utils/dero"
 
@@ -83,9 +84,8 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	shipping := data.Components[2].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	contact := data.Components[3].(*discordgo.ActionsRow).Components[0].(*discordgo.TextInput).Value
 	comment := "C: " + color + " S: " + size + " A: " + shipping + " P: " + contact
-	address := "dero1qyw4fl3dupcg5qlrcsvcedze507q9u67lxfpu8kgnzp04aq73yheqqg2ctjn4"
-	destination := 1337
-	integratedAddress := dero.MakeIntegratedAddress(address, amount, comment, destination)
+
+	integratedAddress := dero.MakeIntegratedAddress(exports.ServerWallet, amount, comment, exports.DestinationPort)
 
 	content := "To purchase your giftbox, please use the following address :\n```" + integratedAddress + "```And we will get back to you as soon as your order is marked receieved.\nWe will contact you on your shipping status."
 	RespondWithMessage(session, interaction, content)
@@ -93,12 +93,11 @@ func handleGiftboxInteraction(session *discordgo.Session, interaction *discordgo
 	if !strings.HasPrefix(data.CustomID, "giftbox_") {
 		return
 	}
-	shopkeeper := "706842280828469260"
+
 	userid := strings.Split(data.CustomID, "_")[1]
 	resultsMsg := fmt.Sprintf(
-		"User <@%s> has made an integrated address for <@%s>'s a Giftbox,", userid, shopkeeper)
-	resultsChannel := "1156571722384953466"
-	_, err := session.ChannelMessageSend(resultsChannel, resultsMsg)
+		"User <@%s> has made an integrated address for <@%s>'s a Giftbox,", userid, exports.Shopkeeper)
+	_, err := session.ChannelMessageSend(exports.OrdersChannel, resultsMsg)
 	if err != nil {
 		panic(err)
 	}
