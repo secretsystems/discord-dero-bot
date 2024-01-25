@@ -20,12 +20,12 @@ func AddHandlers(session *discordgo.Session, appID string) {
 		case discordgo.InteractionApplicationCommand:
 			log.Println("received: discordgo.InteractionApplicationCommand")
 			if h, ok := handlers[interaction.ApplicationCommandData().Name]; ok {
-				h(session, interaction, appID) // Pass appID
+				h(session, interaction, appID)
 			}
 		case discordgo.InteractionMessageComponent:
 			log.Println("received: discordgo.InteractionMessageComponent")
 			if h, ok := handlers[interaction.MessageComponentData().CustomID]; ok {
-				h(session, interaction, appID) // Pass appID
+				h(session, interaction, appID)
 			}
 		}
 	})
