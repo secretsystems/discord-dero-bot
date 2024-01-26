@@ -38,6 +38,7 @@ func HandleBigTip(session *discordgo.Session, message *discordgo.MessageCreate) 
 	var discordIDs []string // To store Discord user IDs involved in transfers
 	session.ChannelMessageSend(message.ChannelID, "All registered users are being tipped. This process takes time.")
 
+	log.Printf("Before processing transfers: %v", transfers)
 	// Iterate through user mappings and create TransferInfo objects
 	for discordID, address := range userMappings {
 		address = resolveWalletAddress(address)
@@ -52,10 +53,8 @@ func HandleBigTip(session *discordgo.Session, message *discordgo.MessageCreate) 
 		discordIDs = append(discordIDs, discordID)
 
 		// If we have transfers, perform the bulk transfer and reset the transfers slice
-		if len(transfers) == 10 {
-			log.Printf("Before processing transfers: %v", transfers)
+		if len(transfers) == 50 {
 			processTransfers(session, message, transfers, discordIDs)
-			log.Printf("After processing transfers")
 			transfers = nil
 			discordIDs = nil
 		}
@@ -63,10 +62,9 @@ func HandleBigTip(session *discordgo.Session, message *discordgo.MessageCreate) 
 
 	// Process any remaining transfers
 	if len(transfers) > 0 {
-		log.Printf("Before processing transfers: %v", transfers)
 		processTransfers(session, message, transfers, discordIDs)
-		log.Printf("After processing transfers")
 	}
+	log.Printf("After processing transfers")
 
 	return
 }
@@ -136,7 +134,7 @@ func processTransfers(session *discordgo.Session, message *discordgo.MessageCrea
 	}
 
 	for _, discordID := range discordIDs {
-		messageToSend += fmt.Sprintf("- <@%s>\n", discordID) // Mention users using Discord IDs
+		messageToSend += fmt.Sprintf(" <@%s> ", discordID) // Mention users using Discord IDs
 	}
 
 	// Optionally, you can perform additional actions based on whether the bulk transfer was successful or not.
@@ -230,7 +228,7 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 
 	// Check user roles and adjust tip amount based on role priority
 	for _, roleID := range userRoles {
-		fmt.Printf("Role ID: %s\n", roleID)
+		// fmt.Printf("Role ID: %s\n", roleID)
 		switch roleID {
 		case exports.SecretMembersRoleID:
 			amnt = 200
@@ -255,7 +253,7 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 		return
 	case getUserMappings(userID) != "":
 		amnt, amntmsg = handleUserPermissions(session, message, userID)
-		userID = fmt.Sprintf("<@%s>", userID)
+		// userID = fmt.Sprintf("<@%s>", userID)
 	case getAddressMappings(resolveWalletAddress(userID)) != "":
 		amnt, amntmsg = handleUserPermissions(
 			session,
