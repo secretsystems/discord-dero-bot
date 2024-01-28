@@ -253,7 +253,7 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 		return
 	case getUserMappings(userID) != "":
 		amnt, amntmsg = handleUserPermissions(session, message, userID)
-		// userID = fmt.Sprintf("<@%s>", userID)
+		userID = fmt.Sprintf("<@%s>", userID)
 	case getAddressMappings(resolveWalletAddress(userID)) != "":
 		amnt, amntmsg = handleUserPermissions(
 			session,
