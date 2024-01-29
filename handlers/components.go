@@ -73,7 +73,7 @@ func RespondWithMessage(session *discordgo.Session, interaction *discordgo.Inter
 		},
 	})
 	if err != nil {
-		panic(err)
+		log.Printf("Error: %v", err)
 	}
 }
 
@@ -88,21 +88,27 @@ func RespondWithModal(session *discordgo.Session, interaction *discordgo.Interac
 		},
 	})
 	if err != nil {
-		log.Printf("Response Error: %v", err)
+		log.Printf("Error: %v", err)
 	}
 }
 
-func respondWithMessageAndComponents(session *discordgo.Session, interaction *discordgo.InteractionCreate, message string, components []discordgo.MessageComponent) {
-	err := session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content:    message,
-			Flags:      discordgo.MessageFlagsEphemeral,
-			Components: components,
-		},
-	})
+func respondWithMessageAndComponents(
+	session *discordgo.Session,
+	interaction *discordgo.InteractionCreate,
+	message string, components []discordgo.MessageComponent,
+) {
+	err := session.InteractionRespond(
+		interaction.Interaction,
+		&discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content:    message,
+				Flags:      discordgo.MessageFlagsEphemeral,
+				Components: components,
+			},
+		})
 	if err != nil {
-		panic(err)
+		log.Printf("Error: %v", err)
 	}
 }
 
@@ -126,6 +132,6 @@ func (m *Modal) Show() {
 		},
 	})
 	if err != nil {
-		panic(err)
+		log.Printf("Error: %v", err)
 	}
 }
