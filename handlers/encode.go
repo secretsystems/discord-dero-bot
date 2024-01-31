@@ -21,7 +21,6 @@ func handleEncodeModal(session *discordgo.Session, interaction *discordgo.Intera
 
 	memberID := interaction.Interaction.Member.User.ID
 
-	log.Printf("The member's ID of this interaction is %s", memberID)
 	modal := NewModal(session, interaction, "encode_"+memberID, "Encode a DERO Integrated Address", components)
 	modal.Show()
 }

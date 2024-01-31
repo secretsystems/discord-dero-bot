@@ -9,19 +9,22 @@ func AddModals(session *discordgo.Session, appID string) {
 		if interaction.Type == discordgo.InteractionModalSubmit {
 
 			customID := interaction.ModalSubmitData().CustomID
+			memberID := interaction.Member.User.ID
 
 			// Distinguish between different custom IDs
 			switch customID {
-			case "encode_" + interaction.Member.User.ID:
+			case "encode_" + memberID:
 				handleEncodeInteraction(session, interaction)
-			case "decode_" + interaction.Member.User.ID:
+			case "decode_" + memberID:
 				handleDecodeInteraction(session, interaction)
-			case "giftbox_" + interaction.Member.User.ID:
+			case "giftbox_" + memberID:
 				handleGiftboxInteraction(session, interaction)
-			case "register_" + interaction.Member.User.ID:
+			case "register_" + memberID:
 				handleRegister(session, interaction)
-			case "qr_" + interaction.Member.User.ID:
+			case "qr_" + memberID:
 				handleQRInteraction(session, interaction)
+			case "node_" + memberID:
+				handleNodeInteraction(session, interaction)
 			}
 		}
 	})

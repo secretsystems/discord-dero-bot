@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GetInfoDerod() string {
+func GetInfoDerod(endpoint string) string {
 	// Define JSON struct
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
@@ -24,7 +24,7 @@ func GetInfoDerod() string {
 	}
 
 	// Construct the URL using the retrieved IP address and wallet port
-	url := fmt.Sprintf("http://%s:%s/json_rpc", DeroServerIP, DeroServerPort)
+	url := fmt.Sprintf("http://" + endpoint + "/json_rpc") //, DeroServerIP, DeroServerPort)
 
 	// Define request for node
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))

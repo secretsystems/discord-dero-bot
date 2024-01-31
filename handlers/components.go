@@ -40,19 +40,31 @@ var Commands = []discordgo.ApplicationCommand{
 		Name:        "qr",
 		Description: "Create QR Code",
 	},
+	{
+		Name:        "node",
+		Description: "Get Node info",
+	},
 }
 
 // DefineHandlers defines the component and command handlers.
-func DefineHandlers(session *discordgo.Session, appID string) map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
+func DefineHandlers(
+	session *discordgo.Session,
+	appID string,
+) map[string]func(
+	session *discordgo.Session,
+	interaction *discordgo.InteractionCreate,
+	appID string,
+) {
 	handlers := make(map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string))
 
 	// Add your command handlers
 	handlers["encode"] = handleEncodeModal
-	handlers["trade-dero-xmr"] = handleTradeDeroXmrComponent
 	handlers["decode"] = handleDecodeModal
 	handlers["giftbox"] = handleGiftboxModal
-	handlers["register"] = handleRegistrationModal
+	handlers["node"] = handleNodeModal
 	handlers["qr"] = handleQRModal
+	handlers["register"] = handleRegistrationModal
+	handlers["trade-dero-xmr"] = handleTradeDeroXmrComponent
 
 	// Add your component handlers
 	handlers["fd_yes"] = handleFdYes
