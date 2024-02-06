@@ -11,6 +11,7 @@ import (
 type TransferInfo struct {
 	Destination string `json:"destination"`
 	Amount      int    `json:"amount"`
+	SCID        string `json:"scid"`
 }
 
 func MakeBulkTransfer(transfers []TransferInfo) (string, error) {

@@ -47,6 +47,7 @@ func init() {
 	}
 	dero.GetDeroWalletBalance()
 	monero.GetWalletBalance()
+
 }
 
 func main() {
@@ -71,10 +72,18 @@ func main() {
 	registrationBucket := handlers.NewTokenBucket(1, 1, time.Second*4) // Allow 1 request every 5 seconds
 	handlers.RegisterSlashCommands(session, appID, guildID, registrationBucket)
 
+	// Start the CheckSubs goroutine to run in the background
+	go func() {
+		for {
+			handlers.Subscriptions(session)
+			// Sleep for 24 hours
+			time.Sleep(24 * time.Hour)
+		}
+	}()
+
 	bot.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
 		log.Println("Bot is up!")
 	})
-
 	// Set up a channel to capture the Ctrl+C signal
 	channel := make(chan os.Signal, 1)
 	signal.Notify(channel, os.Interrupt)

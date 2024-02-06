@@ -4,3 +4,4 @@ env
 _work
 _home
 env_script.sh
+*.bak

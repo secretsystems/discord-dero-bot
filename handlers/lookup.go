@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/secretsystems/discord-dero-bot/utils/dero"
-
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -14,42 +12,34 @@ func HandleWalletName(session *discordgo.Session, message *discordgo.MessageCrea
 	content := message.Content
 	// fmt.Println("CONTENT: %s", content)
 
-	if !strings.HasPrefix(content, "!lookup ") {
+	userInput := strings.TrimPrefix(content, "!lookup ")
+	// log.Printf("User Input: " + userInput)
+
+	switch {
+	case userInput == "":
 		userMessage := "To lookup a DERO address, use the format: `!lookup <@user_mention or wallet_name>`"
 		session.ChannelMessageSend(message.ChannelID, userMessage)
 		return
-	}
-
-	userInput := strings.TrimPrefix(message.Content, "!lookup ")
-	// log.Printf("User Input: " + userInput)
-
-	// Check if the input matches the format of a user mention
-	if strings.HasPrefix(userInput, "<@") && strings.HasSuffix(userInput, ">") {
+	case strings.HasPrefix(userInput, "<@"):
 		userID := strings.TrimPrefix(userInput, "<@")
 		userID = strings.TrimSuffix(userID, ">")
 
-		userMappingsMutex.Lock()
-		mappedAddress, exists := userMappings[userID] // userid : registered wallet addr / name
-		userMappingsMutex.Unlock()
+		exists := getUserMappings(userID)
 
-		if exists {
-			session.ChannelMessageSend(message.ChannelID, "DERO Address (from registered user): ```"+mappedAddress+"```")
-		} else {
-			// Ping the user with the mention
-			userMention := "<@" + userID + ">"
-			userMessage := " is not registered or invalid input. \n\n To register, please use `/register`"
-			session.ChannelMessageSend(message.ChannelID, userMention+userMessage)
+		if exists != "" {
+			session.ChannelMessageSend(message.ChannelID, "DERO Address: ```"+exists+"```")
 		}
-	} else {
-		// Perform a wallet name lookup for non-user mention inputs
-		deroAddress, err := dero.WalletNameToAddress(userInput)
-		if err != nil {
-			fmt.Println("Wallet name not found or invalid.")
-		}
-		if deroAddress != "" {
-			session.ChannelMessageSend(message.ChannelID, "DERO Address: ```"+deroAddress+"```")
-		} else {
-			session.ChannelMessageSend(message.ChannelID, "Wallet name not found or invalid.")
-		}
+	case getUserMappings(userInput) == "" && getAddressMappings(resolveWalletAddress(userInput)) == "" && isValidDeroAddress(resolveWalletAddress(userInput)):
+		session.ChannelMessageSend(message.ChannelID, "please consider using `/register`")
+		return
+	case getAddressMappings(resolveWalletAddress(userInput)) != "":
+		userInput = fmt.Sprintf(
+			"<@%s>",
+			getAddressMappings(
+				resolveWalletAddress(userInput),
+			),
+		)
+		session.ChannelMessageSend(message.ChannelID, "Discord User: "+userInput)
+
 	}
 }

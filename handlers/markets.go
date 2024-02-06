@@ -121,7 +121,7 @@ func formatPairs(pairs []map[string]map[string]string, count int) string {
 func formatPairDetails(pair map[string]map[string]string) string {
 	pairName := getKey(pair)
 	details := pair[pairName]
-	return fmt.Sprintf("[%s]: Volume: %s, Price: %s\n",
+	return fmt.Sprintf("[%s]: V: %s, P: %s\n",
 		pairName, details["volume"], details["price"])
 }
 

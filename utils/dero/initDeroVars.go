@@ -1,10 +1,13 @@
 package dero
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv" // Import the godotenv package
+	"github.com/ybbus/jsonrpc"
 )
 
 var (
@@ -19,7 +22,21 @@ var (
 	pongDir          string
 	pongDB           string
 	iAddressTextFile string
+	DeroHttpClient   *http.Client
+	DeroRpcClient    jsonrpc.RPCClient
 )
+
+type TransportWithBasicAuth struct {
+	Username string
+	Password string
+	Base     http.RoundTripper
+}
+
+// RoundTrip implements the RoundTripper interface
+func (t *TransportWithBasicAuth) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.SetBasicAuth(t.Username, t.Password)
+	return t.Base.RoundTrip(req)
+}
 
 func init() {
 	// Load environment variables from .env file
@@ -39,6 +56,21 @@ func init() {
 	pongDir = homeDir + "/dero-utils"
 	pongDB = pongDir + "/" + pongAmount + ".sales.db"
 	iAddressTextFile = pongDir + "/" + pongAmount + ".iaddress.txt"
+
+	DeroHttpClient = &http.Client{
+		Transport: &TransportWithBasicAuth{
+			Username: deroUser,
+			Password: deroPass,
+			Base:     http.DefaultTransport,
+		},
+	}
+
+	DeroRpcClient = jsonrpc.NewClientWithOpts(
+		fmt.Sprintf("%s:%s", DeroServerIP, DeroServerPort),
+		&jsonrpc.RPCClientOpts{
+			HTTPClient: DeroHttpClient,
+		},
+	)
 
 	if _, err := os.Stat(pongDir); os.IsNotExist(err) {
 		err := os.Mkdir(pongDir, 0755)

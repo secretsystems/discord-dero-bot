@@ -175,7 +175,7 @@ func resolveWalletAddress(input string) string {
 		return input
 	}
 
-	lookupResult, err := dero.WalletNameToAddress(input) // Implement the wallet name lookup function
+	lookupResult, err := dero.WalletNameToAddress(input)
 	if err != nil || lookupResult == "" {
 		return ""
 	}
@@ -248,7 +248,7 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 	case userID == "":
 		session.ChannelMessageSend(message.ChannelID, "userID cannot be empty")
 		return
-	case getUserMappings(userID) == "" && getAddressMappings(resolveWalletAddress(userID)) == "" && isValidDeroAddress(resolveWalletAddress(userID)) == false:
+	case getUserMappings(userID) == "" && getAddressMappings(resolveWalletAddress(userID)) == "" && isValidDeroAddress(resolveWalletAddress(userID)):
 		session.ChannelMessageSend(message.ChannelID, "please consider using `/register`")
 		return
 	case getUserMappings(userID) != "":
@@ -269,7 +269,7 @@ func handleTip(session *discordgo.Session, message *discordgo.MessageCreate, use
 			),
 		)
 
-	case isValidDeroAddress(resolveWalletAddress(userID)) != false:
+	case isValidDeroAddress(resolveWalletAddress(userID)):
 		amnt, amntmsg = handleUserPermissions(session, message, userID)
 		userID = fmt.Sprintf("%s", userID)
 	}

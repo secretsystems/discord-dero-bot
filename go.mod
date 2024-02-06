@@ -10,8 +10,8 @@ require (
 	github.com/gabstv/httpdigest v0.0.0-20230306144402-1057ac3638b3
 	github.com/joho/godotenv v1.5.1
 	github.com/jonas747/dca v0.0.0-20210930103944-155f5e5f0cc7
-	github.com/secretnamebasis/secret-app v0.0.0-20240124225404-f361e47f7092
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	github.com/ybbus/jsonrpc v2.1.2+incompatible
 )
 
 require (
@@ -37,7 +37,6 @@ require (
 	github.com/go-logr/zapr v1.2.3 // indirect
 	github.com/go-text/render v0.0.0-20230619120952-35bccb6164b8 // indirect
 	github.com/go-text/typesetting v0.0.0-20230616162802-9c17dd34aa4a // indirect
-	github.com/google/uuid v1.5.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jonas747/ogg v0.0.0-20161220051205-b4f6f4cf3757 // indirect
@@ -62,7 +61,6 @@ require (
 	github.com/templexxx/cpu v0.1.0 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	github.com/ybbus/jsonrpc v2.1.2+incompatible // indirect
 	github.com/ybbus/jsonrpc/v3 v3.1.4 // indirect
 	github.com/yuin/goldmark v1.5.5 // indirect
 	go.etcd.io/bbolt v1.3.8 // indirect
