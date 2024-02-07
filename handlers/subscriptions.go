@@ -28,7 +28,7 @@ func Subscriptions(session *discordgo.Session) {
 
 		switch result.(type) {
 		case float64: // Fix the case type assertion
-			log.Printf("User %s is subscribed", userID)
+			// log.Printf("User %s is subscribed", userID)
 
 			if hasRole(session, userID) {
 				if now > result.(float64) {
@@ -36,7 +36,8 @@ func Subscriptions(session *discordgo.Session) {
 					session.ChannelMessageSend(botChannelID, "Subscription Expired for <@"+userID+">")
 					log.Printf("User %s had a role, but their subscription has expired", userID)
 				} else {
-					log.Printf("User %s already has a role, and their subscription is still valid", userID)
+					// do nothing
+					// log.Printf("User %s already has a role, and their subscription is still valid", userID)
 				}
 			} else {
 				if now < result.(float64) {

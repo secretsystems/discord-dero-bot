@@ -77,7 +77,7 @@ func main() {
 		for {
 			handlers.Subscriptions(session)
 			// Sleep for 24 hours
-			time.Sleep(24 * time.Hour)
+			time.Sleep(1 * time.Minute)
 		}
 	}()
 
