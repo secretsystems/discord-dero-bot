@@ -1,5 +1,5 @@
 .env
-userMappings.json
+*.json
 env
 _work
 _home
