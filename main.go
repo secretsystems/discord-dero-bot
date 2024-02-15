@@ -45,7 +45,14 @@ func init() {
 		// Process the fetched and parsed transfer entries
 		log.Printf("Fetched and parsed %d transfer entries.\n", len(transferEntries))
 	}
-	dero.GetDeroWalletBalance()
+	_, err = dero.GetDeroWalletBalance(dero.DeroServerIP, "10106")
+	if err != nil {
+		log.Printf("Error fetching and parsing tips instance: %v", err)
+	}
+	_, err = dero.GetDeroWalletBalance(dero.DeroServerIP, "10104")
+	if err != nil {
+		log.Printf("Error fetching and parsing tips instance: %v", err)
+	}
 	monero.GetWalletBalance()
 
 }

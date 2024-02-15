@@ -15,7 +15,7 @@ type DeroBalanceResponse struct {
 	} `json:"result"`
 }
 
-func GetDeroWalletBalance() (uint64, error) {
+func GetDeroWalletBalance(DeroServerIP, deroWalletPort string) (uint64, error) {
 	data := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "1",
