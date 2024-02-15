@@ -144,7 +144,7 @@ func handleFdNo(session *discordgo.Session, interaction *discordgo.InteractionCr
 
 func handleTradeDeroXmrComponent(session *discordgo.Session, interaction *discordgo.InteractionCreate, appID string) {
 	moneroBal, _ := monero.GetWalletBalance()
-	deroBal, _ := dero.GetDeroWalletBalance()
+	deroBal, _ := dero.GetDeroWalletBalance(dero.DeroServerIP, "10104")
 
 	// Convert balances to the desired decimal precision
 	deroBalStr := strconv.FormatFloat(float64(deroBal)/100000, 'f', 5, 64)

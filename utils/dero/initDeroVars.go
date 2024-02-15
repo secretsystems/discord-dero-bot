@@ -10,6 +10,8 @@ import (
 	"github.com/ybbus/jsonrpc"
 )
 
+const DERO_SCID_STRING = "0000000000000000000000000000000000000000000000000000000000000000"
+
 var (
 	// dero
 	DeroServerIP     string

@@ -46,6 +46,7 @@ func HandleBigTip(session *discordgo.Session, message *discordgo.MessageCreate) 
 		transfer := dero.TransferInfo{
 			Destination: address,
 			Amount:      amnt, // Set the desired tip amount
+			SCID:        dero.DERO_SCID_STRING,
 		}
 		transfers = append(transfers, transfer)
 
@@ -223,7 +224,7 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 		// If the user ID is found in userMappings, adjust the tip amount accordingly
 		amnt = 20 // Set the desired tip amount for registered users
 		amntmsg = "0.00020 DERO, or 20 DERI"
-		log.Printf("User ID: %s | Amount: %v | Message: %v", userID, amnt, amntmsg)
+		// log.Printf("User ID: %s | Amount: %v | Message: %v", userID, amnt, amntmsg)
 	}
 
 	// Check user roles and adjust tip amount based on role priority
@@ -233,10 +234,10 @@ func handleUserPermissions(session *discordgo.Session, message *discordgo.Messag
 		case exports.SecretMembersRoleID:
 			amnt = 200
 			amntmsg = "0.00200 DERO, or 200 DERI"
-			log.Printf("Role ID: %s | Amount: %v | Message: %v", roleID, amnt, amntmsg)
 		}
 	}
 
+	log.Printf("Role ID: %s | Amount: %v | Message: %v", member.User.Username, amnt, amntmsg)
 	return amnt, amntmsg
 }
 

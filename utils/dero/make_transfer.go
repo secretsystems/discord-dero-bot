@@ -20,7 +20,6 @@ func MakeTransfer(address string, amnt int, comment string) (string, error) {
 	// Define payload data
 	addr := address
 
-	scid := "0000000000000000000000000000000000000000000000000000000000000000"
 	payloadData := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      "1",
@@ -29,7 +28,7 @@ func MakeTransfer(address string, amnt int, comment string) (string, error) {
 			"ringsize": 16,
 			"transfers": []map[string]interface{}{
 				{
-					"scid":        scid,
+					"scid":        DERO_SCID_STRING,
 					"destination": addr,
 					"amount":      amnt,
 					"payload": map[string]interface{}{

@@ -23,13 +23,14 @@ func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 		"params": map[string]interface{}{
 			"ringsize":  8,
 			"transfers": transfers,
+			"scid":      DERO_SCID_STRING,
 		},
 	}
 
 	// Marshal payload data to JSON
 	payloadJSON, err := json.Marshal(payloadData)
 	if err != nil {
-		return "", fmt.Errorf("Error marshaling JSON: %v", err)
+		return "", fmt.Errorf("error marshaling JSON: %v", err)
 	}
 
 	// Define HTTP client and request
@@ -38,7 +39,7 @@ func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadJSON))
 	if err != nil {
-		return "", fmt.Errorf("Error creating request: %v", err)
+		return "", fmt.Errorf("error creating request: %v", err)
 	}
 	req.SetBasicAuth(deroUser, deroPass)
 	req.Header.Set("Content-Type", "application/json")
@@ -46,14 +47,14 @@ func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 	// Send HTTP request
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("Error sending request: %v", err)
+		return "", fmt.Errorf("error sending request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	// Read and process response body
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("Error reading response body: %v", err)
+		return "", fmt.Errorf("error reading response body: %v", err)
 	}
 
 	// Print response body
@@ -63,7 +64,7 @@ func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 	var response map[string]interface{}
 	err = json.Unmarshal(responseBody, &response)
 	if err != nil {
-		return "", fmt.Errorf("Error decoding response JSON: %v", err)
+		return "", fmt.Errorf("error decoding response JSON: %v", err)
 	}
 
 	if responseError, ok := response["error"].(map[string]interface{}); ok {
@@ -74,5 +75,5 @@ func MakeBulkTransfer(transfers []TransferInfo) (string, error) {
 		return txID, nil
 	}
 
-	return "", fmt.Errorf("No transaction ID found in the response")
+	return "", fmt.Errorf("no transaction ID found in the response")
 }
